@@ -1,5 +1,7 @@
 # HiMiao（开源导出包）
 
+![HiMiao Platform Screenshot](2026-03-31%2021.44.15.png)
+
 本目录是从你 NAS 上的 `himiao` 备份裁剪导出的 **GitHub 可公开代码包**。
 
 ## 本次导出已排除（避免泄露/过大）
