@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>保司评级调试</title>
+  <style>
+    body { font-family: system-ui; padding: 20px; max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 18px; }
+    pre { background: #f1f5f9; padding: 12px; overflow-x: auto; font-size: 12px; }
+    .ok { color: #0d9488; }
+    .err { color: #dc2626; }
+    .row { margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>保司评级调试</h1>
+  <p>本页用于验证 API 是否返回保司评级数据。请用与访问产品列表<strong>相同的方式</strong>打开此页（同域名、同端口）。</p>
+  <div id="out"></div>
+  <script>
+    (async function() {
+      const base = window.API_BASE || '/api/v1';
+      const url = base + '/products?type=critical_illness&limit=3';
+      const out = document.getElementById('out');
+      out.innerHTML = '<p>请求: <code>' + url + '</code></p><p>加载中…</p>';
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        let html = '<div class="row"><strong>HTTP ' + res.status + '</strong>，返回 ' + items.length + ' 条产品</div>';
+        if (items.length === 0) {
+          html += '<p class="err">未获取到产品数据</p>';
+        } else {
+          items.forEach((p, i) => {
+            const m = p.meta || {};
+            const r = m.rating;
+            const has = r && r !== '—';
+            html += '<div class="row">';
+            html += '<strong>' + (m.company || '?') + ' ' + (m.name || '').slice(0, 20) + '</strong><br>';
+            html += 'rating=' + (r || '(空)') + ' · agency=' + (m.rating_agency || '(空)') + ' · ';
+            html += '<span class="' + (has ? 'ok' : 'err') + '">' + (has ? '✓ 有评级' : '✗ 无评级') + '</span>';
+            html += '</div>';
+          });
+        }
+        html += '<details><summary>原始 JSON（首条 meta）</summary><pre>' +
+          JSON.stringify(items[0]?.meta || {}, null, 2) + '</pre></details>';
+        out.innerHTML = html;
+      } catch (e) {
+        out.innerHTML += '<p class="err">请求失败: ' + e.message + '</p>';
+      }
+    })();
+  </script>
+</body>
+</html>

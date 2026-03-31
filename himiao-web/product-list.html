@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品审计库 | HiMiao Audit</title>
+<meta name="description" content="独立精算数据库：香港储蓄险、终身寿险、重疾险 IRR、回本期、分红实现率全比较。数据来源保司官方披露，A-Z 中立排序。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://himiao.com/product-list.html">
+<meta property="og:title" content="产品审计库 | HiMiao Audit">
+<meta property="og:description" content="香港保险产品独立精算数据库，IRR、回本期、分红实现率横向对比，A-Z 中立排序，不销售不导流。">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root {
+  --blue:   #00a9e0;
+  --blue-d: #0083af;
+  --blue-l: #e3f6fd;
+  --navy:   #0f1d2e;
+  --paper:  #fdfbf7;
+  --p2:     #f5f1e8;
+  --p3:     #ede8de;
+  --ink:    #1c1c1e;
+  --ink2:   #48484a;
+  --ink3:   #8e8e93;
+  --rule:   #ede8de;
+  --green:  #1a7a3c;
+  --red:    #c0392b;
+  --amber:  #b45309;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--paper); color: var(--ink); font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: "palt" 1; }
+
+/* ── SIDEBAR ── */
+.sidebar-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+  display: block;
+}
+.filter-btn {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--rule);
+  background: white;
+  cursor: pointer;
+  color: var(--ink2);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--blue);
+  background: var(--blue-l);
+  color: var(--blue-d);
+}
+/* ── Company chip (compact 2-col) ── */
+.co-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1.5px solid var(--rule);
+  background: white;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink2);
+  transition: all .15s;
+  flex: 1 1 calc(50% - 3px);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.co-chip:hover, .co-chip.active {
+  border-color: var(--blue);
+  background: var(--blue-l);
+  color: var(--blue-d);
+}
+.co-chip-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+input[type=range] { -webkit-appearance: none; background: transparent; width: calc(100% - 8px); margin-left: 4px; margin-right: 4px; cursor: pointer; display: block; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { height: 3px; background: var(--rule); border-radius: 2px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 15px; width: 15px; border-radius: 50%; background: var(--blue); margin-top: -6px; box-shadow: 0 0 0 2.5px white, 0 0 6px rgba(0,169,224,.4); }
+
+.sticky-sb { position: sticky; top: 160px; max-height: calc(100vh - 160px); overflow-y: auto; overflow-x: hidden; }
+.sticky-sb::-webkit-scrollbar { width: 3px; }
+.sticky-sb::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+/* ── PRODUCT CARD ── */
+.pcard {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow .22s, transform .22s, border-color .22s;
+  position: relative;
+}
+.pcard:hover {
+  box-shadow: 0 12px 40px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+  border-color: #d4eaf4;
+}
+.pcard.featured { border-color: #b3e0f5; }
+
+/* Logo strip — the hero brand area */
+.logo-strip {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.logo-hero {
+  height: 36px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+.logo-fallback {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -.2px;
+}
+
+/* Card body */
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0;
+  align-items: stretch;
+}
+@media(max-width:700px) {
+  .card-body { grid-template-columns: 1fr; }
+  .metrics-col, .cta-col { border-left: none !important; border-top: 1px solid var(--rule); }
+}
+
+.content-col { padding: 20px 24px; min-width: 0; overflow: hidden; }
+.metrics-col {
+  padding: 20px 22px;
+  border-left: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-shrink: 0;
+}
+.cta-col {
+  padding: 20px 20px;
+  border-left: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  flex-shrink: 0;
+  min-width: 0;
+  width: 150px;
+  max-width: 150px;
+}
+
+/* Score ring */
+.ring-wrap { position: relative; width: 54px; height: 54px; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+
+/* Tag — 标签自然显示，不强制截断，由容器overflow处理*/
+.tag { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; background: var(--p2); color: var(--ink2); display: inline-block; vertical-align: middle; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.tag.blue { background: var(--blue-l); color: var(--blue-d); }
+
+/* Badge */
+.rating-badge { font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 5px; }
+
+/* Featured ribbon */
+.featured-ribbon {
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--blue);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 4px 13px;
+  border-radius: 0 15px 0 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Review box */
+.review-box {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+/* Buttons */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  background: var(--blue);
+  color: white;
+  padding: 11px 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 9px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-primary:hover { background: var(--blue); }
+.btn-primary .btn-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  background: white;
+  border: 1.5px solid var(--rule);
+  color: var(--ink2);
+  padding: 9px 0;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue-d); }
+.btn-ghost input[type=checkbox] { accent-color: var(--blue); width: 13px; height: 13px; cursor: pointer; }
+
+/* 英文时蓝按钮与下面 Add 同字号，且不出现省略号 */
+html[lang="en"] .btn-primary,
+html[lang="en"] .btn-primary .btn-txt {
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+html[lang="en"] .btn-ghost { font-size: 9px; }
+
+/* Compare bar */
+#compare-bar { transition: transform .3s; }
+
+/* Mobile sidebar overlay */
+@media (max-width: 767px) {
+  #pl-sidebar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 290;
+    background: white;
+    width: 100% !important;
+    overflow-y: auto;
+    padding: 20px 20px 100px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  }
+  #pl-sidebar .sticky-sb {
+    position: static !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+</style>
+</head>
+
+    <!-- ══ V8.0 区域提示横幅 — 内地IP时显示 ══ -->
+    <div id="geo-warning-banner" style="display:none;background:#eff6ff;border-bottom:2px solid #3b82f6;
+         padding:10px 24px;font-size:12px;color:#1d4ed8;text-align:center;font-weight:600;line-height:1.8;">
+        <span data-i18n="about_region_banner">【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地提供推介、报告下载或业务引导服务。</span><br>
+        <span style="font-weight:400;color:#3b82f6;">This platform provides actuarial data for reference only and does not offer insurance solicitation services in Mainland China.</span>
+    </div>
+    <script>
+    // V8.0 前端 Geo 检测（Cloudflare CF-IPCountry 或 ip-api 兜底）
+    (function() {
+        // Phase 1: 通过公开 API 检测（NAS 阶段兜底）
+        // Phase 2: 改用 Cloudflare Worker 注入的 meta 标签或 cookie
+        try {
+            fetch('https://ip-api.com/json/?fields=countryCode', { cache: 'force-cache' })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.countryCode === 'CN') {
+                        document.getElementById('geo-warning-banner').style.display = 'block';
+                        // 隐藏所有下载和留资按钮
+                        document.querySelectorAll('.dl-btn, .subscribe-form, [data-geo-hide]')
+                                .forEach(el => el.style.display = 'none');
+                    }
+                }).catch(() => {}); // 静默失败，不影响主流程
+        } catch(e) {}
+    })();
+    </script>
+
+<body style="min-height:100vh;">
+<!-- ══ Geo 横幅 fixed 不影响文档流 ══ -->
+<div id="geo-mainland-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
+     background:#1d4ed8;color:white;font-size:12px;padding:10px 20px;text-align:center;line-height:1.6;">
+  <span data-i18n="about_region_banner">【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地开展任何保险推介、报告下载或业务引导服务。</span>
+</div>
+
+<!-- ══ Nav 注入点必须在 Tab 之前，Tab 的 top:96px 才能正确粘在 nav 下方 ══ -->
+<div id="himiao-nav" style="min-height:96px;"></div>
+
+<!-- ══ 险种 Tab 导航栏（静态 HTML）══ -->
+ <style>
+#type-tab-nav { 
+  background: white; 
+  border-bottom: 1px solid #ede8de; 
+  position: -webkit-sticky; /* 兼容 Safari */
+  position: sticky; 
+  top: 0; /* 默认贴紧浏览器最顶部 */
+  z-index: 200; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+}
+.pl-tab-inner { max-width:1280px; margin:0 auto; padding:0 24px; display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.pl-tab-inner::-webkit-scrollbar { display:none; }
+.pl-tab {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 24px; font-size:14px; font-weight:700;
+  text-decoration:none; white-space:nowrap;
+  color:#9ca3af; border-bottom:3px solid transparent;
+  transition:color .2s, border-color .2s; flex-shrink:0;
+}
+.pl-tab:hover { color:#6b7280; }
+</style>
+
+<nav id="type-tab-nav">
+  <div class="pl-tab-inner">
+    <a href="product-list.html?type=savings" id="tab-savings" class="pl-tab">
+      🏦 <span data-i18n="tab_savings">储蓄分红险</span>
+    </a>
+    <a href="product-list.html?type=whole_life" id="tab-wholelife" class="pl-tab">
+      🛡️ <span data-i18n="tab_wholelife">终身寿险</span>
+    </a>
+    <a href="product-list.html?type=critical_illness" id="tab-ci" class="pl-tab">
+      🫀 <span data-i18n="tab_ci">重疾险</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+/* ── 高级版 Sticky 智能高度匹配（彻底抛弃卡顿的 fixed spacer） ── */
+(function() {
+  function adjustStickyTop() {
+    var nav = document.getElementById('himiao-nav');
+    var tabNav = document.getElementById('type-tab-nav');
+    if (!tabNav) return;
+
+    // 智能侦测：如果顶部主导航条(Logo那栏)也是固定的，自动将Tab吸附在主导航正下方
+    var navH = nav ? nav.getBoundingClientRect().height : 0;
+    var navStyle = nav ? window.getComputedStyle(nav).position : 'static';
+    var firstChildStyle = (nav && nav.firstElementChild) ? window.getComputedStyle(nav.firstElementChild).position : 'static';
+
+    if (navStyle === 'fixed' || navStyle === 'sticky' || firstChildStyle === 'fixed' || firstChildStyle === 'sticky') {
+        tabNav.style.top = navH + 'px';
+    } else {
+        // 如果顶部主导航会随滚动条滚走，那这排 Tab 就直接吸附在屏幕边缘 0px 处
+        tabNav.style.top = '0px';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', adjustStickyTop);
+  window.addEventListener('load', adjustStickyTop);
+  window.addEventListener('resize', adjustStickyTop);
+  setTimeout(adjustStickyTop, 500); // 兜底执行
+})();
+</script>
+
+
+<script>
+(function() {
+  // ── 激活当前 Tab ──
+  var TYPE_COLORS = { savings:'#00a9e0', whole_life:'#8b5cf6', critical_illness:'#ef4444' };
+  var TAB_IDS = { savings:'tab-savings', whole_life:'tab-wholelife', critical_illness:'tab-ci' };
+  var type = new URLSearchParams(window.location.search).get('type') || 'savings';
+  var color = TYPE_COLORS[type] || '#00a9e0';
+  var el = document.getElementById(TAB_IDS[type] || 'tab-savings');
+  if (el) {
+    el.style.color = color;
+    el.style.borderBottomColor = color;
+  }
+
+  // ── Geo 检测 ──
+  fetch('https://ip-api.com/json/?fields=countryCode',{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.countryCode==='CN'){
+        var b=document.getElementById('geo-mainland-banner');
+        if(b){b.style.display='block'; document.body.style.paddingTop='46px';}
+        document.querySelectorAll('.dl-btn,[data-geo-hide]').forEach(function(e){e.style.display='none';});
+      }
+    }).catch(function(){});
+})();
+</script>
+
+
+<!-- BREADCRUMB -->
+<div style="border-bottom:1px solid var(--rule);background:white;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:38px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);">
+    <a href="index.html" style="color:var(--blue);text-decoration:none;font-weight:600;" data-i18n="nav_home">首页</a>
+    <span>›</span>
+    <span style="color:var(--ink2);font-weight:600;" data-i18n="nav_assets">资产避险</span>
+    <span>›</span>
+    <span id="pl-breadcrumb-type">储蓄分红险审计库</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;display:inline-block;"></span>
+      <span style="font-size:10.5px;font-weight:600;" id="data-update-date" data-i18n="loading_msg">数据更新中…</span>
+      <script>
+      (function(){
+        function upd() {
+          var T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+          var pref = T.filter_update || '数据更新';
+          var el = document.getElementById('data-update-date');
+          if (!el) return;
+          fetch('/api/v1/products?limit=1').then(function(r){return r.json();}).then(function(d){
+            var items = Array.isArray(d) ? d : (d.items||[]);
+            var p = items[0];
+            var ts = p && (p.updated_at || p.created_at);
+            if (ts) {
+              var dt = new Date(ts);
+              var y = dt.getFullYear(), m = String(dt.getMonth()+1).padStart(2,'0'), day = String(dt.getDate()).padStart(2,'0');
+              el.textContent = pref + ' ' + y + '-' + m + '-' + day;
+            } else {
+              el.textContent = pref + ' 2026';
+            }
+          }).catch(function(){
+            el.textContent = pref + ' 2026';
+          });
+        }
+        upd();
+        document.addEventListener('hm:langchange', upd);
+      })();
+      </script>
+    </div>
+  </div>
+</div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+<!-- Mobile filter toggle -->
+<div id="mobile-filter-btn" onclick="toggleMobileSidebar()" style="display:none;position:fixed;bottom:80px;right:18px;z-index:300;align-items:center;gap:6px;background:var(--blue);color:white;padding:10px 16px;border-radius:24px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,169,224,.4);letter-spacing:.04em;">
+  <svg id="mf-icon-filter" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+  <span id="mf-label" data-i18n="filter_btn_filter">筛选</span>
+</div>
+<script>
+function toggleMobileSidebar() {
+  var sb = document.getElementById('pl-sidebar');
+  var label = document.getElementById('mf-label');
+  var open = sb.style.display !== 'none' && sb.style.display !== '';
+  var T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  if (open) {
+    sb.style.display = 'none';
+    if (label) label.textContent = T.filter_btn_filter || '筛选';
+  } else {
+    sb.style.display = 'block';
+    if (label) label.textContent = T.filter_btn_close || '关闭';
+  }
+}
+</script>
+
+<!-- LAYOUT -->
+<div style="max-width:1280px;margin:0 auto;padding:28px 24px 64px;display:flex;gap:28px;align-items:flex-start;min-height:calc(100vh - 160px);">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside id="pl-sidebar" style="width:216px;flex-shrink:0;" data-mobile-hidden="true">
+    <div class="sticky-sb" style="display:flex;flex-direction:column;gap:20px;">
+
+      <div>
+        <span class="sidebar-label" data-i18n="filter_title">审计类目</span>
+        <div id="type-list">
+          <div class="type-item" onclick="location.href='product-list.html?type=savings'" style="cursor:pointer;padding:12px 16px;border-radius:10px;border:1.5px solid var(--rule);margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+            <input type="radio" name="cat" id="cat-savings">
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">🏦 <span data-i18n="tab_savings">储蓄分红险</span></span>
+            <span id="count-savings" style="margin-left:auto;font-size:11px;font-weight:700;background:var(--blue);color:white;padding:2px 8px;border-radius:4px;"></span>
+          </div>
+          <div class="type-item" onclick="location.href='product-list.html?type=whole_life'" style="cursor:pointer;padding:12px 16px;border-radius:10px;border:1.5px solid var(--rule);margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+            <input type="radio" name="cat" id="cat-whole_life">
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">🛡️ <span data-i18n="tab_wholelife">终身寿险</span></span>
+            <span id="count-whole_life" style="margin-left:auto;font-size:11px;font-weight:700;background:var(--blue);color:white;padding:2px 8px;border-radius:4px;"></span>
+          </div>
+          <div class="type-item" onclick="location.href='product-list.html?type=critical_illness'" style="cursor:pointer;padding:12px 16px;border-radius:10px;border:1.5px solid var(--rule);margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+            <input type="radio" name="cat" id="cat-critical_illness">
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">🫀 <span data-i18n="tab_ci">重疾险</span></span>
+            <span id="count-critical_illness" style="margin-left:auto;font-size:11px;font-weight:700;background:var(--blue);color:white;padding:2px 8px;border-radius:4px;"></span>
+          </div>
+        </div>
+        <script>
+        (function(){
+          var t = new URLSearchParams(window.location.search).get('type') || 'savings';
+          var el = document.getElementById('cat-'+t);
+          if(el){ el.checked = true; el.closest('.type-item').style.background='var(--blue-l)'; el.closest('.type-item').style.borderColor='var(--blue)'; }
+          ['savings','whole_life','critical_illness'].forEach(function(type){
+            fetch('/api/v1/products?type='+type+'&limit=200').then(function(r){return r.json();}).then(function(d){
+              var items = Array.isArray(d) ? d : (d.items||[]);
+              var el = document.getElementById('count-'+type);
+              if(el) el.textContent = d.total || items.length;
+            }).catch(function(){});
+          });
+        })();
+        </script>
+      </div>
+
+      <div style="border-top:1px solid var(--rule);padding-top:16px;">
+        <span class="sidebar-label" data-i18n="filter_co">发行保司</span>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;" id="co-filters">
+          <!-- 动态生成：由 buildInsurerFilter() 填充 -->
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--rule);padding-top:16px;">
+        <span class="sidebar-label" data-i18n="filter_currency">保单币种</span>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <button class="filter-btn" onclick="toggleFilter('currency','USD',this)">🇺🇸 USD</button>
+          <button class="filter-btn" onclick="toggleFilter('currency','HKD',this)">🇭🇰 HKD</button>
+          <button class="filter-btn" onclick="toggleFilter('currency','RMB',this)">🇨🇳 RMB</button>
+        </div>
+      </div>
+
+      <div id="bk-slider-section" style="border-top:1px solid var(--rule);padding-top:16px;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span class="sidebar-label" style="margin-bottom:0;" data-i18n="card_breakeven">回本期</span>
+          <span style="font-size:11.5px;font-weight:800;color:var(--blue);font-family:'JetBrains Mono';" id="breakevenLabel">≤ 15 年</span>
+        </div>
+        <input type="range" min="4" max="15" value="15" id="bkSlider" oninput="onBkSlider(this.value)" style="margin:4px 0;width:100%;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);font-family:'JetBrains Mono';"><span data-i18n="lbl_4yr">4年</span><span data-i18n="lbl_15yr">15年</span></div>
+      </div>
+
+      <div id="irr-slider-section" style="border-top:1px solid var(--rule);padding-top:16px;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span class="sidebar-label" style="margin-bottom:0;" data-i18n="card_irr_label">20年 IRR</span>
+          <span style="font-size:11.5px;font-weight:800;color:var(--blue);font-family:'JetBrains Mono';" id="irrLabel">≥ 0%</span>
+        </div>
+        <input type="range" min="0" max="7" step="0.5" value="0" id="irrSlider" oninput="onIrrSlider(this.value)" style="margin:4px 0;width:100%;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);font-family:'JetBrains Mono';"><span>0%</span><span>7%</span></div>
+      </div>
+
+      <div style="border-top:1px solid var(--rule);padding-top:16px;display:flex;flex-direction:column;gap:7px;">
+        <!-- 上市年份筛选（据保司公告，仅在有可靠来源时显示） -->
+        <span class="sidebar-label" data-i18n="filter_launch_year">上市年份</span>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:6px;">据保司公告</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="yearFilterBtns">
+          <button class="filter-btn active" onclick="filterYear(null,this)" data-i18n="cat_all">全部</button>
+          <button class="filter-btn" onclick="filterYear(2026,this)">2026</button>
+          <button class="filter-btn" onclick="filterYear(2025,this)">2025</button>
+          <button class="filter-btn" onclick="filterYear(2024,this)">2024</button>
+          <button class="filter-btn" onclick="filterYear(2023,this)">2023</button>
+          <button class="filter-btn" onclick="filterYear(2022,this)">2022</button>
+          <button class="filter-btn" onclick="filterYear(2021,this)">2021</button>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--rule);padding-top:16px;display:flex;flex-direction:column;gap:7px;">
+        <button onclick="clearFilters()" style="width:100%;padding:9px;font-size:12px;font-weight:700;color:var(--ink3);border:1.5px solid var(--rule);background:white;border-radius:8px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='#fca5a5';this.style.color='#dc2626'" onmouseout="this.style.borderColor='var(--rule)';this.style.color='var(--ink3)'"><span data-i18n="clear_all">✕  清除全部筛选</span></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main style="flex:1;min-width:0;">
+
+    <!-- Header -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--rule);gap:12px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:900;color:var(--ink);font-family:'Noto Serif SC',serif;margin-bottom:3px;" data-i18n="page_h1">全球资产审计库</h1>
+        <p style="font-size:12.5px;color:var(--ink3);" id="resultCount">显示 4 款 · 共 128 款产品</p>
+      </div>
+      <select id="sortSel" onchange="applySort()" data-i18n-sel="sortSel" style="background:white;border:1.5px solid var(--rule);font-size:12px;font-weight:700;color:var(--ink);padding:8px 14px;border-radius:9px;outline:none;cursor:pointer;font-family:'DM Sans';">
+        <option value="name_az" selected data-i18n="sort_name_az">产品名称（A→Z）</option>
+        <option value="score" data-i18n="sort_score">综合评分（高→低）</option>
+        <option value="irr" id="sort-opt-irr" data-i18n="sort_irr">20年 IRR（高→低）</option>
+        <option value="breakeven" id="sort-opt-bk" data-i18n="sort_breakeven">回本期（快→慢）</option>
+      </select>
+      <script>
+        (function(){
+          var t = new URLSearchParams(window.location.search).get('type') || 'savings';
+          var irrOpt = document.getElementById('sort-opt-irr');
+          var bkOpt  = document.getElementById('sort-opt-bk');
+          if (irrOpt) irrOpt.style.display = (t !== 'critical_illness') ? '' : 'none';
+          if (bkOpt)  bkOpt.style.display  = (t === 'savings') ? '' : 'none';
+        })();
+      </script>
+    </div>
+
+    <!-- Filter chips -->
+    <div id="activeChips" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;min-height:4px;"></div>
+
+    <!-- Product list -->
+    <div id="product-list" style="display:flex;flex-direction:column;gap:16px;"></div>
+
+    <!-- Empty -->
+    <div id="emptyState" style="display:none;padding:80px 20px;text-align:center;">
+      <div style="font-size:52px;margin-bottom:14px;">🔍</div>
+      <p style="font-size:15px;font-weight:700;color:var(--ink3);margin-bottom:10px;"><span data-i18n="empty_msg">没有找到匹配的产品</span></p>
+      <button onclick="clearFilters()" style="font-size:13px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;text-decoration:underline;"><span data-i18n="clear_filter">清除筛选条件</span></button>
+    </div>
+
+    <!-- Pagination (动态生成) -->
+    <div id="pagination"></div>
+  </main>
+</div>
+
+<!-- COMPARE BAR -->
+<div id="compare-bar" style="position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--rule);box-shadow:0 -4px 20px rgba(0,0,0,.08);transform:translateY(100%);z-index:40;">
+  <div style="max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:14px;font-weight:700;color:var(--ink);"><span data-i18n="lbl_selected_cmp">已选对比</span> (<span id="cmpCount">0</span>/3)</div>
+      <div id="cmpItems" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+    </div>
+    <button onclick="startCompare()" style="background:var(--blue);color:white;padding:10px 26px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:9px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#0092c9'" onmouseout="this.style.background='var(--blue)'"><span data-i18n="btn_compare_start">开始详细对比</span></button>
+  </div>
+</div>
+
+<footer-placeholder></footer-placeholder>
+<ai-capsule-placeholder></ai-capsule-placeholder>
+
+<script>
+/* ══ DATA ══ */
+const LOGO_URLS = {
+  AIA:        'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/AIA_Group_logo.svg/300px-AIA_Group_logo.svg.png',
+  Prudential: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/Prudential_plc_logo.svg/300px-Prudential_plc_logo.svg.png',
+  Manulife:   'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Manulife_logo.svg/300px-Manulife_logo.svg.png',
+  SunLife:    'https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/Sun_Life_Financial_logo.svg/300px-Sun_Life_Financial_logo.svg.png',
+  FWD:        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/FWD_Group_logo.svg/200px-FWD_Group_logo.svg.png',
+  AXA:        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/AXA_logo.svg/200px-AXA_logo.svg.png',
+};
+const CO_DISPLAY_NAMES = {
+  'AIA': '友邦 AIA', 'Prudential': '保诚 Prudential', '保诚保险': '保诚 Prudential',
+  'Manulife': '宏利 Manulife', 'YFLife': '万通 YF Life', 'SunLife': '永明 Sun Life',
+  'FWD': '富卫 FWD', 'ChinaLife': '中国人寿', 'CTFLife': '周大福 CTF Life',
+  'AXA': '安盛 AXA', 'TaipingLife': '太平 Taiping', 'BOCLife': '中银 BOC Life',
+  'GENERALI': '忠利 Generali', 'CPICLife': '太平洋 CPIC', 'Bupa': '保柏 Bupa',
+  'FTLife': '富通 FTLife',
+};
+const CO_DISPLAY_NAMES_EN = {
+  'AIA': 'AIA', 'Prudential': 'Prudential', '保诚保险': 'Prudential',
+  'Manulife': 'Manulife', 'YFLife': 'YF Life', 'SunLife': 'Sun Life',
+  'FWD': 'FWD', 'ChinaLife': 'China Life', 'CTFLife': 'CTF Life',
+  'AXA': 'AXA', 'TaipingLife': 'Taiping', 'BOCLife': 'BOC Life',
+  'GENERALI': 'Generali', 'CPICLife': 'CPIC', 'Bupa': 'Bupa',
+  'FTLife': 'FTLife',
+};
+const TAGS_I18N = {
+  '管理权益户口': { en: 'Managed Equity Account', hk: '管理權益戶口' },
+  '含人民币': { en: 'incl. RMB', hk: '含人民幣' },
+  '美元': { en: 'USD', hk: '美元' },
+  '美元计价': { en: 'USD', hk: '美元計價' },
+  '港元计价': { en: 'HKD', hk: '港元計價' },
+  '多币': { en: 'Multi-currency', hk: '多幣' },
+  '多币种': { en: 'Multi-Currency', hk: '多幣種' },
+  '储蓄险': { en: 'Savings', hk: '儲蓄險' },
+  '分红型': { en: 'Participating', hk: '分紅型' },
+  '英式分红': { en: 'British-style Div.', hk: '英式分紅' },
+  '美式分红': { en: 'American-style Div.', hk: '美式分紅' },
+  '人民币': { en: 'RMB', hk: '人民幣' },
+  '高收益': { en: 'High Yield', hk: '高收益' },
+  '稳健型': { en: 'Conservative', hk: '穩健型' },
+  '高透明度': { en: 'High Transparency', hk: '高透明度' },
+  '老牌资管': { en: 'Established Asset Mgmt', hk: '老牌資管' },
+  '回本最快': { en: 'Fastest Breakeven', hk: '回本最快' },
+  '短缴期': { en: 'Short Pay', hk: '短繳期' },
+  '分红锁定功能': { en: 'Dividend Lock-in', hk: '分紅鎖定功能' },
+  '9种货币切换': { en: '9 Currency Switching', hk: '9種貨幣切換' },
+  '无限次更换受保人': { en: 'Unlimited Insured Changes', hk: '無限次更換受保人' },
+  '开枝散叶分拆': { en: 'Policy Split (Legacy)', hk: '開枝散葉分拆' },
+  '开枝散叶分拆选项': { en: 'Policy Split Option', hk: '開枝散葉分拆選項' },
+  '多货币计价转换': { en: 'Multi-Currency Conversion', hk: '多貨幣計價轉換' },
+  '非保证部分波动最小': { en: 'Lowest Non-Guaranteed Volatility', hk: '非保證部分波動最小' },
+  '条款透明度业内第一': { en: 'Industry-Leading Transparency', hk: '條款透明度業內第一' },
+  '第2年可锁定红利': { en: 'Dividend Lock from Year 2', hk: '第2年可鎖定紅利' },
+  '保证现价占比最高': { en: 'Highest Guaranteed Cash Value Ratio', hk: '保證現價佔比最高' },
+  '保单贷款90%现价': { en: 'Policy Loan 90% Cash Value', hk: '保單貸款90%現價' },
+  '红利管理权益户口': { en: 'Bonus Equity Account', hk: '紅利管理權益戶口' },
+  '杰出表现奖': { en: 'Outstanding Performance Award', hk: '傑出表現獎' },
+  '年金权益12种选择': { en: '12 Annuity Benefit Options', hk: '年金權益12種選擇' },
+  '初生婴儿奖HKD20000': { en: 'Newborn Grant HKD20000', hk: '初生嬰兒獎HKD20000' },
+  '付款人保费豁免': { en: 'Payer Premium Waiver', hk: '付款人保費豁免' },
+  '10种货币最多': { en: 'Up to 10 Currencies', hk: '10種貨幣最多' },
+  '24小时全球客服支援': { en: '24/7 Global Support', hk: '24小時全球客服支援' },
+  '10种货币': { en: '10 Currencies', hk: '10種貨幣' },
+  '8种货币': { en: '8 Currencies', hk: '8種貨幣' },
+  '9种货币': { en: '9 Currencies', hk: '9種貨幣' },
+  '9种货币含纽元': { en: '9 Currencies incl. NZD', hk: '9種貨幣含紐元' },
+  '105%身故保证': { en: '105% Death Benefit', hk: '105%身故保證' },
+  '主货币户口+环球货币户口': { en: 'Primary + Global Currency', hk: '主貨幣戶口+環球貨幣戶口' },
+  '9种货币无保费假期': { en: '9 Currencies, Premium Holiday', hk: '9種貨幣無保費假期' },
+  '无保费假期': { en: 'Premium Holiday', hk: '無保費假期' },
+  '无忧选': { en: 'Worry-Free Option', hk: '無憂選' },
+  '无忧选定期入息': { en: 'Worry-Free Regular Income', hk: '無憂選定期入息' },
+  '传意选': { en: 'Legacy Option', hk: '傳意選' },
+  '传承版': { en: 'Legacy Version', hk: '傳承版' },
+  '保单承继人+暂托': { en: 'Policy Successor + Custodian', hk: '保單承繼人+暫託' },
+  '保单暂托人选项': { en: 'Policy Custodian Option', hk: '保單暫託人選項' },
+  '保证现金价值占比最高': { en: 'Highest Guaranteed Cash Ratio', hk: '保證現金價值佔比最高' },
+  '3年缴清最短缴期': { en: '3-yr Shortest Pay', hk: '3年繳清最短繳期' },
+  '保费假期最长2年': { en: 'Premium Holiday up to 2yr', hk: '保費假期最長2年' },
+  '升级版IRR': { en: 'Upgraded IRR', hk: '升級版IRR' },
+  '双重货币户口(第5年起)': { en: 'Dual Currency (from Yr5)', hk: '雙重貨幣戶口(第5年起)' },
+  '双重货币户口(第10年起)': { en: 'Dual Currency (from Yr10)', hk: '雙重貨幣戶口(第10年起)' },
+  '多元货币9种': { en: '9 Currencies', hk: '多元貨幣9種' },
+  '卓越成绩奖': { en: 'Excellence Award', hk: '卓越成績獎' },
+  '学术优异奖': { en: 'Academic Merit Award', hk: '學術優異獎' },
+  '延缴保费惠益': { en: 'Premium Holiday Benefit', hk: '延繳保費惠益' },
+  '延缴保费惠益(7种情形)': { en: 'Premium Holiday (7 Cases)', hk: '延繳保費惠益(7種情形)' },
+  '开枝散叶分拆': { en: 'Policy Split (Legacy)', hk: '開枝散葉分拆' },
+  '意外身故赔偿(首5年)': { en: 'Accidental Death (1st 5yr)', hk: '意外身故賠償(首5年)' },
+  '投保人意外身故保障': { en: 'Holder Accidental Death', hk: '投保人意外身故保障' },
+  '身心守护预支保障': { en: 'Pre-advance Care Benefit', hk: '身心守護預支保障' },
+  '财富管理服务': { en: 'Wealth Mgmt Service', hk: '財富管理服務' },
+  '安抚无忧服务': { en: 'Peace-of-Mind Service', hk: '安撫無憂服務' },
+  '终期红利锁定(第5年起每年最多10%)': { en: 'Terminal Bonus Lock (Yr5, max10%)', hk: '終期紅利鎖定(第5年起每年最多10%)' },
+  '终期红利锁定(第10年起)': { en: 'Terminal Bonus Lock (Yr10)', hk: '終期紅利鎖定(第10年起)' },
+  '红利解锁选项': { en: 'Bonus Unlock Option', hk: '紅利解鎖選項' },
+  '保证可支取现金(第5-30年年3.88%基本金额)': { en: 'Guaranteed Withdrawal (Yr5-30)', hk: '保證可支取現金(第5-30年年3.88%基本金額)' },
+  '第6个保单月起可更改受保人': { en: 'Change Insured from Month 6', hk: '第6個保單月起可更改受保人' },
+  '第5年退保值高': { en: 'High Surrender at Yr5', hk: '第5年退保值高' },
+  '仅USD单币种': { en: 'USD Only', hk: '僅USD單幣種' },
+  '仅2种货币': { en: '2 Currencies Only', hk: '僅2種貨幣' },
+  '仅3种货币': { en: '3 Currencies Only', hk: '僅3種貨幣' },
+  '港元为主币': { en: 'HKD Primary', hk: '港元為主幣' },
+  '20年IRR最高': { en: 'Top 20yr IRR', hk: '20年IRR最高' },
+};
+function tagLabel(t) {
+  if (t == null) return '';
+  var lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+  var key = lang === 'hk' ? 'hk' : lang === 'en' ? 'en' : 'zh';
+  if (typeof t === 'object') {
+    var v = t[key] || t.en || t.zh || t.hk;
+    return (v != null && typeof v === 'string') ? v : (t.zh || t.en || t.hk || '');
+  }
+  var m = TAGS_I18N[t];
+  return (m && m[lang]) ? m[lang] : (typeof t === 'string' ? t : '');
+}
+function insurerDisplayName(co, lang) {
+  var fullName = CO_DISPLAY_NAMES[co] || co;
+  if (lang === 'en') return CO_DISPLAY_NAMES_EN[co] || co;
+  return fullName.split(' ')[0];
+}
+function buildInsurerFilter() {
+  const coFilters = document.getElementById('co-filters');
+  if (!coFilters) return;
+  const lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+  const typeProds = productsDB.filter(p => p.product_type === F.type);
+  const companies = [...new Set(typeProds.map(p => p.company).filter(Boolean))].sort();
+  if (!companies.length) { coFilters.innerHTML = ''; return; }
+  coFilters.innerHTML = companies.map(co => {
+    const shortName = insurerDisplayName(co, lang);
+    const fullName = CO_DISPLAY_NAMES[co] || co;
+    const dotColor  = BRAND_COLORS[co] || '#8e8e93';
+    const isActive  = F.company.has(co) ? 'active' : '';
+    return `<button class="co-chip ${isActive}" onclick="toggleFilter('company','${co}',this)" title="${fullName}">
+      <span class="co-chip-dot" style="background:${dotColor};"></span>
+      <span>${shortName}</span>
+    </button>`;
+  }).join('');
+}
+const BRAND_COLORS = {
+  AIA: '#c8102e', Prudential: '#e4002b', '保诚保险': '#e4002b', Manulife: '#006341',
+  YFLife: '#1a5276', SunLife: '#f5a623', FWD: '#e8402a', AXA: '#00008f',
+  ChinaLife: '#c0392b', CTFLife: '#8b6914', TaipingLife: '#16a085',
+  BOCLife: '#2e4482', GENERALI: '#d4191a', CPICLife: '#005bac', Bupa: '#00a3e0',
+  FTLife: '#003087',
+};
+
+let productsDB = []; // 从 API 动态加载，不再硬编码
+
+/* ── 从API加载产品数据 ── */
+async function loadProductsFromAPI(type) {
+  try {
+    var lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+    var params = type ? `type=${encodeURIComponent(type)}&limit=200` : 'limit=200';
+    if (lang) params += '&lang=' + encodeURIComponent(lang);
+    const res = await fetch('/api/v1/products?' + params);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // API返回的数据已经是扁平格式，直接用
+    const raw = Array.isArray(data) ? data : (data.items || []);
+    // 把API嵌套结构铺平，匹配前端渲染字段
+    productsDB = raw.map(p => ({
+      ...p,
+      name:                    p.meta?.name        || '',
+      name_en:                 p.meta?.name_en     || '',
+      company:                 p.meta?.company     || '',
+      company_full:            p.meta?.company_full|| '',
+      currency:                p.meta?.currency    || 'USD',
+      irr_20y:                 p.actuarial?.irr_20y            ?? null,
+      breakeven_year:          p.actuarial?.breakeven_year     ?? null,
+      breakeven:               p.actuarial?.breakeven_year     ?? null,
+      dividend_fulfillment_5y: p.actuarial?.dividend_fulfillment_5y ?? null,
+      loan_ltv:                p.actuarial?.loan_ltv           ?? null,
+      max_early_exit_loss_pct: p.actuarial?.max_early_exit_loss_pct ?? null,
+      premium_years:           p.actuarial?.premium_years      ?? null,
+      premium_annual:          p.actuarial?.premium_annual     ?? null,
+      annual_limit_hkd:        p.actuarial?.annual_limit_hkd  ?? null,
+      deductible_min:          p.actuarial?.deductible_min     ?? null,
+      covered_conditions_count: p.actuarial?.covered_conditions_count ?? null,
+      multi_pay:               p.actuarial?.multi_pay          ?? null,
+      irr_10y:                 p.specifications?.irr_10y       ?? null,
+      non_guaranteed_ratio:    p.specifications?.non_guaranteed_ratio ?? null,
+      launch_year:             p.launch_year ?? p.specifications?.launch_year ?? null,
+      is_available:            p.is_available ?? null,
+      content_zh:              p.content_zh || null,
+      content_en:             p.content_en || null,
+    }));
+    buildInsurerFilter();
+    renderProducts();
+  } catch(e) {
+    console.error('[HiMiao] 产品加载失败:', e);
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('emptyState').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#94a3b8">⚠ 产品加载失败，请刷新重试</div>';
+  }
+}
+
+/* ══ STATE ══ */
+// Initialize type from URL param (default to 'savings')
+const _urlType = new URLSearchParams(window.location.search).get('type') || 'savings';
+const F = { company: new Set(), currency: new Set(), breakeven: 15, irr: 0, type: _urlType, launch_year: null }; window._PL_FILTERS = F;
+// V8.0 铁律：默认排序 A-Z（无利益导向）
+let sortBy = 'name_az', selectedProducts = new Set();
+
+function toggleFilter(type, val, btn) {
+  const s = F[type];
+  s.has(val) ? (s.delete(val), btn.classList.remove('active')) : (s.add(val), btn.classList.add('active'));
+  renderProducts(); renderChips();
+}
+function onBkSlider(v) { F.breakeven = +v; const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {}; document.getElementById('breakevenLabel').textContent = '≤ ' + v + ' ' + T.val_year; renderProducts(); }
+function onIrrSlider(v) { F.irr = +v; document.getElementById('irrLabel').textContent = '≥ ' + v + '%'; renderProducts(); }
+function filterYear(year, btn) {
+  F.launch_year = year;
+  document.querySelectorAll('#yearFilterBtns .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentPage = 1;
+  renderProducts(); renderChips();
+}
+function clearFilters() {
+  F.company.clear(); F.currency.clear(); F.breakeven = 15; F.irr = 0; F.launch_year = null;
+  document.getElementById('bkSlider').value = 15;
+  document.getElementById('irrSlider').value = 0;
+  const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  document.getElementById('breakevenLabel').textContent = '≤ 15 ' + (T.val_year||'年');
+  document.getElementById('irrLabel').textContent = '≥ 0%';
+  document.querySelectorAll('.filter-btn.active, .co-chip.active').forEach(b => b.classList.remove('active'));
+  // 年份全部按钮设为active
+  const allYearBtn = document.querySelector('#yearFilterBtns .filter-btn');
+  if (allYearBtn) allYearBtn.classList.add('active');
+  currentPage = 1;
+  renderProducts(); renderChips();
+}
+function getFiltered() {
+  const isCI = F.type === 'critical_illness';
+  return productsDB.filter(p =>
+    p.product_type === F.type &&
+    (F.company.size === 0 || F.company.has(p.company)) &&
+    (F.currency.size === 0 || F.currency.has(p.currency)) &&
+    (isCI || p.breakeven == null || p.breakeven <= F.breakeven) &&
+    (isCI || p.irr_20y == null || p.irr_20y >= F.irr) &&
+    (F.launch_year == null || p.launch_year === F.launch_year)
+  );
+}
+function _updateSidebarForType(type) {
+  var showSliders = type !== 'critical_illness';
+  var bkSec = document.getElementById('bk-slider-section');
+  var irrSec = document.getElementById('irr-slider-section');
+  if (bkSec)  bkSec.style.display  = showSliders ? '' : 'none';
+  if (irrSec) irrSec.style.display = showSliders ? '' : 'none';
+}
+function applySort() { sortBy = document.getElementById('sortSel').value; renderProducts(); }
+
+function renderChips() {
+  const chips = [...F.company, ...F.currency];
+  const el = document.getElementById('activeChips');
+  el.innerHTML = chips.length
+    ? '<span style="font-size:12px;color:var(--ink3);align-self:center;margin-right:2px;">已筛选：</span>' +
+      chips.map(c => `<span style="font-size:11px;font-weight:700;padding:4px 11px;background:var(--blue-l);color:var(--blue-d);border-radius:6px;display:inline-flex;align-items:center;gap:6px;">${c}<button onclick="removeChip('${c}')" style="background:none;border:none;cursor:pointer;color:var(--blue-d);font-size:14px;line-height:1;padding:0;">×</button></span>`).join('')
+    : '';
+}
+function removeChip(v) {
+  F.company.delete(v); F.currency.delete(v);
+  document.querySelectorAll('.filter-btn, .co-chip').forEach(b => { if (b.textContent.trim().includes(v)) b.classList.remove('active'); });
+  renderProducts(); renderChips();
+}
+
+/* ══ HELPERS ══ */
+function scoreColor(s) { return s >= 80 ? '#16a34a' : s >= 70 ? '#d97706' : '#dc2626'; }
+function irrColor(v)   { return v >= 6  ? '#15803d' : v >= 5  ? '#0083af' : '#b45309'; }
+
+function scoreRing(score) {
+  const r = 22, c = 2 * Math.PI * r;
+  const off = c - (score / 100) * c;
+  const col = scoreColor(score);
+  return `<div class="ring-wrap"><svg width="54" height="54" viewBox="0 0 54 54">
+    <circle cx="27" cy="27" r="${r}" fill="none" stroke="#f3f4f6" stroke-width="5.5"/>
+    <circle cx="27" cy="27" r="${r}" fill="none" stroke="${col}" stroke-width="5.5"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/>
+  </svg>
+  <div class="ring-center">
+    <span style="font-size:15px;font-weight:900;color:${col};">${score}</span>
+    <span style="font-size:8px;color:var(--ink3);">/100</span>
+  </div></div>`;
+}
+
+const RATING_STYLE = {
+  'AA+': { bg: '#dcfce7', tx: '#15803d' },
+  'AA-': { bg: '#dcfce7', tx: '#15803d' },
+  'A+':  { bg: '#dbeafe', tx: '#1d4ed8' },
+  'A':   { bg: '#fef9c3', tx: '#92400e' },
+};
+
+function logoStripHTML(p, T) {
+  T = T || (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  const src = LOGO_URLS[p.company];
+  const bColor = BRAND_COLORS[p.company] || '#4a4a4a';
+  const logoImg = src
+    ? `<img class="logo-hero" src="${src}" alt="${p.company}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const fallback = `<div class="logo-fallback" style="color:${bColor};display:${src ? 'none' : 'flex'};">${p.company}</div>`;
+
+  return `<div class="logo-strip">
+    <div style="display:flex;align-items:center;gap:16px;">
+      ${logoImg}${fallback}
+      <div style="height:28px;width:1px;background:var(--rule);"></div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink2);">${p.company_full}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:1px;">${p.name_en || ''}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+      ${p.rating ? (() => { const rs = RATING_STYLE[p.rating] || {bg:'#f3f4f6',tx:'#6b7280'}; return `<span class="rating-badge" style="background:${rs.bg};color:${rs.tx};">⬡ ${p.rating}</span>`; })() : ''}
+      <span class="tag blue">${p.currency}</span>
+      <span style="font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace;">${T.card_pay_prefix} ${p.premium_years} ${T.val_year}</span>
+    </div>
+  </div>`;
+}
+
+/* ══ PAGINATION ══ */
+let currentPage = 1;
+const PAGE_SIZE = 5;
+
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  let html = '<div style="display:flex;justify-content:center;gap:8px;margin-top:32px;flex-wrap:wrap;">';
+  const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  if (currentPage > 1) {
+    html += `<button class="filter-btn" onclick="goPage(${currentPage-1})">${T.prev_page || '← 上一页'}</button>`;
+  }
+  for (let i = 1; i <= totalPages; i++) {
+    const active = i === currentPage ? 'active' : '';
+    html += `<button class="filter-btn ${active}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (currentPage < totalPages) {
+    html += `<button class="filter-btn" onclick="goPage(${currentPage+1})">${T.next_page || '下一页 →'}</button>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function goPage(n) {
+  currentPage = n;
+  renderProducts();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+/* ══ RENDER ══ */
+function renderProducts() {
+  const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  const allFiltered = getFiltered().sort((a, b) =>
+    sortBy === 'score'     ? (b.score||0) - (a.score||0) :
+    sortBy === 'irr'       ? (b.irr_20y||0) - (a.irr_20y||0) :
+    sortBy === 'breakeven' ? (a.breakeven||99) - (b.breakeven||99) :
+    (a.name||'').localeCompare((b.name||''), 'zh-Hans-CN')
+  );
+
+  const con = document.getElementById('product-list');
+  const em  = document.getElementById('emptyState');
+  const resultEl = document.getElementById('resultCount');
+  if (resultEl) resultEl.textContent = T.result_count
+    ? T.result_count.replace('{n}', allFiltered.length)
+    : `${allFiltered.length}`;
+
+  if (!allFiltered.length) { con.innerHTML = ''; em.style.display = 'block'; renderPagination(0); return; }
+  em.style.display = 'none';
+
+  // 分页切片
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const list  = allFiltered.slice(start, start + PAGE_SIZE);
+
+  con.innerHTML = list.map((p) => {
+    const tags   = (p.tags || []).map(t => { var lbl = tagLabel(t); return `<span class="tag" title="${lbl}">${lbl}</span>`; }).join('');
+    const ribbon = p.highlight ? `<div class="featured-ribbon">${T.card_ribbon||'精选'}</div>` : '';
+    const bkVal  = p.breakeven != null ? p.breakeven : '—';
+    const irrVal = p.irr_20y  != null ? p.irr_20y  : '—';
+    const irrC   = p.irr_20y  != null ? irrColor(p.irr_20y) : 'var(--ink3)';
+    const _type = p.product_type || F.type;
+    const metric1Label = _type==='critical_illness' ? (T.metric_covered||'保障病种') : _type==='whole_life' ? (T.metric_prem_years||'缴费年期') : (T.card_breakeven||'回本年');
+    const metric1Val   = _type==='critical_illness' ? (p.covered_conditions_count != null ? p.covered_conditions_count+'种' : '—') :
+                         _type==='whole_life' ? (p.premium_years != null ? p.premium_years+(T.val_year||'年') : '—') :
+                         (bkVal !== '—' ? bkVal : '—');
+    const metric1Unit  = _type==='savings' && bkVal!=='—' ? (T.val_year||'年') : '';
+    const metric2Label = _type==='critical_illness' ? (T.metric_multi_pay||'多重赔付') : _type==='whole_life' ? (T.metric_annual_prem||'年缴保费') : (T.card_irr_label||'20Y IRR');
+    const metric2Val   = _type==='critical_illness' ? (p.multi_pay ? '✓' : p.multi_pay===false ? '✗' : '—') :
+                         _type==='whole_life' ? (p.premium_annual != null ? '$'+Number(p.premium_annual).toLocaleString() : '—') :
+                         (irrVal !== '—' ? irrVal+'%' : '—');
+    const metric2Color = _type==='critical_illness' ? 'var(--ink)' : irrC;
+    const launchBadge = p.launch_year ? `<span class="tag" style="background:#f3f4f6;color:var(--ink3);">${p.launch_year}${T.val_year||'年'}</span>` : '';
+    const availBadge  = p.is_available === false
+      ? `<span class="tag" style="background:#fee2e2;color:#b91c1c;">${T.tag_discontinued||'已停售'}</span>`
+      : p.is_available === true
+      ? `<span class="tag" style="background:#dcfce7;color:#15803d;">${T.tag_onsale||'在售'}</span>`
+      : '';
+
+    return `<div class="pcard ${p.highlight ? 'featured' : ''}">
+  ${ribbon}
+  ${logoStripHTML(p, T)}
+  <div class="card-body">
+    <div class="content-col">
+      <h2 style="font-size:20px;font-weight:900;color:var(--ink);font-family:'Noto Serif SC',serif;line-height:1.25;margin-bottom:8px;">${(window.HM_LANG==='en'&&p.name_en)?p.name_en:(window.HM_LANG==='hk'&&p.name_tw)?p.name_tw:p.name||'—'}</h2>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;align-items:center;min-width:0;">${tags}${availBadge}</div>
+      <div class="review-box">
+        <span style="font-weight:800;color:var(--blue);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">${T.card_review_label||'精算备注'} / Audit Review</span>
+        <div style="margin-top:5px;font-size:13px;line-height:1.65;color:var(--ink2);">${(((window.HM_I18N&&window.HM_I18N.lang())||window.HM_LANG||'cn')==='en'&&p.content_en) ? p.content_en : (p.content_zh || `<span style="color:var(--ink3);font-style:italic;">${T.no_data||'暂无精算备注'}</span>`)}</div>
+      </div>
+    </div>
+    <div class="metrics-col">
+      <div style="display:flex;flex-direction:column;gap:12px;text-align:center;">
+        ${p.launch_year ? `<div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:#f3f4f6;color:var(--ink3);width:fit-content;margin:0 auto;">${p.launch_year}${T.val_year||'年'}</div>` : ''}
+        <div>
+          <div style="font-size:9.5px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-family:'JetBrains Mono'">${metric1Label}</div>
+          <div style="font-size:${_type==='critical_illness'?'20':'24'}px;font-weight:900;color:var(--ink);font-family:'JetBrains Mono',monospace;line-height:1;">${metric1Val}<span style="font-size:12px;font-weight:500;color:var(--ink3);">${metric1Unit}</span></div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-family:'JetBrains Mono'">${metric2Label}</div>
+          <div style="font-size:24px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1;color:${metric2Color}">${metric2Val}</div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-col">
+      <a href="product-detail.html?id=${p.id}" class="btn-primary"><span class="btn-txt">${(T.card_view||'查看详情').replace(/</g,'&lt;')}</span></a>
+      <button id="cmpbtn-${p.id}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" onclick="toggleCmp('${p.id}','${(p.name||'').replace(/'/g,"\\'")}')" class="btn-ghost">${T.card_compare||'加入对比'}</button>
+    </div>
+  </div>
+</div>`;
+  }).join('');
+
+  renderPagination(allFiltered.length);
+}
+
+/* ══ COMPARE ══ */
+// selectedProductsMap: Map<id, {id, name, name_en, name_tw}> — 支持按语言显示产品名
+const selectedProductsMap = new Map();
+
+function productDisplayName(p) {
+  var lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+  if (lang === 'en' && (p.name_en || '').trim()) return p.name_en.trim();
+  if (lang === 'hk' && (p.name_tw || '').trim()) return p.name_tw.trim();
+  return p.name || '';
+}
+
+function toggleCmp(id, name) {
+  if (selectedProductsMap.has(id)) {
+    selectedProductsMap.delete(id);
+    const cb = document.getElementById('cb-' + id);
+    if (cb) cb.checked = false;
+    updateCmpBtn(id, false);
+  } else {
+    if (selectedProductsMap.size >= 3) {
+      showToast((window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn'])?.toast_max || '最多同时对比 3 款产品');
+      return;
+    }
+    var p = (typeof productsDB !== 'undefined' && productsDB.find) ? productsDB.find(x => x.id === id) : null;
+    selectedProductsMap.set(id, { id, name: p ? p.name : name, name_en: p ? p.name_en : '', name_tw: p ? p.name_tw : '' });
+    const cb = document.getElementById('cb-' + id);
+    if (cb) cb.checked = true;
+    updateCmpBtn(id, true);
+  }
+  refreshCmpBar();
+}
+
+function updateCmpBtn(id, added) {
+  const btn = document.getElementById('cmpbtn-' + id);
+  if (!btn) return;
+  const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {};
+  if (added) {
+    btn.style.borderColor = 'var(--blue)';
+    btn.style.color = 'var(--blue-d)';
+    btn.style.background = 'var(--blue-l)';
+    btn.innerHTML = `<span style="color:#16a34a;">✓</span> ${T.card_added} <span onclick="event.stopPropagation();toggleCmp('${id}','${btn.dataset.name}')" style="margin-left:4px;cursor:pointer;color:var(--ink3);font-size:14px;line-height:1;">×</span>`;
+  } else {
+    btn.style.borderColor = 'var(--rule)';
+    btn.style.color = 'var(--ink2)';
+    btn.style.background = 'white';
+    btn.innerHTML = T.card_compare;
+  }
+}
+
+function refreshCmpBar() {
+  const bar = document.getElementById('compare-bar');
+  const count = selectedProductsMap.size;
+  document.getElementById('cmpCount').textContent = count;
+  document.getElementById('cmpItems').innerHTML = [...selectedProductsMap.values()].map(p => {
+    var displayName = productDisplayName(p) || p.name;
+    var safeName = (p.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `<div style="display:flex;align-items:center;gap:6px;background:var(--blue-l);border:1px solid rgba(0,169,224,.3);padding:5px 10px;border-radius:6px;">
+      <span style="font-size:12px;font-weight:700;color:var(--blue-d);">${(displayName || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+      <button onclick="toggleCmp('${p.id}','${safeName}')" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:15px;line-height:1;padding:0;margin-left:2px;">×</button>
+    </div>`;
+  }).join('');
+  bar.style.transform = count > 0 ? 'translateY(0)' : 'translateY(100%)';
+}
+
+function startCompare() {
+  const ids = [...selectedProductsMap.keys()];
+  if (ids.length < 2) { const T = (window.HM_DICT && window.HM_DICT[window.HM_LANG || 'cn']) || {}; showToast(T.toast_min_select || '请至少选择 2 款产品进行对比'); return; }
+  window.location.href = `compare.html?ids=${ids.join(',')}`;
+}
+
+function showToast(msg) {
+  let t = document.getElementById('pl-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'pl-toast';
+    t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:white;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+/* ══ RESPONSIVE ══ */
+function checkSidebar() {
+  const sb = document.getElementById('pl-sidebar');
+  if (!sb) return;
+  const isMobile = window.innerWidth < 768;
+  if (!isMobile) {
+    sb.style.display = 'block';
+    sb.style.position = '';
+  }
+  // On mobile: keep current visibility state, don't force hide (toggle handles it)
+  const toggleBtn = document.getElementById('mobile-filter-btn');
+  if (toggleBtn) toggleBtn.style.display = isMobile ? 'flex' : 'none';
+}
+window.addEventListener('resize', checkSidebar);
+
+document.addEventListener('DOMContentLoaded', function () {
+  checkSidebar();
+  const urlType = new URLSearchParams(window.location.search).get('type') || 'savings';
+  _updateSidebarForType(urlType);
+  loadProductsFromAPI(urlType);
+});
+</script>
+
+<!-- i18n dict removed: now in components/lang.js -->
+
+  <script src="components/lang.js"></script>
+  <script src="components/i18n-engine.js"></script>
+  <script src="components/nav.js"></script>
+<!-- langchange listener removed: handled by i18n-engine.js -->
+<script>
+/* Re-render JS components when language changes */
+document.addEventListener('hm:langchange', function(e) {
+  var lang = e.detail.lang;
+  window.PL_LANG = lang; /* backward compat for any old references */
+  window.HM_LANG = lang; /* i18n-engine sets this, ensure sync */
+  if (typeof buildInsurerFilter === 'function') buildInsurerFilter();
+  if (typeof renderProducts === 'function') renderProducts();
+  if (typeof refreshCmpBar === 'function') refreshCmpBar();
+  if (typeof updateCmpBtn === 'function') {
+    /* Update all compare buttons */
+    document.querySelectorAll('[id^="cmpbtn-"]').forEach(function(btn) {
+      var id = btn.id.replace('cmpbtn-', '');
+      var added = typeof selectedProductsMap !== 'undefined' && selectedProductsMap.has(id);
+      updateCmpBtn(id, added);
+    });
+  }
+  /* Update slider labels */
+  var T = (window.HM_DICT && window.HM_DICT[lang]) || {};
+  var bkEl = document.getElementById('breakevenLabel');
+  var F = window._PL_FILTERS;
+  if (bkEl && F) bkEl.textContent = '\u2264 ' + F.breakeven + ' ' + (T.val_year || '年');
+  /* Update page title/h1 and breadcrumb */
+  var typeConf = window._PL_TYPECONF || (function(){
+    var t = window.HIMIAO_CURRENT_TYPE || 'savings';
+    var cfg = window.HIMIAO_TYPE_CONFIG || {};
+    return cfg[t] || { label:'储蓄分红险', labelHk:'儲蓄分紅險', labelEn:'Savings', icon:'🏦' };
+  })();
+  if (typeConf) {
+    var lbl = lang==='en' ? typeConf.labelEn : lang==='hk' ? typeConf.labelHk : typeConf.label;
+    var sfx = lang==='en' ? ' Audit Library' : lang==='hk' ? '審計庫' : '审计库';
+    document.title = typeConf.icon + ' ' + lbl + sfx + ' | HiMiao Audit';
+    var h1 = document.querySelector('[data-i18n="page_h1"]');
+    if (h1) h1.textContent = typeConf.icon + ' ' + lbl + sfx;
+    var bc = document.getElementById('pl-breadcrumb-type');
+    if (bc) bc.textContent = lbl + sfx;
+  }
+});
+</script>
+
+    <script>
+    // ══════════════════════════════════════════════════════
+    // URL 参数驱动险种过滤
+    // product-list.html?type=savings|whole_life|critical_illness
+    // ══════════════════════════════════════════════════════
+    (function() {
+        const TYPE_CONFIG = {
+            savings:          { label: '储蓄分红险', labelHk: '儲蓄分紅險', labelEn: 'Savings',         icon: '🏦', color: '#00a9e0' },
+            whole_life:       { label: '终身寿险',   labelHk: '終身壽險',   labelEn: 'Whole Life',       icon: '🛡️', color: '#8b5cf6' },
+            critical_illness: { label: '重疾险',     labelHk: '重疾險',     labelEn: 'Critical Illness', icon: '🫀', color: '#ef4444' },
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentType = urlParams.get('type') || 'savings';
+        const typeConf = TYPE_CONFIG[currentType] || TYPE_CONFIG.savings;
+
+        // 1. 更新页面标题和副标题
+        document.addEventListener('DOMContentLoaded', function() {
+            const _lang = localStorage.getItem('himiao-lang') || 'cn';
+            const _lbl = _lang === 'en' ? typeConf.labelEn : _lang === 'hk' ? typeConf.labelHk : typeConf.label;
+            const _sfx = _lang === 'en' ? ' Audit Library' : _lang === 'hk' ? '審計庫' : '审计库';
+            // 更新 <title>
+            document.title = `${typeConf.icon} ${_lbl}${_sfx} | HiMiao Audit`;
+
+            // 更新 h1 若存在
+            const h1 = document.querySelector('[data-i18n="page_h1"]');
+            if (h1) h1.textContent = `${typeConf.icon} ${_lbl}${_sfx}`;
+            const bc = document.getElementById('pl-breadcrumb-type');
+            if (bc) bc.textContent = `${_lbl}${_sfx}`;
+
+                // 3. 拦截 API 调用，注入 type 参数
+            // 如果页面已有 HiMiaoAPI，在它加载后拦截 getProducts
+            if (window.HiMiaoAPI) {
+                _applyTypeFilter(currentType);
+            } else {
+                // 降级：拦截 fetch
+                const originalFetch = window.fetch;
+                window.fetch = function(url, options) {
+                    if (typeof url === 'string' && url.includes('data/products.json') && currentType !== 'savings') {
+                        // 静态 JSON 时代：无法过滤，显示提示
+                        console.warn('[HiMiao] 静态 JSON 模式下类型过滤需升级至 API 模式');
+                    }
+                    if (typeof url === 'string' && url.includes('/api/v1/products') && !url.includes('type=')) {
+                        url = url + (url.includes('?') ? '&' : '?') + `type=${currentType}`;
+                    }
+                    return originalFetch.call(this, url, options);
+                };
+            }
+        });
+
+        function _applyTypeFilter(type) {
+            // 切换险种时重新从API加载
+            if (typeof loadProductsFromAPI === 'function') {
+                F.type = type;
+                loadProductsFromAPI(type);
+            }
+        }
+
+        // 4. 暴露给全局，让页面现有代码可以调用
+        window.HIMIAO_CURRENT_TYPE = currentType;
+        window.HIMIAO_TYPE_CONFIG  = TYPE_CONFIG;
+    })();
+    </script>
+
+
+
+</body>
+</html>

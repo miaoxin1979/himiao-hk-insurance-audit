@@ -1,0 +1,2297 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>产品对比 | HiMiao Audit · 独立香港保险精算审计</title>
+
+  <meta name="description" content="横向对比香港储蓄险、重疾险、年金等产品的 IRR、回本期、分红实现率等核心精算指标。数据源自保司官方披露，独立客观，不销售不导流。">
+
+  <meta name="robots" content="index, follow">
+
+  <link rel="canonical" href="https://himiao.com/compare.html">
+
+  <meta property="og:title" content="产品对比 | HiMiao Audit">
+
+  <meta property="og:description" content="独立精算数据横向对比香港保险产品，不销售、不导流、不提供个人建议。">
+
+  <meta property="og:type" content="website">
+
+  <link
+
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+
+
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <style>
+
+    :root {
+
+      --blue: #0ea5e9;
+
+      --blue-d: #0284c7;
+
+      --blue-l: #f0f9ff;
+
+      --navy: #0f172a;
+
+      --paper: #f8fafc;
+
+      --p2: #f1f5f9;
+
+      --ink: #0f172a;
+
+      --ink2: #475569;
+
+      --ink3: #64748b;
+
+      --rule: #e2e8f0;
+
+      --accent: #0ea5e9;
+
+      --accent-muted: #bae6fd;
+
+      --red: #dc2626;
+
+      --red-l: #fee2e2;
+
+      --amber: #d97706;
+
+      --success: #0d9488;
+
+    }
+
+
+
+    *,
+
+    *::before,
+
+    *::after {
+
+      box-sizing: border-box;
+
+      margin: 0;
+
+      padding: 0;
+
+    }
+
+
+
+    body {
+
+      background: var(--paper);
+
+      color: var(--ink);
+
+      font-family: 'DM Sans', sans-serif;
+      font-feature-settings: "palt" 1; /* CJK标点位置修正 */
+
+      -webkit-font-smoothing: antialiased;
+
+      min-height: 100vh;
+
+      display: flex;
+
+      flex-direction: column;
+
+    }
+
+
+
+    /* ── COMPARE TABLE ── */
+
+    .cmp-table {
+
+      width: 100%;
+
+      border-collapse: separate;
+
+      border-spacing: 0;
+
+      table-layout: fixed;
+
+    }
+
+
+
+    /* Column widths: enforced by <colgroup> injected in JS; these are fallback defaults */
+
+    .col-label {
+
+      width: 200px;
+
+    }
+
+
+
+    /* .col-product has no default rules; width is dynamically assigned */
+
+
+
+    /* Sticky header — top offset accounts for nav(64px) + breadcrumb(38px) + page-header(~72px) */
+
+    .cmp-header-row th { position: relative; background: white; z-index: 10; border-bottom: 2px solid var(--rule); }
+
+
+
+    /* when the header has scrolled past the top of the viewport we add a class
+
+  that applies a non‑zero top offset.  the offset is stored in a CSS variable
+
+  so it can be updated dynamically without pushing the header down when it is
+
+  still in the normal flow (which is what was causing the blank gap above the
+
+  table and blocking the “缴费期” row). */
+
+    .cmp-header-row.stuck th {
+
+      top: var(--sticky-top, 0px);
+
+    }
+
+
+
+    /* Logo cell: overflow hidden so content never stretches column */
+
+    .logo-cell {
+
+      padding: 20px 16px 16px;
+
+      text-align: center;
+
+      vertical-align: bottom;
+
+      overflow: hidden;
+
+    }
+
+
+
+    .logo-cell img {
+
+      max-width: 100px;
+
+      max-height: 32px;
+
+      object-fit: contain;
+
+      display: block;
+
+      margin: 0 auto 6px;
+
+    }
+
+
+
+    .logo-name-fb {
+
+      font-size: 13px;
+
+      font-weight: 900;
+
+      color: var(--ink);
+
+      margin-bottom: 6px;
+
+    }
+
+
+
+    .product-name-cell {
+
+      font-size: 16px;
+
+      font-weight: 900;
+
+      font-family: 'Noto Serif SC', serif;
+
+      color: var(--ink);
+
+      line-height: 1.2;
+
+      margin-bottom: 4px;
+
+    }
+
+
+
+    .company-name-cell {
+
+      font-size: 11px;
+
+      color: var(--ink3);
+
+      font-weight: 500;
+
+    }
+
+
+
+    /* Remove button */
+
+    .remove-btn {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      margin-top: 10px;
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      color: var(--ink3);
+
+      background: none;
+
+      border: 1.5px solid var(--rule);
+
+      padding: 4px 10px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      transition: all .15s;
+
+    }
+
+
+
+    .remove-btn:hover {
+
+      border-color: var(--red);
+
+      color: var(--red);
+
+    }
+
+
+
+    /* Add product button */
+
+    .add-product-cell {
+
+      padding: 20px 16px;
+
+      text-align: center;
+
+      vertical-align: middle;
+
+    }
+
+
+
+    .add-btn {
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 20px 16px;
+
+      border: 2px dashed var(--rule);
+
+      border-radius: 12px;
+
+      background: white;
+
+      cursor: pointer;
+
+      transition: all .2s;
+
+      width: 100%;
+
+      color: var(--ink3);
+
+    }
+
+
+
+    .add-btn:hover {
+
+      border-color: var(--blue);
+
+      color: var(--blue);
+
+    }
+
+
+
+    .add-btn svg {
+
+      transition: transform .2s;
+
+    }
+
+
+
+    .add-btn:hover svg {
+
+
+      transform: scale(1.1);
+
+    }
+
+
+
+    /* Section row */
+
+    .section-row td {
+
+      background: var(--p2);
+
+      padding: 8px 16px;
+
+      font-size: 10.5px;
+
+      font-weight: 800;
+
+      letter-spacing: .12em;
+
+      text-transform: uppercase;
+
+      color: var(--ink3);
+
+      font-family: 'JetBrains Mono', monospace;
+
+      border-top: 1px solid var(--rule);
+
+    }
+
+
+
+    .section-row td:first-child {
+
+      border-radius: 0;
+
+    }
+
+
+
+    /* Data rows */
+
+    .data-row td {
+
+      padding: 14px 16px;
+
+      border-bottom: 1px solid var(--rule);
+
+      font-size: 14px;
+
+      vertical-align: middle;
+
+    }
+
+
+
+    .data-row:hover td {
+
+      background: rgba(15, 23, 42, .02);
+
+    }
+
+
+
+    .label-col {
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      color: var(--ink2);
+
+      background: var(--p2);
+
+    }
+
+
+
+    .label-sub {
+
+      font-size: 11px;
+
+      color: var(--ink3);
+
+      margin-top: 2px;
+
+      font-weight: 400;
+
+    }
+
+
+
+    /* Value cells */
+
+    .val-num {
+
+      font-size: 22px;
+
+      font-weight: 900;
+
+      font-family: 'JetBrains Mono', monospace;
+
+      line-height: 1;
+
+    }
+
+
+
+    .val-unit {
+
+      font-size: 12px;
+
+      font-weight: 500;
+
+      color: var(--ink3);
+
+      margin-left: 2px;
+
+    }
+
+
+
+    .val-text {
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      color: var(--ink);
+
+    }
+
+
+
+    .val-empty {
+
+      font-size: 13px;
+
+      color: var(--ink3);
+
+    }
+
+
+
+    /* Win badge */
+
+    .win-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      font-size: 10px;
+
+      font-weight: 800;
+
+      background: var(--accent-muted);
+
+      color: var(--success);
+
+      padding: 2px 8px;
+
+      border-radius: 4px;
+
+      margin-left: 6px;
+
+    }
+
+
+
+    .val-cell.winner .val-num {
+
+      color: var(--success);
+
+    }
+
+
+
+    .val-cell.loser .val-num {
+
+      color: var(--ink3);
+
+    }
+
+
+
+    /* Rating badge */
+
+    .rating {
+
+      display: inline-block;
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      padding: 3px 10px;
+
+      border-radius: 5px;
+
+    }
+
+
+
+    /* Tag — compare页内展示完整，不截断 */
+
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--p2);
+      color: var(--ink2);
+      display: inline-block;
+      margin: 2px;
+      vertical-align: middle;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+
+
+    /* Score ring */
+
+    .ring-wrap {
+
+      position: relative;
+
+      width: 52px;
+
+      height: 52px;
+
+      display: inline-block;
+
+    }
+
+
+
+    .ring-wrap svg {
+
+      transform: rotate(-90deg);
+
+    }
+
+
+
+    .ring-center {
+
+      position: absolute;
+
+      inset: 0;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      line-height: 1.1;
+
+    }
+
+
+
+    /* Review section */
+
+    .review-cell {
+
+      font-size: 13px;
+
+      color: var(--ink2);
+
+      line-height: 1.6;
+
+      padding: 16px 12px;
+
+      background: white;
+
+      overflow: visible !important;
+
+      height: auto !important;
+
+    }
+
+
+
+    .review-cell p {
+
+      margin: 0;
+
+      white-space: normal;
+
+      word-break: break-word;
+
+    }
+
+
+
+    /* All table cells must be contained */
+
+    .cmp-table td { overflow: hidden; word-break: break-all; overflow-wrap: break-word; white-space: normal; }
+
+
+
+    .cmp-table th { overflow: hidden; word-break: break-word; white-space: normal; }
+
+
+
+    /* review行不截断 */
+
+    .cmp-table td.review-cell {
+
+      overflow: visible !important;
+
+      word-break: break-word;
+
+    }
+
+
+
+    .cmp-table td a {
+
+      /* anchors inside table cells should respect the column width */
+
+      display: block;
+
+      width: 100%;
+
+      box-sizing: border-box;
+
+      white-space: normal;
+
+      word-break: break-all;
+
+    }
+
+
+
+    /* Compact action buttons used in the table footer: keep them readable but
+
+   prevent them from forcing cell expansion. */
+
+    .cmp-table .action-btn {
+
+      display: block;
+
+      width: calc(100% - 24px);
+
+      margin: 0 auto;
+
+      box-sizing: border-box;
+
+      padding: 8px 12px !important;
+
+      font-size: 12px !important;
+
+      line-height: 1.1 !important;
+
+      max-width: 320px;
+
+      white-space: normal !important;
+
+      word-break: break-word !important;
+
+    }
+
+
+
+    /* Limit cell content width to avoid overflow; colgroup still provides base
+
+   width but this prevents long contents or padding from expanding columns. */
+
+    .cmp-table td {
+
+      box-sizing: border-box;
+
+      max-width: 360px;
+
+    }
+
+
+
+    /* Slightly tighten the third product column's review cell so long text
+
+   doesn't push the column width. For a 3-product layout the third product
+
+   cell is the 4th td in each row (first td is label column). */
+
+    /* review-cell: 所有列都允许内容完整显示，不截断 */
+
+    .cmp-table tr td.review-cell {
+
+      overflow: visible !important;
+
+      height: auto !important;
+
+      vertical-align: top;
+
+      padding: 16px 12px;
+
+    }
+
+
+
+    .cmp-table tr td.review-cell:nth-child(4) { overflow: visible !important; word-break: break-all; }
+
+
+
+    .cmp-table tr td.review-cell p { margin: 0; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-break: anywhere; display: block; padding-right: 14px; text-align: left; }
+
+
+
+    /* CTA section */
+
+    .cta-section {
+
+      background: white;
+
+      border-top: 2px solid var(--rule);
+
+      padding: 24px;
+
+      text-align: center;
+
+    }
+
+
+
+    /* Modal */
+
+    .modal-bg {
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(0, 0, 0, .45);
+
+      z-index: 800;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      backdrop-filter: blur(4px);
+
+    }
+
+
+
+    .modal {
+
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 0;
+
+      width: 480px;
+
+      max-width: calc(100vw - 32px);
+
+      max-height: 80vh;
+
+      overflow: hidden;
+
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .2);
+
+    }
+
+
+
+    .modal-head {
+
+      padding: 20px 24px;
+
+      border-bottom: 1px solid var(--rule);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+    }
+
+
+
+    .modal-body {
+
+      padding: 16px 24px;
+
+      overflow-y: auto;
+
+      max-height: calc(80vh - 120px);
+
+    }
+
+
+
+    .product-option {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+      padding: 12px 16px;
+
+      border: 1.5px solid var(--rule);
+
+      border-radius: 10px;
+
+      cursor: pointer;
+
+      transition: all .15s;
+
+      margin-bottom: 8px;
+
+    }
+
+
+
+    .product-option:hover {
+
+      border-color: var(--blue);
+
+      background: var(--blue-l);
+
+    }
+
+
+
+    .product-option.disabled {
+
+      opacity: .35;
+
+      cursor: not-allowed;
+
+      background: var(--p2);
+
+    }
+
+
+
+    .product-option img {
+
+      max-width: 60px;
+
+      max-height: 22px;
+
+      object-fit: contain;
+
+    }
+
+
+
+    .product-option .pname {
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      color: var(--ink);
+
+    }
+
+
+
+    .product-option .pco {
+
+      font-size: 11px;
+
+      color: var(--ink3);
+
+    }
+
+
+
+    /* Toast */
+
+    #cmp-toast {
+
+      position: fixed;
+
+      top: 80px;
+
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      background: #1c1c1e;
+
+      color: white;
+
+      padding: 12px 24px;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      z-index: 999;
+
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .2);
+
+      opacity: 0;
+
+      transition: opacity .3s;
+
+      pointer-events: none;
+
+    }
+
+  </style>
+
+</head>
+
+
+
+<body>
+
+
+
+  <div id="himiao-nav"></div>
+
+
+
+  <!-- BREADCRUMB -->
+
+  <div style="border-bottom:1px solid var(--rule);background:white;">
+
+    <div
+
+      style="max-width:1200px;margin:0 auto;padding:0 24px;height:38px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);">
+
+      <a href="index.html" style="color:var(--blue);text-decoration:none;font-weight:600;"
+
+        data-i18n="breadcrumb_home">首页</a>
+
+      <span>›</span>
+
+      <a href="product-list.html" style="color:var(--blue);text-decoration:none;font-weight:600;"
+
+        data-i18n="breadcrumb_products">产品库</a>
+
+      <span>›</span>
+
+      <span style="color:var(--ink2);font-weight:600;" data-i18n="breadcrumb_current">产品对比</span>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- PAGE HEADER -->
+
+  <div style="background:white;border-bottom:1px solid var(--rule);padding:20px 24px;">
+
+    <div
+
+      style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+
+      <div>
+
+        <h1 style="font-size:22px;font-weight:900;font-family:'Noto Serif SC',serif;color:var(--ink);margin-bottom:3px;"
+
+          data-i18n="h1">产品对比</h1>
+
+        <p style="font-size:13px;color:var(--ink3);" data-i18n="h1_sub">选择 2–3 款产品进行横向对比，绿色标记为该项数值较高</p>
+
+      </div>
+
+      <div style="display:flex;gap:8px;">
+
+        <button onclick="clearAll()"
+
+          style="padding:9px 18px;font-size:12px;font-weight:700;color:var(--ink3);background:white;border:1.5px solid var(--rule);border-radius:8px;cursor:pointer;transition:all .15s;"
+
+          onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+
+          onmouseout="this.style.borderColor='var(--rule)';this.style.color='var(--ink3)'"
+
+          data-i18n="btn_clear">清除对比</button>
+
+        <a href="product-list.html"
+
+          style="padding:9px 18px;font-size:12px;font-weight:700;color:white;background:var(--ink);border-radius:8px;text-decoration:none;transition:background .15s;"
+
+          onmouseover="this.style.background='var(--blue)'" onmouseout="this.style.background='var(--ink)'"
+
+          data-i18n="btn_back">← 返回产品库</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+  <!-- MAIN -->
+
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px 24px;flex:1;overflow-x:auto;min-width:0;">
+
+    <div id="compare-empty" style="display:none;text-align:center;padding:80px 20px;">
+
+      <div style="font-size:52px;margin-bottom:14px;">📊</div>
+
+      <p style="font-size:16px;font-weight:700;color:var(--ink3);margin-bottom:10px;" data-i18n="empty_msg">请至少选择 2
+
+        款产品进行对比</p>
+
+      <a href="product-list.html"
+
+        style="font-size:14px;font-weight:700;color:var(--blue);text-decoration:none;border:1.5px solid var(--blue);padding:9px 20px;border-radius:8px;display:inline-block;"
+
+        data-i18n="empty_btn">前往产品库选择</a>
+
+    </div>
+
+
+
+    <div id="compare-content">
+
+      <table class="cmp-table" id="cmpTable">
+
+        <thead>
+
+          <tr class="cmp-header-row" id="headerRow">
+
+            <!-- Injected by JS -->
+
+          </tr>
+
+        </thead>
+
+        <tbody id="cmpBody">
+
+          <!-- Injected by JS -->
+
+        </tbody>
+
+      </table>
+
+
+
+      <!-- CTA -->
+
+      <div class="cta-section" id="ctaRow" style="display:none;border-radius:12px;margin-top:8px;">
+
+        <p style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;" data-i18n="cta_h">需要查看更多产品数据？</p>
+
+        <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;" data-i18n="cta_sub">前往产品库浏览完整精算数据，所有数据来自保司官方披露文件
+
+        </p>
+
+        <a href="product-list.html"
+
+          style="display:inline-block;background:var(--blue);color:white;padding:12px 28px;border-radius:9px;font-size:14px;font-weight:700;text-decoration:none;margin-right:10px;"
+
+          data-i18n="cta_browse">浏览产品库</a>
+
+        <a href="about.html"
+
+          style="display:inline-block;background:white;border:1.5px solid var(--rule);color:var(--ink2);padding:12px 28px;border-radius:9px;font-size:14px;font-weight:700;text-decoration:none;"
+
+          data-i18n="cta_method">了解方法论</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ADD PRODUCT MODAL -->
+
+  <div id="modal-bg" class="modal-bg" style="display:none;" onclick="if(event.target===this)closeModal()">
+
+    <div class="modal">
+
+      <div class="modal-head">
+
+        <div style="font-size:16px;font-weight:800;color:var(--ink);" data-i18n="modal_title">添加对比产品</div>
+
+        <button onclick="closeModal()"
+
+          style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--ink3);line-height:1;">×</button>
+
+      </div>
+
+      <div class="modal-body" id="modalProductList">
+
+        <!-- Injected by JS -->
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div id="cmp-toast"></div>
+
+
+
+  <footer-placeholder></footer-placeholder>
+
+  <ai-capsule-placeholder></ai-capsule-placeholder>
+
+
+
+  <script src="components/lang.js"></script>
+
+  <script src="components/i18n-engine.js"></script>
+
+  <script src="components/nav.js"></script>
+
+  <script>
+
+    /* ══ I18N HELPERS ══ */
+
+    const TAG_I18N = {
+
+      '储蓄险': { 'hk': '儲蓄險', 'en': 'Savings' },
+
+      '分红型': { 'hk': '分紅型', 'en': 'Dividend' },
+
+      '美元': { 'hk': '美元', 'en': 'USD' },
+
+      '英式分红': { 'hk': '英式分紅', 'en': 'British-style Div.' },
+
+      '高收益': { 'hk': '高收益', 'en': 'High Yield' },
+
+      '多币种': { 'hk': '多幣種', 'en': 'Multi-Currency' },
+
+      '稳健型': { 'hk': '穩健型', 'en': 'Conservative' },
+
+      '高透明度': { 'hk': '高透明度', 'en': 'High Transparency' },
+
+      '老牌资管': { 'hk': '老牌資管', 'en': 'Established Asset Mgmt' },
+
+      '回本最快': { 'hk': '回本最快', 'en': 'Fastest Breakeven' },
+
+      '港元计价': { 'hk': '港元計價', 'en': 'HKD' },
+
+      '短缴期': { 'hk': '短繳期', 'en': 'Short Pay' },
+
+    };
+
+    const FEATURE_I18N = {
+
+      '分红锁定功能': { 'hk': '分紅鎖定功能', 'en': 'Dividend Lock-in' },
+
+      '9种货币切换': { 'hk': '9種貨幣切換', 'en': '9 Currency Switching' },
+
+      '无限次更换受保人': { 'hk': '無限次更換受保人', 'en': 'Unlimited Insured Changes' },
+
+      '开枝散叶分拆': { 'hk': '開枝散葉分拆', 'en': 'Policy Split (Legacy)' },
+
+      '非保证部分波动最小': { 'hk': '非保證部分波動最小', 'en': 'Lowest Non-Guaranteed Volatility' },
+
+      '条款透明度业内第一': { 'hk': '條款透明度業內第一', 'en': 'Industry-Leading Transparency' },
+
+      '第2年可锁定红利': { 'hk': '第2年可鎖定紅利', 'en': 'Dividend Lock from Year 2' },
+
+      '保证现价占比最高': { 'hk': '保證現價佔比最高', 'en': 'Highest Guaranteed Cash Value Ratio' },
+
+    };
+
+    function tagLabel(t, lang) {
+      if (t == null) return '';
+      if (typeof t === 'object' && (t.zh || t.en || t.hk)) {
+        const k = lang === 'en' ? 'en' : lang === 'hk' ? 'hk' : 'zh';
+        return (t[k] || t.zh || t.en || t.hk) || '';
+      }
+      const s = String(t);
+      if (lang === 'cn') return s;
+      const m = TAG_I18N[s];
+      return (m && m[lang]) || s;
+    }
+    function featureLabel(f, lang) {
+      if (f == null) return '';
+      if (typeof f === 'object' && (f.zh || f.en || f.hk)) {
+        const k = lang === 'en' ? 'en' : lang === 'hk' ? 'hk' : 'zh';
+        return (f[k] || f.zh || f.en || f.hk) || '';
+      }
+      const s = String(f);
+      if (lang === 'cn') return s;
+      const m = FEATURE_I18N[s];
+      return (m && m[lang]) || s;
+    }
+
+    function reviewText(p, lang) {
+      var T = (window.HM_DICT && window.HM_DICT[lang] && window.HM_DICT[lang].no_data) ? window.HM_DICT[lang].no_data : '暂无精算备注';
+      if (lang === 'en' && p.review_en) return p.review_en; if (lang === 'hk' && p.review_hk) return p.review_hk;
+      return p.review || '<span style="color:var(--ink3);font-size:12px;">'+T+'</span>';
+    }
+
+
+
+    /* ══ DATA ══ */
+
+    const LOGO_URLS = {
+      AIA:        'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/AIA_Group_logo.svg/300px-AIA_Group_logo.svg.png',
+      Prudential: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/Prudential_plc_logo.svg/300px-Prudential_plc_logo.svg.png',
+      Manulife:   'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Manulife_logo.svg/300px-Manulife_logo.svg.png',
+      SunLife:    'https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/Sun_Life_Financial_logo.svg/300px-Sun_Life_Financial_logo.svg.png',
+      FWD:        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/FWD_Group_logo.svg/200px-FWD_Group_logo.svg.png',
+      AXA:        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/AXA_logo.svg/200px-AXA_logo.svg.png',
+    };
+
+    const RATING_STYLE = {
+
+      'AA+': { bg: '#ccfbf1', tx: '#0d9488' }, 'AA-': { bg: '#ccfbf1', tx: '#0d9488' },
+
+      'A+': { bg: '#dbeafe', tx: '#1d4ed8' }, 'A': { bg: '#fef9c3', tx: '#92400e' },
+
+    };
+
+
+
+    // 从API动态加载，不再硬编码
+    let ALL_PRODUCTS = [];
+
+    function calcScoreForCompare(p) {
+      var type = p.product_type || 'savings';
+      var m = p.meta || {};
+      var a = p.actuarial || {};
+      var rating = m.rating || 'AA+';
+      var creditScore = rating === 'AAA' ? 10 : rating.indexOf('AA+') !== -1 ? 9.0 : rating.indexOf('AA') !== -1 ? 8.2 : rating.indexOf('A+') !== -1 ? 7.2 : 6.5;
+      var transparencyScore = 7.0;
+      var dims, total;
+      if (type === 'savings') {
+        var irr = a.irr_20y || 0, be = a.breakeven_year || 15, dv = a.dividend_fulfillment_5y || 90, ltv = a.loan_ltv || 80, los = a.max_early_exit_loss_pct || 22;
+        var returnScore = irr >= 5.5 ? 9.0 : irr >= 5.2 ? 8.2 : irr >= 5.0 ? 7.5 : irr >= 4.7 ? 6.5 : irr >= 4.5 ? 6.0 : irr >= 4.0 ? 5.0 : 4.0;
+        var liquidScore = (los <= 15 && be <= 7) ? 7.5 : (los <= 18 && be <= 8) ? 6.0 : (los <= 20 && be <= 10) ? 4.5 : (los <= 22) ? 3.5 : 2.5;
+        var dividendScore = dv >= 103 ? 9.5 : dv >= 100 ? 8.5 : dv >= 97 ? 7.5 : dv >= 95 ? 7.0 : dv >= 92 ? 6.0 : dv >= 90 ? 5.5 : 4.5;
+        var exitScore = ltv >= 90 ? 8.5 : ltv >= 88 ? 7.5 : ltv >= 85 ? 6.5 : ltv >= 80 ? 5.5 : 4.0;
+        dims = [{ score: liquidScore, w: 0.20 }, { score: returnScore, w: 0.30 }, { score: creditScore, w: 0.20 }, { score: transparencyScore, w: 0.10 }, { score: dividendScore, w: 0.15 }, { score: exitScore, w: 0.05 }];
+      } else if (type === 'whole_life') {
+        var irr = a.irr_20y || 0, be = a.breakeven_year || 13, ltv = a.loan_ltv || 76;
+        var returnScore = irr >= 5.0 ? 9.0 : irr >= 4.7 ? 8.0 : irr >= 4.5 ? 7.0 : irr >= 4.2 ? 6.0 : irr >= 4.0 ? 5.0 : 4.0;
+        var liquidScore = be <= 11 ? 7.0 : be <= 12 ? 6.0 : be <= 13 ? 5.0 : 4.0;
+        var exitScore = ltv >= 80 ? 7.5 : ltv >= 78 ? 6.5 : ltv >= 75 ? 5.5 : 4.5;
+        dims = [{ score: liquidScore, w: 0.20 }, { score: returnScore, w: 0.30 }, { score: creditScore, w: 0.20 }, { score: transparencyScore, w: 0.10 }, { score: 8.0, w: 0.12 }, { score: exitScore, w: 0.08 }];
+      } else {
+        var cnt = a.covered_conditions_count || 100, multiPay = a.multi_pay;
+        var coverageScore = cnt >= 190 ? 9.5 : cnt >= 150 ? 8.5 : cnt >= 120 ? 7.5 : cnt >= 100 ? 6.5 : 5.5;
+        var payoutScore = multiPay ? 8.5 : 5.0;
+        dims = [{ score: coverageScore, w: 0.30 }, { score: payoutScore, w: 0.25 }, { score: creditScore, w: 0.20 }, { score: transparencyScore, w: 0.10 }, { score: 7.0, w: 0.08 }, { score: 6.5, w: 0.07 }];
+      }
+      total = 0;
+      for (var i = 0; i < dims.length; i++) total += dims[i].score * dims[i].w;
+      return Math.round(total * 10);
+    }
+
+
+
+    /* ══ STATE ══ */
+
+    let compareIds = [];
+
+
+
+    /* ══ INIT ══ */
+
+    async function init() {
+      // 先从API加载所有产品，再渲染对比
+      try {
+        // 加载所有险种产品
+        const types = ['savings', 'whole_life', 'critical_illness'];
+        const results = await Promise.all(
+          types.map(t => fetch(`/api/v1/products?type=${t}&limit=200`).then(r => r.json()).catch(() => []))
+        );
+        const raw = results.flat();
+        // 铺平字段
+        ALL_PRODUCTS = raw.map(p => ({
+          ...p,
+          name:                    p.meta?.name         || '',
+          name_en:                 p.meta?.name_en      || '',
+          company:                 p.meta?.company      || '',
+          company_full:            p.meta?.company_full || '',
+          currency:                p.meta?.currency     || 'USD',
+          rating:                  p.meta?.rating       || null,
+          irr_20y:                 p.actuarial?.irr_20y            ?? null,
+          breakeven:               p.actuarial?.breakeven_year     ?? 99,
+          breakeven_year:          p.actuarial?.breakeven_year     ?? null,
+          dividend_fulfill:        p.actuarial?.dividend_fulfillment_5y != null ? p.actuarial.dividend_fulfillment_5y + '%' : '—',
+          non_guaranteed_ratio:    p.specifications?.non_guaranteed_ratio != null ? p.specifications.non_guaranteed_ratio + '%' : '—',
+          loan_ltv:                p.actuarial?.loan_ltv != null ? p.actuarial.loan_ltv + '%' : '—',
+          premium_years:             p.actuarial?.premium_years          ?? null,
+          premium_annual:            p.actuarial?.premium_annual         ?? null,
+          covered_conditions_count:  p.actuarial?.covered_conditions_count ?? null,
+          multi_pay:                 p.actuarial?.multi_pay              ?? null,
+          score:                     (p.scores && p.scores.total != null) ? p.scores.total : calcScoreForCompare(p),
+          tags:                      p.tags                              || [],
+          features:                  p.features || p.specifications?.features || [],
+          review:                    p.content_zh || '',
+          review_hk:                 '',
+          review_en:                 '',
+        }));
+      } catch(e) {
+        console.error('[Compare] 产品加载失败:', e);
+      }
+
+      // Parse URL params: ?ids=aia_abundance_future_3,manulife_global_currency
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get('ids') || '';
+      compareIds = raw.split(',').filter(id => id && ALL_PRODUCTS.find(p => p.id === id)).slice(0, 3);
+
+      render();
+    }
+
+
+
+    /* ══ RENDER ══ */
+
+    function render() {
+
+      const products = compareIds.map(id => ALL_PRODUCTS.find(p => p.id === id)).filter(Boolean);
+
+
+
+      if (products.length === 0) {
+
+        document.getElementById('compare-empty').style.display = 'block';
+
+        document.getElementById('compare-content').style.display = 'none';
+
+        return;
+
+      }
+
+      document.getElementById('compare-empty').style.display = 'none';
+
+      document.getElementById('compare-content').style.display = 'block';
+
+      document.getElementById('ctaRow').style.display = 'block';
+
+
+
+      // Update URL
+
+      const url = new URL(window.location);
+
+      url.searchParams.set('ids', compareIds.join(','));
+
+      window.history.replaceState({}, '', url);
+
+
+
+      renderHeader(products);
+
+      renderBody(products);
+
+
+
+      // ── 注入 <colgroup>：table-layout:fixed 下 colgroup 决定所有列宽
+
+      // label列固定200px，产品列均分剩余宽度，添加列固定窄宽度
+
+      const table = document.getElementById('cmpTable');
+
+      const container = table.closest('[style*="overflow"]') || table.parentElement;
+
+      const cs = window.getComputedStyle(container);
+      const containerW = (container.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0)) || 900;
+
+      const labelW = 200;
+
+      const addColW = compareIds.length < 3 ? 85 : 0;  // 添加占位列：固定窄宽度
+
+      const productW = Math.max(210, Math.floor((containerW - labelW - addColW) / Math.max(products.length, 1)));
+
+      let colHtml = `<col style="width:${labelW}px;min-width:${labelW}px;">`;
+
+      for (let i = 0; i < products.length; i++) {
+
+        colHtml += `<col style="width:${productW}px;min-width:${productW}px;">`;
+
+      }
+
+      if (addColW > 0) {
+
+        colHtml += `<col style="width:${addColW}px;min-width:${addColW}px;">`;
+
+      }
+
+      const existing = table.querySelector('colgroup');
+
+      if (existing) existing.remove();
+
+      const cg = document.createElement('colgroup');
+
+      cg.innerHTML = colHtml;
+
+      table.insertBefore(cg, table.firstChild);
+
+
+
+      // create sentinel element if not exists
+
+      if (!document.getElementById('cmp-sentinel')) {
+
+        const sent = document.createElement('div');
+
+        sent.id = 'cmp-sentinel';
+
+        sent.style.height = '1px';
+
+        table.parentNode.insertBefore(sent, table);
+
+      }
+
+
+
+      // setup observer after render
+
+      clearTimeout(window._observerSetupTimer);
+
+      window._observerSetupTimer = setTimeout(() => {
+
+        updateStickyTop(true);
+
+        // setupHeaderObserver();
+
+      }, 10);
+
+      // allow horizontal scroll if content overflows (do not clip)
+      try { if (container && container.style) container.style.overflowX = 'auto'; } catch (e) { }
+
+
+
+      // set the table to the exact computed width and center it in the container
+
+      try {
+
+        const totalW = labelW + productW * products.length + addColW;
+
+        table.style.width = totalW + 'px';
+
+        table.style.margin = '0 auto';
+
+      } catch (e) { }
+
+    }
+
+
+
+    function logoHTML(company, size) {
+
+      const src = LOGO_URLS[company];
+
+      const h = size || 28;
+
+      if (src) return `<img src="${src}" alt="${company}" style="max-width:${h * 4}px;max-height:${h}px;object-fit:contain;display:block;margin:0 auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div style="display:none;font-size:13px;font-weight:900;color:var(--ink);">${company}</div>`;
+
+      return `<div style="font-size:13px;font-weight:900;color:var(--ink);">${company}</div>`;
+
+    }
+
+
+
+    function renderHeader(products) {
+
+      const canAdd = compareIds.length < 3;
+
+      const lang = (window.HM_I18N ? window.HM_I18N.lang() : null) || localStorage.getItem('himiao-lang') || 'cn';
+
+      const T = (window.HM_DICT && window.HM_DICT[lang]) || (window.HM_DICT && window.HM_DICT.cn) || {};
+
+      // 1. 左侧维度栏：改为 vertical-align: top，上边距统一设为 24px
+
+      let html = `<th class="col-label" style="padding:24px 16px 16px;border-bottom:2px solid var(--rule);font-size:12px;font-weight:800;color:var(--ink2);vertical-align:middle;background:var(--paper);white-space:nowrap;">${T.cmp_dim || '对比维度 / Comparison Metrics'}</th>`;
+
+
+
+      products.forEach(p => {
+
+        const rs = RATING_STYLE[p.rating] || { bg: '#f3f4f6', tx: '#6b7280' };
+
+        // 恢复为 vertical-align: bottom，这对于防止错位非常关键
+
+        html += `<th class="col-product" style="padding:0;border-bottom:2px solid var(--rule);border-left:1px solid var(--rule);vertical-align:bottom;background:white;">
+
+      <div class="logo-cell" style="padding-top:24px;">
+
+        ${logoHTML(p.company, 28)}
+
+        <div class="product-name-cell" style="margin-top:10px;word-break:break-word;">${p.name}</div>
+
+        <div class="company-name-cell" style="word-break:break-word;">${p.company_full}</div>
+
+        <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;">
+
+          ${p.rating ? `<span class="rating" style="background:${rs.bg};color:${rs.tx};">⬡ ${p.rating}</span>` : ''}
+
+          <span class="tag" style="background:var(--blue-l);color:var(--blue-d);">${p.currency}</span>
+
+        </div>
+
+        <button class="remove-btn" onclick="removeProduct('${p.id}')">
+
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+
+          ${T.col_remove || (lang === "en" ? "Remove" : lang === "hk" ? "移除" : "移除")}
+
+        </button>
+
+      </div>
+
+    </th>`;
+
+      });
+
+
+
+      if (canAdd) {
+
+        const remaining = 3 - compareIds.length;
+
+        html += `<th class="col-product" style="padding:0;border-bottom:2px solid var(--rule);border-left:1px solid var(--rule);vertical-align:bottom;">
+
+      <div class="add-product-cell" style="padding-top:24px;">
+
+        <button class="add-btn" onclick="openModal()">
+
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+
+          <span style="font-size:13px;font-weight:700;">${T.col_add || (lang === "en" ? "Add Product" : "添加产品")}</span>
+
+          <span style="font-size:11px;font-weight:500;">${T.col_add_sub || (lang === "en" ? "Can add" : "还可添加")} ${remaining} ${T.col_add_unit || (lang === "en" ? "more" : "款")}</span>
+
+        </button>
+
+      </div>
+
+    </th>`;
+
+      }
+
+
+
+      document.getElementById('headerRow').innerHTML = html;
+
+    }
+
+
+
+    function renderBody(products) {
+      const lang = (window.HM_I18N ? window.HM_I18N.lang() : null) || localStorage.getItem('himiao-lang') || 'cn';
+      const T = (window.HM_DICT && window.HM_DICT[lang]) || (window.HM_DICT && window.HM_DICT.cn) || {};
+      const n = products.length;
+
+      /* ── helpers ── */
+      function higher(arr) {
+        const valid = arr.filter(v => v !== null && v !== undefined && !isNaN(v));
+        if (valid.length < 2) return arr.map(() => null);
+        const best = Math.max(...valid);
+        return arr.map(v => (v !== null && v !== undefined && !isNaN(v) && v === best) ? 'winner' : (v === null || v === undefined || isNaN(v)) ? null : 'loser');
+      }
+      function lower(arr) {
+        const valid = arr.filter(v => v !== null && v !== undefined && !isNaN(v));
+        if (valid.length < 2) return arr.map(() => null);
+        const best = Math.min(...valid);
+        return arr.map(v => (v !== null && v !== undefined && !isNaN(v) && v === best) ? 'winner' : (v === null || v === undefined || isNaN(v)) ? null : 'loser');
+      }
+      function winBadge(cls) {
+        if (cls === 'winner') return `<span style="font-size:9px;font-weight:700;color:var(--success);display:block;margin-top:3px;">▲ 更优</span>`;
+        if (cls === 'loser')  return `<span style="font-size:9px;color:var(--ink3);display:block;margin-top:3px;">▼</span>`;
+        return '';
+      }
+      function numCell(val, unit, winClass) {
+        if (val === null || val === undefined || val === '—' || (typeof val === 'number' && isNaN(val))) {
+          return `<td style="border-left:1px solid var(--rule);text-align:center;vertical-align:middle;padding:14px;"><span class="val-empty">${T.cmp_pending || '待更新'}</span></td>`;
+        }
+        const color = winClass === 'winner' ? 'var(--success)' : winClass === 'loser' ? 'var(--ink3)' : 'var(--ink)';
+        return `<td style="border-left:1px solid var(--rule);text-align:center;vertical-align:middle;padding:14px 16px;">
+          <div class="val-num" style="color:${color};">${val}<span class="val-unit">${unit}</span></div>
+          ${winBadge(winClass)}
+        </td>`;
+      }
+      function secRow(key) {
+        const txt = T[key] || key;
+        return `<tr class="section-row"><td colspan="${n + 1}"><span>${txt}</span></td></tr>`;
+      }
+      function tagRow(labelKey, labelEn) {
+        const lb = T[labelKey] || labelKey;
+        return `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${lb}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);padding:10px 12px;vertical-align:middle;">
+            <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
+              ${(p.tags||[]).length ? (p.tags||[]).map(t=>`<span class="tag" title="${tagLabel(t,lang)}">${tagLabel(t,lang)}</span>`).join('') : '<span class="val-empty">—</span>'}
+            </div>
+          </td>`).join('') + `</tr>`;
+      }
+      function featureRow() {
+        return `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_feature || '核心亮点'}</td>` +
+          products.map(p => {
+            const fs = p.features || [];
+            return `<td style="border-left:1px solid var(--rule);padding:14px;vertical-align:top;">
+              <div>
+                ${fs.length ? fs.map(f=>`<div style="font-size:12.5px;color:var(--ink2);word-break:break-word;overflow-wrap:break-word;padding:2px 0;">✓ ${featureLabel(f,lang)}</div>`).join('') : '<span class="val-empty">'+(T.cmp_no_data||'暂无数据')+'</span>'}
+              </div>
+            </td>`;
+          }).join('') + `</tr>`;
+      }
+      function scoreRow(w) {
+        return `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_score || '综合评分'}</td>` +
+          products.map((p, i) => {
+            if (p.score == null) {
+              /* 尚无评分：虚线圆环占位 */
+              return `<td style="border-left:1px solid var(--rule);text-align:center;padding:12px;">
+                <div style="width:46px;height:46px;display:inline-block;position:relative;margin:0 auto;">
+                  <svg width="46" height="46" viewBox="0 0 46 46" style="transform:rotate(-90deg);">
+                    <circle cx="23" cy="23" r="18" fill="none" stroke="#e5e7eb" stroke-width="5" stroke-dasharray="5 4"/>
+                  </svg>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ink3);">—</div>
+                </div>
+                <div style="font-size:9.5px;color:var(--ink3);margin-top:4px;">${T.cmp_pending_in || '待录入'}</div>
+              </td>`;
+            }
+            const col = w[i] === 'winner' ? 'var(--success)' : w[i] === 'loser' ? 'var(--ink3)' : 'var(--ink)';
+            const r = 18, c = 2 * Math.PI * r, off = c - (p.score / 100) * c;
+            return `<td style="border-left:1px solid var(--rule);text-align:center;padding:12px;">
+              <div style="width:46px;height:46px;display:inline-block;position:relative;margin:0 auto;">
+                <svg width="46" height="46" viewBox="0 0 46 46" style="transform:rotate(-90deg);">
+                  <circle cx="23" cy="23" r="${r}" fill="none" stroke="#f3f4f6" stroke-width="5"/>
+                  <circle cx="23" cy="23" r="${r}" fill="none" stroke="${col}" stroke-width="5" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;">
+                  <span style="font-size:13px;font-weight:900;color:${col};">${p.score}</span>
+                  <span style="font-size:7px;color:var(--ink3);">/100</span>
+                </div>
+              </div>
+              ${winBadge(w[i])}
+            </td>`;
+          }).join('') + `</tr>`;
+      }
+      function currencyRow() {
+        return `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_currency || '保单币种'}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+            <span style="font-size:13px;font-weight:700;padding:3px 10px;border-radius:5px;background:var(--blue-l);color:var(--blue-d);">${p.currency||'—'}</span>
+          </td>`).join('') + `</tr>`;
+      }
+
+      /* ── type detection ── */
+      const type = products[0]?.product_type;
+      const allSame = products.every(p => p.product_type === type);
+
+      let html = '';
+
+      /* mixed-type warning */
+      if (!allSame) {
+        html += `<tr><td colspan="${n + 1}" style="padding:10px 16px;background:#fef3c7;border-top:2px solid #d97706;">
+          <span style="font-size:12px;font-weight:700;color:var(--amber);">${T.cmp_mixed_warn || '⚠ 当前对比包含不同险种产品，建议选择同类产品以获得精准对比维度'}</span>
+        </td></tr>`;
+      }
+
+      /* ══════════════════════════════════
+         储蓄分红险 SAVINGS
+      ══════════════════════════════════ */
+      if (type === 'savings' && allSame) {
+        const irrs = products.map(p => p.irr_20y);
+        const bks  = products.map(p => (p.breakeven && p.breakeven < 99) ? p.breakeven : null);
+        const fuls = products.map(p => { const v = parseFloat(p.dividend_fulfill); return isNaN(v) ? null : v; });
+        const ltvs = products.map(p => { const v = parseFloat(p.loan_ltv); return isNaN(v) ? null : v; });
+        const scrs = products.map(p => p.score);
+        const irrW = higher(irrs), bkW = lower(bks), fulW = higher(fuls), ltvW = higher(ltvs), scrW = higher(scrs);
+
+        /* 基本信息 */
+        html += secRow('cmp_basic');
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_payment_term || '缴费年期'}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+            <span class="val-num">${p.premium_years != null ? p.premium_years : '—'}</span>
+            ${p.premium_years != null ? '<span class="val-unit"> yr</span>' : ''}
+          </td>`).join('') + `</tr>`;
+        html += currencyRow();
+
+        /* 精算核心 */
+        html += secRow('cmp_actuarial');
+        html += scoreRow(scrW);
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_irr20 || '20年 IRR'}</td>` +
+          products.map((p, i) => numCell(p.irr_20y, '%', irrW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_breakeven || '保证回本年'}</td>` +
+          products.map((p, i) => numCell(bks[i], ' yr', bkW[i])).join('') + `</tr>`;
+
+        /* 合规披露 */
+        html += secRow('cmp_compliance');
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_fulfill5y || '近5年分红实现率'}</td>` +
+          products.map((p, i) => numCell(fuls[i], '%', fulW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_loan_ltv || '保单贷款上限'}</td>` +
+          products.map((p, i) => numCell(ltvs[i], '%', ltvW[i])).join('') + `</tr>`;
+
+        /* 产品特色 */
+        html += secRow('cmp_features');
+        html += tagRow('cmp_tags');
+        html += featureRow();
+
+      /* ══════════════════════════════════
+         终身寿险 WHOLE LIFE
+      ══════════════════════════════════ */
+      } else if (type === 'whole_life' && allSame) {
+        const scrs  = products.map(p => p.score);
+        const prems = products.map(p => p.premium_annual ? Number(p.premium_annual) : null);
+        const scrW  = higher(scrs), premW = lower(prems); // lower premium is better
+
+        /* 基本信息 */
+        html += secRow('cmp_basic');
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_payment_term || '缴费年期'}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+            <span class="val-num">${p.premium_years != null ? p.premium_years : '—'}</span>
+            ${p.premium_years != null ? '<span class="val-unit"> yr</span>' : ''}
+          </td>`).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_annual_prem || '年缴保费'}</td>` +
+          products.map((p, i) => {
+            if (!prems[i]) return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span class="val-empty">${T.cmp_pending || '待更新'}</span></td>`;
+            const color = premW[i] === 'winner' ? 'var(--success)' : premW[i] === 'loser' ? 'var(--ink3)' : 'var(--ink)';
+            return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+              <div style="font-size:16px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${color};">$${Number(prems[i]).toLocaleString()}</div>
+              ${winBadge(premW[i])}
+            </td>`;
+          }).join('') + `</tr>`;
+        html += currencyRow();
+
+        /* 精算核心 — IRR / 回本 / 现金价值 */
+        html += secRow('cmp_actuarial');
+        html += scoreRow(scrW);
+        const wlIrrs = products.map(p => p.irr_20y);
+        const wlBks  = products.map(p => { const v = p.actuarial?.breakeven_year ?? null; return (v != null && v < 99) ? v : null; });
+        const wlLtvs = products.map(p => { const v = parseFloat(p.loan_ltv); return isNaN(v) ? null : v; });
+        const wlIrrW = higher(wlIrrs), wlBkW = lower(wlBks), wlLtvW = higher(wlLtvs);
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_irr20 || '20年 IRR'}</td>` +
+          products.map((p, i) => numCell(wlIrrs[i], '%', wlIrrW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_breakeven || '回本年'}</td>` +
+          products.map((p, i) => numCell(wlBks[i], ' yr', wlBkW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_loan_ltv || '保单贷款上限'}</td>` +
+          products.map((p, i) => numCell(wlLtvs[i], '%', wlLtvW[i])).join('') + `</tr>`;
+        [10, 20, 30].forEach(yr => {
+          const vals = products.map(p => {
+            const tl = p.audit_data?.timeline || {};
+            const e = tl[yr]; if (!e) return null;
+            return (e.gcv || 0) + (e.div_opt || 0);
+          });
+          const w = higher(vals);
+          html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${(T.cmp_year_cash || '第{n}年现金价值').replace('{n}', yr)}</td>` +
+            products.map((p, i) => {
+              if (vals[i] === null) return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span class="val-empty">${T.cmp_pending || '待更新'}</span></td>`;
+              const color = w[i] === 'winner' ? 'var(--success)' : w[i] === 'loser' ? 'var(--ink3)' : 'var(--ink)';
+              const tot = prems[i] ? prems[i] * (p.premium_years || 10) : 0;
+              const pct = tot > 0 ? ((vals[i] / tot) * 100).toFixed(0) + '%' : '';
+              return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+                <div style="font-size:16px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${color};">$${vals[i].toLocaleString('en',{maximumFractionDigits:0})}</div>
+                ${pct ? `<div style="font-size:10px;color:var(--ink3);margin-top:2px;">${pct} of total premium</div>` : ''}
+                ${winBadge(w[i])}
+              </td>`;
+            }).join('') + `</tr>`;
+        });
+
+        /* 产品特色 */
+        html += secRow('cmp_features');
+        html += tagRow('cmp_tags');
+        html += featureRow();
+
+      /* ══════════════════════════════════
+         重疾险 CRITICAL ILLNESS
+      ══════════════════════════════════ */
+      } else if (type === 'critical_illness' && allSame) {
+        const scrs = products.map(p => p.score);
+        const cics = products.map(p => p.covered_conditions_count);
+        const scrW = higher(scrs), cicW = higher(cics);
+
+        /* 基本信息 */
+        html += secRow('cmp_basic');
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_payment_term || '缴费年期'}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;">
+            <span class="val-num">${p.premium_years != null ? p.premium_years : '—'}</span>
+            ${p.premium_years != null ? '<span class="val-unit"> yr</span>' : ''}
+          </td>`).join('') + `</tr>`;
+        html += currencyRow();
+
+        /* 保障内容 */
+        html += secRow('cmp_coverage');
+        html += scoreRow(scrW);
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_conditions || '涵盖重疾病种数'}</td>` +
+          products.map((p, i) => numCell(p.covered_conditions_count, ' 种', cicW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">多重赔付<div class="label-sub">Multiple Payout Benefit</div></td>` +
+          products.map(p => {
+            if (p.multi_pay === true)  return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span style="font-size:20px;color:var(--success);">✓</span><div style="font-size:10px;color:var(--success);margin-top:2px;font-weight:700;">${T.cmp_support || '支持'}</div></td>`;
+            if (p.multi_pay === false) return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span style="font-size:20px;color:var(--ink3);">—</span><div style="font-size:10px;color:var(--ink3);margin-top:2px;">${T.cmp_no_support || '不支持'}</div></td>`;
+            return `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span class="val-empty">${T.cmp_confirm || '待确认'}</span></td>`;
+          }).join('') + `</tr>`;
+
+        /* 产品特色 */
+        html += secRow('cmp_features');
+        html += tagRow('cmp_tags');
+        html += featureRow();
+
+      /* ══════════════════════════════════
+         DEFAULT / MIXED
+      ══════════════════════════════════ */
+      } else {
+        const scrs = products.map(p => p.score), scrW = higher(scrs);
+        const irrs = products.map(p => p.irr_20y), irrW = higher(irrs);
+        const bks  = products.map(p => (p.breakeven && p.breakeven < 99) ? p.breakeven : null), bkW = lower(bks);
+
+        html += secRow('cmp_basic');
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_payment_term || '缴费年期'}</td>` +
+          products.map(p => `<td style="border-left:1px solid var(--rule);text-align:center;padding:14px;"><span class="val-num">${p.premium_years != null ? p.premium_years : '—'}</span><span class="val-unit"> yr</span></td>`).join('') + `</tr>`;
+        html += currencyRow();
+        html += secRow('cmp_actuarial');
+        html += scoreRow(scrW);
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_irr20 || '20年 IRR'}</td>` +
+          products.map((p, i) => numCell(p.irr_20y, '%', irrW[i])).join('') + `</tr>`;
+        html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;">${T.cmp_breakeven || '保证回本年'}</td>` +
+          products.map((p, i) => numCell(bks[i], ' yr', bkW[i])).join('') + `</tr>`;
+        html += secRow('cmp_features');
+        html += tagRow('cmp_tags');
+        html += featureRow();
+      }
+
+      /* ══ 精算辣评（所有类型通用） ══ */
+      html += secRow('cmp_verdict');
+      html += `<tr class="data-row"><td class="label-col" style="padding:14px 16px;vertical-align:top;">
+        精算辣评
+        <div class="label-sub">Audit Review</div>
+        <div style="margin-top:10px;font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;line-height:1.6;">由精算团队<br>逐产品撰写</div>
+      </td>` +
+        products.map(p => `<td style="border-left:1px solid var(--rule);vertical-align:top;padding:16px;">
+          <div style="font-size:9.5px;font-weight:800;color:var(--blue);margin-bottom:8px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;">⚖ HIMIAO AUDIT REVIEW</div>
+          <p style="font-size:13px;color:var(--ink2);line-height:1.7;">${reviewText(p, lang)}</p>
+        </td>`).join('') + `</tr>`;
+
+      /* ══ 操作区 ══ */
+      html += `<tr><td style="padding:14px 16px;background:var(--p2);" class="label-col"></td>` +
+        products.map(p => `<td style="border-left:1px solid var(--rule);padding:16px;text-align:center;">
+          <a href="product-detail.html?id=${p.id}" style="display:block;background:var(--blue);color:white;border-radius:9px;padding:10px 0;font-size:12px;font-weight:800;letter-spacing:.05em;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='var(--blue-d)'" onmouseout="this.style.background='var(--blue)'">${T.cmp_view_audit || '查看审计详情 →'}</a>
+        </td>`).join('') + `</tr>`;
+
+      document.getElementById('cmpBody').innerHTML = html;
+    }
+
+
+
+    /* ══ PRODUCT MANAGEMENT ══ */
+
+    function removeProduct(id) {
+
+      compareIds = compareIds.filter(x => x !== id);
+
+      if (compareIds.length === 0) {
+
+        document.getElementById('compare-empty').style.display = 'block';
+
+        document.getElementById('compare-content').style.display = 'none';
+
+      } else {
+
+        render();
+
+      }
+
+    }
+
+
+
+    function clearAll() {
+
+      compareIds = [];
+
+      document.getElementById('compare-empty').style.display = 'block';
+
+      document.getElementById('compare-content').style.display = 'none';
+
+      const url = new URL(window.location);
+
+      url.searchParams.delete('ids');
+
+      window.history.replaceState({}, '', url);
+
+    }
+
+
+
+    /* ══ MODAL ══ */
+
+    function openModal() {
+
+      const lang = (window.HM_I18N ? window.HM_I18N.lang() : null) || localStorage.getItem('himiao-lang') || 'cn';
+
+      const T = (window.HM_DICT && window.HM_DICT[lang]) || (window.HM_DICT && window.HM_DICT.cn) || {};
+
+      const modal = document.getElementById('modal-bg');
+
+      const list = document.getElementById('modalProductList');
+
+      list.innerHTML = ALL_PRODUCTS.map(p => {
+
+        const already = compareIds.includes(p.id);
+
+        const src = LOGO_URLS[p.company];
+
+        const logoEl = src
+
+          ? `<img src="${src}" alt="${p.company}" style="max-width:56px;max-height:20px;object-fit:contain;" onerror="this.style.display='none'">`
+
+          : `<span style="font-size:11px;font-weight:800;">${p.company}</span>`;
+
+        return `<div class="product-option ${already ? 'disabled' : ''}" onclick="${already ? '' : `addProduct('${p.id}')`}">
+
+      <div style="width:64px;flex-shrink:0;text-align:center;">${logoEl}</div>
+
+      <div>
+
+        <div class="pname">${p.name}</div>
+
+        <div class="pco">${p.company_full}</div>
+
+      </div>
+
+      ${already ? `<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--ink3);">${T.modal_added}</span>` : '<span style="margin-left:auto;font-size:13px;color:var(--ink3);">+</span>'}
+
+    </div>`;
+
+
+
+      }).join('');
+
+      modal.style.display = 'flex';
+
+    }
+
+
+
+    function closeModal() {
+
+      document.getElementById('modal-bg').style.display = 'none';
+
+    }
+
+
+
+    function addProduct(id) {
+
+      const lang = (window.HM_I18N ? window.HM_I18N.lang() : null) || localStorage.getItem('himiao-lang') || 'cn';
+
+      const T = (window.HM_DICT && window.HM_DICT[lang]) || (window.HM_DICT && window.HM_DICT.cn) || {};
+
+      if (compareIds.length >= 3) { toast(T.toast_max); return; }
+
+      if (compareIds.includes(id)) { toast(T.toast_dupe); return; }
+
+      compareIds.push(id);
+
+      closeModal();
+
+      render();
+
+    }
+
+
+
+    function toast(msg) {
+
+      const t = document.getElementById('cmp-toast');
+
+      t.textContent = msg;
+
+      t.style.opacity = '1';
+
+      clearTimeout(t._timer);
+
+      t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+
+    }
+
+
+
+    /* ══ I18N TRANSLATIONS ══ */
+
+    /* translations removed — all keys now in components/lang.js → HM_DICT */
+
+
+
+    /* applyPageLang removed — i18n-engine.js handles [data-i18n] rendering.
+
+       render() re-renders JS-built table via hm:langchange listener below. */
+
+
+
+    document.addEventListener('DOMContentLoaded', init);
+
+
+
+    // ── STICKY HEADER HANDLING
+
+    // We need two pieces of information:
+
+    //   * the height of the fixed nav bar at the top of the page (stickyOffset)
+
+    //   * the document‑relative Y coordinate of the header row when it is in
+
+    //     the normal flow (headerDocY)
+
+    //
+
+    // The header row should only receive the offset once it has scrolled past the
+
+    // top of the viewport; before that it must sit flush with the rest of the
+
+    // table.  The previous implementation always applied `top=<offset>` to the
+
+    // <th> elements which effectively pushed the header down in the normal flow
+
+    // and produced a white gap above the table and hid the first data row.
+
+
+
+    let stickyOffset = 0;
+
+    let headerDocY = 0;
+
+    let headerObserver = null; // IntersectionObserver that watches the sentinel
+
+
+
+
+
+    // recalc sticky offset and optionally the header's original document Y
+
+    // position. when `recalcHeader` is false we keep the previous headerDocY and
+
+    // do not toggle classes, which avoids flicker when called during scrolling.
+
+    function updateStickyTop(recalcHeader = true) {
+
+      // nav高度 + 面包屑(38px) + 页面标题区，直接量headerRow当前位置最准确
+
+      const navEl = document.getElementById('himiao-nav');
+
+      const navH = navEl ? navEl.getBoundingClientRect().height : 0;
+
+      // 页面未滚动时，headerRow.getBoundingClientRect().top 就是完整的偏移量
+
+      if (recalcHeader && window.scrollY < 20) {
+
+        const hr = document.getElementById('headerRow');
+
+        if (hr) {
+
+          const top = hr.getBoundingClientRect().top;
+
+          if (top > navH) { stickyOffset = top; }
+
+        }
+
+      }
+
+      if (!stickyOffset) stickyOffset = navH + 110; // 兜底：nav+面包屑+标题
+
+      // expose for CSS so .stuck cells can pick it up
+
+      document.documentElement.style.setProperty('--sticky-top', stickyOffset + 'px');
+
+
+
+      // if an observer exists we also need to update its rootMargin so the point
+
+      // at which the sentinel is considered "out" reflects the current offset.
+
+      if (headerObserver) {
+
+        headerObserver.disconnect();
+
+        // setupHeaderObserver();
+
+      }
+
+
+
+      if (recalcHeader) {
+
+        const headerRow = document.getElementById('headerRow');
+
+        if (headerRow) {
+
+          // use offsetTop instead of getBoundingClientRect to avoid needing to
+
+          // strip the "stuck" class. offsetTop gives the distance from the
+
+          // header to its offsetParent in document flow, which stays stable even
+
+          // when the element is positioned.
+
+          headerDocY = headerRow.offsetTop;
+
+        }
+
+        checkSticky();
+
+      }
+
+    }
+
+
+
+    // create or re-create the IntersectionObserver watching the sentinel.
+
+    // when the sentinel leaves the viewport we add .stuck to the header, when it
+
+    // returns we remove the class. this eliminates timing issues inherent in our
+
+    // previous scroll-based toggling logic.
+
+    function setupHeaderObserver() {
+
+      const sentinel = document.getElementById('cmp-sentinel');
+
+      if (!sentinel) return;
+
+      headerObserver = new IntersectionObserver(entries => {
+
+
+
+        entries.forEach(e => {
+
+          const headerRow = document.getElementById('headerRow');
+
+          if (!headerRow) return;
+
+          if (!e.isIntersecting) {
+
+            // headerRow.classList.add('stuck');
+
+          } else {
+
+            headerRow.classList.remove('stuck');
+
+          }
+
+        });
+
+      }, {
+
+        rootMargin: `-${stickyOffset}px 0px 0px 0px`,
+
+        threshold: 0
+
+      });
+
+      headerObserver.observe(sentinel);
+
+    }
+
+
+
+    function checkSticky() {
+
+      const headerRow = document.getElementById('headerRow');
+
+      if (!headerRow) return;
+
+      if (window.scrollY + stickyOffset > headerDocY) {
+
+        // headerRow.classList.add('stuck');
+
+      } else {
+
+        headerRow.classList.remove('stuck');
+
+      }
+
+    }
+
+
+
+    // initial calculations and when the nav height might change. also re-run on
+
+    // scroll in case the navbar dynamically resizes as the user scrolls (some
+
+    // themes collapse the bar). the extra overhead is negligible.
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      updateStickyTop();
+
+      setTimeout(updateStickyTop, 150);
+
+      setTimeout(updateStickyTop, 500); // 字体加载后再校正一次
+
+    });
+
+    window.addEventListener('resize', updateStickyTop);
+
+    window.addEventListener('scroll', () => {
+
+      // only update offset; the IntersectionObserver handles adding/removing the
+
+      // "stuck" class based on scroll position. recalculating headerDocY every
+
+      // frame isn't necessary now.
+
+      updateStickyTop(false);
+
+    });
+
+    document.addEventListener('hm:langchange', function () {
+
+      if (window.HM_I18N && window.HM_I18N.render) window.HM_I18N.render();
+
+      if (typeof render === 'function' && compareIds && compareIds.length > 0) {
+
+        render();
+
+        updateStickyTop();
+
+      }
+
+    });
+
+  </script>
+
+</body>
+
+
+
+</body>
+
+
+
+</html>

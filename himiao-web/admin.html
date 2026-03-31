@@ -1,0 +1,4004 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HiMiao 后台管理系统</title>
+<style>
+/* ══════════════════════════════════════════════════════
+   HiMiao Admin UI v3.0 — 商业级后台
+   设计语言：深色侧边栏 + 白色主区域 + 品牌蓝点缀
+   ══════════════════════════════════════════════════════ */
+:root {
+  --blue:    #00a9e0;
+  --blue-dk: #0083af;
+  --blue-lt: #e3f6fd;
+  --dark:    #0f1d2e;
+  --dark2:   #162336;
+  --charcoal:#4a4a4a;
+  --border:  #eaecf0;
+  --bg:      #f8f9fc;
+  --white:   #ffffff;
+  --red:     #dc2626;
+  --red-lt:  #fee2e2;
+  --green:   #16a34a;
+  --green-lt:#dcfce7;
+  --amber:   #d97706;
+  --amber-lt:#fef3c7;
+  --gray:    #6b7280;
+  --gray-lt: #f3f4f6;
+  --shadow:  0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,.12);
+  --radius:  10px;
+  --radius-lg:16px;
+  --sidebar: 240px;
+  --transition: .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Approval Master-Detail ── */
+@media (max-width: 900px) {
+  #approval-master-detail { grid-template-columns: 1fr !important; }
+}
+.approval-card { border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .15s; }
+.approval-card:hover { border-color:var(--blue);background:var(--blue-lt); }
+.approval-card.selected { border-color:var(--blue);background:var(--blue-lt);box-shadow:0 0 0 2px rgba(0,169,224,.2); }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'PingFang SC','SF Pro Text','Helvetica Neue',Arial,sans-serif;
+       background: var(--bg); color: #111; min-height: 100vh; font-size: 14px;
+       -webkit-font-smoothing: antialiased; }
+a { color: var(--blue); text-decoration: none; }
+
+/* ══ SCROLLBAR ══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9px; }
+
+/* ══ LOGIN SCREEN (CareerCompass 风格) ═══════════════════════════════════════ */
+#login-screen {
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative; overflow: hidden;
+}
+@media (max-width: 900px) {
+  #login-screen { grid-template-columns: 1fr; }
+  #login-characters { display: none !important; }
+}
+#login-characters {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  position: relative;
+}
+#login-characters::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 20% 80%, rgba(0,169,224,.12) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(0,169,224,.08) 0%, transparent 50%);
+}
+#login-characters-inner {
+  position: relative; z-index: 1;
+  width: 550px; height: 400px;
+}
+.login-char {
+  position: absolute; bottom: 0; transition: transform 0.7s ease-in-out;
+  transform-origin: bottom center;
+  animation: char-drop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes char-drop {
+  from { transform: translateY(-120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.login-char-purple {
+  left: 70px; width: 180px; height: 400px; background: #6C3FF5;
+  border-radius: 10px 10px 0 0; z-index: 1;
+  animation-delay: 0.05s; transform: translateY(-120%);
+  transition: transform 0.7s ease-in-out, height 0.7s ease-in-out;
+}
+.login-char-black {
+  left: 240px; width: 120px; height: 310px; background: #2D2D2D;
+  border-radius: 8px 8px 0 0; z-index: 2;
+  animation-delay: 0.15s; transform: translateY(-120%);
+}
+.login-char-orange {
+  left: 0; width: 240px; height: 200px; background: #FF9B6B;
+  border-radius: 120px 120px 0 0; z-index: 3;
+  animation-delay: 0.25s; transform: translateY(-120%);
+}
+.login-char-yellow {
+  left: 310px; width: 140px; height: 230px; background: #E8D754;
+  border-radius: 70px 70px 0 0; z-index: 4;
+  animation-delay: 0.35s; transform: translateY(-120%);
+}
+.login-char-eyes-wrap {
+  position: absolute; display: flex; gap: 8px; align-items: center;
+  transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
+}
+#eyes-purple { left: 45px; top: 40px; }
+#eyes-black { left: 26px; top: 32px; }
+#eyes-orange, #eyes-yellow { gap: 8px; transition: left 0.2s ease-out, top 0.2s ease-out; }
+#eyes-orange { left: 82px; top: 90px; }
+#eyes-yellow { left: 52px; top: 40px; }
+#mouth-y { left: 40px; top: 88px; }
+.login-char-eye {
+  border-radius: 50%; background: white; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.08s;
+}
+.login-char-eye.blink { transform: scaleY(0.05); transition: transform 0.08s; }
+.login-char-pupil {
+  width: 10px; height: 10px; border-radius: 50%; background: #2D2D2D;
+  position: relative; transition: transform 0.1s ease-out;
+}
+.login-char-mouth {
+  position: absolute; width: 80px; height: 4px; background: #2D2D2D; border-radius: 2px;
+  transition: left 0.2s ease-out, top 0.2s ease-out;
+}
+.login-char-eye { width: 18px; height: 18px; flex-shrink: 0; }
+#eye-b1, #eye-b2 { width: 16px; height: 16px; }
+.login-char-pupil.standalone { width: 12px; height: 12px; flex-shrink: 0; }
+#login-form-wrap {
+  display: flex; align-items: center; justify-content: center; padding: 40px;
+}
+.login-panel {
+  width: 100%; max-width: 400px;
+}
+.login-logo {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+}
+.login-logo .mark {
+  width: 40px; height: 40px; background: var(--blue); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: white; font-weight: 900;
+}
+.login-logo .text { line-height: 1.2; }
+.login-logo .name { font-size: 16px; font-weight: 900; color: #111; }
+.login-logo .sub  { font-size: 11px; color: var(--gray); font-weight: 500; }
+.login-panel h2 { font-size: 24px; font-weight: 800; color: #111; margin-bottom: 6px; }
+.login-panel p  { font-size: 14px; color: var(--gray); margin-bottom: 28px; }
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--charcoal);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em;
+}
+.field-wrap { position: relative; }
+.field-wrap input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius); font-size: 14px; outline: none;
+  font-family: inherit; transition: border-color var(--transition), box-shadow var(--transition);
+  background: var(--white); color: #111;
+}
+.field-wrap input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,169,224,.12);
+}
+.field-wrap input.error { border-color: var(--red); }
+.field-wrap .pwd-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 16px; color: var(--gray);
+  padding: 4px; opacity: 0.7;
+}
+.field-wrap .pwd-toggle:hover { opacity: 1; color: #111; }
+
+.login-error {
+  display: none; background: var(--red-lt); border: 1px solid #fca5a5;
+  color: var(--red); border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600; margin-top: 4px; margin-bottom: 12px;
+  align-items: center; gap: 8px;
+}
+.login-error.visible { display: flex; }
+
+.btn-login {
+  width: 100%; padding: 13px; background: var(--blue); color: white;
+  border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background var(--transition), transform var(--transition);
+  letter-spacing: .02em; margin-top: 4px;
+}
+.btn-login:hover  { background: var(--blue-dk); }
+.btn-login:active { transform: scale(.98); }
+.btn-login.loading { opacity: .7; pointer-events: none; }
+
+/* ══ APP SHELL ═══════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: var(--sidebar);
+  background: var(--dark);
+  display: flex; flex-direction: column;
+  z-index: 50; overflow-y: auto;
+}
+.sb-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; gap: 10px;
+}
+.sb-logo .mark {
+  width: 32px; height: 32px; background: var(--blue); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 900; color: white; flex-shrink: 0;
+}
+.sb-logo .txt { line-height: 1.25; }
+.sb-logo .name { font-size: 14px; font-weight: 800; color: white; }
+.sb-logo .ver  { font-size: 10px; color: rgba(255,255,255,.3); font-weight: 500; }
+
+.sb-section { padding: 16px 12px 8px; }
+.sb-section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  color: rgba(255,255,255,.25); padding: 0 8px; margin-bottom: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px; border-radius: 8px;
+  color: rgba(255,255,255,.5); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  margin-bottom: 2px; user-select: none;
+}
+.nav-item:hover  { color: rgba(255,255,255,.85); background: rgba(255,255,255,.06); }
+.nav-item.active { color: white; background: rgba(0,169,224,.2); }
+.nav-item.active .nav-icon { color: var(--blue); }
+.nav-icon { width: 18px; text-align: center; font-size: 15px; }
+
+.sb-bottom {
+  margin-top: auto; padding: 12px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.sb-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; border-radius: 8px;
+  cursor: pointer; transition: background var(--transition);
+}
+.sb-user:hover { background: rgba(255,255,255,.06); }
+.sb-avatar {
+  width: 32px; height: 32px; background: var(--blue);
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; font-weight: 800; color: white;
+  flex-shrink: 0;
+}
+.sb-user-info { flex: 1; min-width: 0; }
+.sb-username { font-size: 12px; font-weight: 700; color: white; }
+.sb-role     { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 1px; }
+.sb-logout   { font-size: 14px; color: rgba(255,255,255,.3); }
+
+/* ── Main content ── */
+.main { margin-left: var(--sidebar); padding: 28px; min-height: 100vh; }
+
+/* ── Topbar ── */
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px;
+}
+.topbar-left h2 { font-size: 21px; font-weight: 800; color: #111; }
+.topbar-left p  { font-size: 13px; color: var(--gray); margin-top: 2px; }
+.topbar-right   { display: flex; align-items: center; gap: 10px; }
+
+/* ── Stat cards ── */
+.stat-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 22px 24px; border: 1px solid var(--border);
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at top right, rgba(0,169,224,.07), transparent 70%);
+}
+.stat-label { font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+.stat-num   { font-size: 34px; font-weight: 900; color: #111; line-height: 1; }
+.stat-num.blue  { color: var(--blue); }
+.stat-num.green { color: var(--green); }
+.stat-change { font-size: 12px; color: var(--green); margin-top: 6px; font-weight: 600; }
+
+/* ── Table cards ── */
+.card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  overflow: hidden; margin-bottom: 20px;
+}
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+}
+.card-head h3   { font-size: 15px; font-weight: 800; color: #111; }
+.card-head p    { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.card-actions   { display: flex; align-items: center; gap: 8px; }
+
+/* Filter bar */
+.filter-bar {
+  padding: 14px 22px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  background: #fafbfc;
+}
+.filter-select {
+  padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 7px;
+  font-size: 12px; font-weight: 600; color: var(--charcoal);
+  background: white; cursor: pointer; outline: none;
+  transition: border-color var(--transition);
+}
+.filter-select:focus { border-color: var(--blue); }
+.filter-input {
+  padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 7px;
+  font-size: 12px; outline: none; width: 180px; font-family: inherit;
+  transition: border-color var(--transition);
+}
+.filter-input:focus { border-color: var(--blue); }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 11px 16px; background: #f9fafb; text-align: left;
+  font-size: 11px; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: .07em;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+tbody td {
+  padding: 13px 16px; border-bottom: 1px solid #f3f4f6;
+  font-size: 13px; vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #f9fafd; }
+.td-main    { font-weight: 700; color: #111; }
+.td-sub     { font-size: 11px; color: var(--gray); margin-top: 2px; }
+.td-mono    { font-family: 'SF Mono','Consolas',monospace; font-size: 12px; }
+
+/* Empty state */
+.empty-state {
+  padding: 56px 24px; text-align: center;
+}
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; color: var(--gray); font-weight: 600; }
+.empty-sub  { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+/* Pagination */
+.pagination {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 22px; border-top: 1px solid var(--border);
+}
+.pagination-info { font-size: 13px; color: var(--gray); }
+.pagination-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: white; font-size: 12px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); color: var(--charcoal);
+}
+.page-btn:hover  { border-color: var(--blue); color: var(--blue); }
+.page-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+.page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ══ BUTTONS ════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; transition: all var(--transition);
+  white-space: nowrap; font-family: inherit;
+}
+.btn-sm  { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn-icon { padding: 7px; }
+
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover { background: var(--blue-dk); }
+
+.btn-success { background: var(--green-lt); color: var(--green); }
+.btn-success:hover { background: #bbf7d0; }
+
+.btn-danger  { background: var(--red-lt); color: var(--red); }
+.btn-danger:hover { background: #fca5a5; }
+
+.btn-warning { background: var(--amber-lt); color: var(--amber); }
+.btn-warning:hover { background: #fde68a; }
+
+.btn-ghost {
+  background: white; border: 1.5px solid var(--border); color: var(--charcoal);
+}
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+
+.btn-dark { background: #111; color: white; }
+.btn-dark:hover { background: #333; }
+
+/* ══ BADGE ═══════════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.badge-green  { background: var(--green-lt); color: var(--green); }
+.badge-green::before { background: var(--green); }
+.badge-red    { background: var(--red-lt); color: var(--red); }
+.badge-red::before { background: var(--red); }
+.badge-blue   { background: var(--blue-lt); color: var(--blue-dk); }
+.badge-blue::before { background: var(--blue); }
+.badge-gray   { background: var(--gray-lt); color: var(--gray); }
+.badge-gray::before { background: #9ca3af; }
+.badge-amber  { background: var(--amber-lt); color: var(--amber); }
+.badge-amber::before { background: var(--amber); }
+
+/* ══ MODAL ═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,29,46,.6);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 600px; max-width: 100%; max-height: 90vh;
+  overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: modal-in .2s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-lg { width: 780px; }
+@keyframes modal-in {
+  from { transform: scale(.95) translateY(10px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+.modal-head {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.modal-head h3 { font-size: 16px; font-weight: 800; color: #111; }
+.modal-head p  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 7px; background: var(--gray-lt);
+  border: none; cursor: pointer; font-size: 16px; color: var(--gray);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); flex-shrink: 0;
+}
+.modal-close:hover { background: var(--red-lt); color: var(--red); }
+.modal-body {
+  padding: 24px; overflow-y: auto; flex: 1;
+}
+.modal-foot {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-row  { margin-bottom: 0; }
+.form-row label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--charcoal);
+  margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em;
+}
+.form-row label .req { color: var(--red); margin-left: 2px; }
+.form-ctrl {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 13px; outline: none;
+  font-family: inherit; transition: border-color var(--transition), box-shadow var(--transition);
+  background: white; color: #111;
+}
+.form-ctrl:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,169,224,.1);
+}
+.form-ctrl.error { border-color: var(--red); }
+textarea.form-ctrl { resize: vertical; min-height: 80px; }
+.form-hint { font-size: 11px; color: var(--gray); margin-top: 4px; }
+.form-divider {
+  grid-column: 1/-1; border-top: 1px solid var(--border);
+  margin: 4px 0 8px;
+}
+.form-section-title {
+  grid-column: 1/-1; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--gray); padding-bottom: 4px;
+}
+
+.check-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; cursor: pointer; transition: border-color var(--transition);
+  user-select: none;
+}
+.check-row:hover { border-color: var(--blue); }
+.check-row input[type=checkbox] {
+  width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer;
+}
+.check-row span { font-size: 13px; font-weight: 600; color: var(--charcoal); }
+
+/* ══ TOAST ═══════════════════════════════════════════════ */
+#toast-container {
+  position: fixed; top: 20px; right: 20px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  box-shadow: var(--shadow-lg); min-width: 260px; max-width: 360px;
+  animation: toast-in .25s cubic-bezier(.34,1.56,.64,1);
+  cursor: pointer;
+}
+@keyframes toast-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.toast-success { background: #f0fdf4; border: 1px solid #86efac; color: #15803d; }
+.toast-error   { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+.toast-info    { background: #eff8ff; border: 1px solid #bae6fd; color: #0369a1; }
+.toast-icon    { font-size: 16px; flex-shrink: 0; }
+
+/* ══ CONFIRM DIALOG ══════════════════════════════════════ */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(15,29,46,.5);
+  z-index: 300; display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: white; border-radius: var(--radius-lg); padding: 28px;
+  width: 380px; max-width: calc(100vw - 40px);
+  box-shadow: var(--shadow-lg);
+  animation: modal-in .2s cubic-bezier(.34,1.56,.64,1);
+}
+.confirm-icon  { font-size: 32px; margin-bottom: 12px; }
+.confirm-title { font-size: 17px; font-weight: 800; color: #111; margin-bottom: 8px; }
+.confirm-msg   { font-size: 14px; color: var(--gray); line-height: 1.6; }
+.confirm-btns  { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+
+/* ══ SECTION VISIBILITY ══════════════════════════════════ */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ══ STATUS PILLS ════════════════════════════════════════ */
+.product-type-pill {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.type-savings  { background: #e3f6fd; color: #0083af; }
+.type-medical  { background: #f0fdf4; color: #15803d; }
+.type-ci       { background: #fef2f2; color: #dc2626; }
+.type-annuity  { background: #fef3c7; color: #d97706; }
+
+/* ══ PUBLISH TOGGLE ══════════════════════════════════════ */
+.toggle-switch {
+  position: relative; width: 36px; height: 20px; cursor: pointer;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; background: #d1d5db;
+  border-radius: 10px; transition: background var(--transition);
+}
+.toggle-slider::before {
+  content: ''; position: absolute; left: 2px; top: 2px;
+  width: 16px; height: 16px; background: white; border-radius: 50%;
+  transition: transform var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--green); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ══ LOADING SPINNER ═════════════════════════════════════ */
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: var(--blue); border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══ SECTION PLACEHOLDER ══════════════════════════════════ */
+.coming-soon {
+  padding: 80px 24px; text-align: center;
+}
+.coming-soon .cs-icon { font-size: 48px; margin-bottom: 16px; }
+.coming-soon h3 { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 8px; }
+.coming-soon p  { font-size: 14px; color: var(--gray); max-width: 360px; margin: 0 auto; line-height: 1.7; }
+.roadmap-badge  {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--amber-lt); color: var(--amber);
+  font-size: 11px; font-weight: 700; padding: 4px 10px;
+  border-radius: 20px; margin-bottom: 16px;
+}
+
+/* ══ PASSWORD TOGGLE (eye icon) ════════════════════════════ */
+.pwd-wrap { position: relative; }
+.pwd-wrap .form-ctrl { padding-right: 40px; }
+.pwd-eye {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  font-size: 16px; color: var(--gray); padding: 2px 4px;
+  line-height: 1; transition: color var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  user-select: none;
+}
+.pwd-eye:hover { color: var(--blue); }
+
+/* ══ PM3 TAB NAVIGATION ═══════════════════════════════════════ */
+.pm3-tab {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 14px 12px; background: white; border: none;
+  cursor: pointer; border-bottom: 3px solid transparent;
+  transition: all var(--transition); color: var(--gray);
+  font-family: inherit;
+}
+.pm3-tab:hover  { background: var(--bg); color: var(--charcoal); }
+.pm3-tab.active { border-bottom-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+
+/* ══ MOBILE FIRST RESPONSIVE ═══════════════════════════════════ */
+@media (max-width: 768px) {
+  :root { --sidebar: 0px; }
+  .sidebar { transform: translateX(-100%); transition: transform .25s; z-index: 200; }
+  .sidebar.open { transform: translateX(0); width: 240px; box-shadow: 4px 0 24px rgba(0,0,0,.3); }
+  .main { margin-left: 0 !important; padding: 16px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-num  { font-size: 26px; }
+  .form-grid { grid-template-columns: 1fr !important; }
+  .pm3-tab div div:last-child { display: none; }
+  .pm3-tab   { gap: 6px; padding: 12px 6px; }
+  .topbar    { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .topbar-right { width: 100%; justify-content: flex-start; }
+  .card-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .card-head .card-actions, .card-head > div:last-child { width: 100%; }
+  .modal { width: 100% !important; max-height: 95vh; border-radius: 16px 16px 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-body { padding: 16px; }
+  /* 文章表格：手机只显示封面+标题+操作 */
+  #articles-tbody td:nth-child(3),
+  #articles-tbody td:nth-child(4),
+  #articles-tbody td:nth-child(5),
+  #articles-thead th:nth-child(3),
+  #articles-thead th:nth-child(4),
+  #articles-thead th:nth-child(5) { display: none; }
+  /* 产品表格：手机隐藏次要列 */
+  .table-wrap thead th:nth-child(n+4):not(:last-child) { display: none; }
+  .table-wrap tbody td:nth-child(n+4):not(:last-child) { display: none; }
+  /* filter-bar 换行 */
+  .filter-bar { gap: 6px; }
+  .filter-select { font-size: 11px; }
+  /* 按钮文字缩短 */
+  .btn-sm { padding: 5px 8px; font-size: 11px; }
+  /* 弹窗底部按钮竖排 */
+  .modal-foot { flex-wrap: wrap; gap: 8px; }
+  .modal-foot .btn { flex: 1; justify-content: center; min-width: 100px; }
+}
+
+/* 侧边栏遮罩层 */
+#sb-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.4); z-index: 199;
+}
+#sb-overlay.show { display: block; }
+
+/* ── Mobile menu toggle ── */
+.mob-menu-btn {
+  display: none; position: fixed; top: 14px; left: 14px; z-index: 100;
+  width: 38px; height: 38px; border-radius: 9px;
+  background: var(--dark); border: none; cursor: pointer;
+  color: white; font-size: 18px; align-items: center; justify-content: center;
+}
+@media (max-width: 768px) {
+  .mob-menu-btn { display: flex; }
+  .main { padding-top: 64px; }
+}
+</style>
+</head>
+<body>
+<div id="sb-overlay" onclick="closeSidebar()"></div>
+<button class="mob-menu-btn" onclick="toggleSidebar()" title="菜单">☰</button>
+
+<!-- ══════════════════════════════════════════════════════
+     LOGIN SCREEN (CareerCompass 风格 + 动画角色)
+══════════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <!-- 左侧：动画角色 -->
+  <div id="login-characters">
+    <div id="login-characters-inner">
+      <div class="login-char login-char-purple" id="char-purple" data-ref="purple">
+        <div class="login-char-eyes-wrap" id="eyes-purple">
+          <div class="login-char-eye" id="eye-p1"><div class="login-char-pupil" id="pupil-p1"></div></div>
+          <div class="login-char-eye" id="eye-p2"><div class="login-char-pupil" id="pupil-p2"></div></div>
+        </div>
+      </div>
+      <div class="login-char login-char-black" id="char-black" data-ref="black">
+        <div class="login-char-eyes-wrap" id="eyes-black">
+          <div class="login-char-eye" id="eye-b1"><div class="login-char-pupil" id="pupil-b1"></div></div>
+          <div class="login-char-eye" id="eye-b2"><div class="login-char-pupil" id="pupil-b2"></div></div>
+        </div>
+      </div>
+      <div class="login-char login-char-orange" id="char-orange" data-ref="orange">
+        <div class="login-char-eyes-wrap" id="eyes-orange">
+          <div class="login-char-pupil standalone" id="pupil-o1"></div>
+          <div class="login-char-pupil standalone" id="pupil-o2"></div>
+        </div>
+      </div>
+      <div class="login-char login-char-yellow" id="char-yellow" data-ref="yellow">
+        <div class="login-char-eyes-wrap" id="eyes-yellow">
+          <div class="login-char-pupil standalone" id="pupil-y1"></div>
+          <div class="login-char-pupil standalone" id="pupil-y2"></div>
+        </div>
+        <div class="login-char-mouth" id="mouth-y"></div>
+      </div>
+    </div>
+  </div>
+  <!-- 右侧：登录表单 -->
+  <div id="login-form-wrap">
+    <div class="login-panel">
+      <div class="login-logo">
+        <div class="mark">⚖</div>
+        <div class="text">
+          <div class="name">HiMiao Audit</div>
+          <div class="sub">香港保险精算审计平台</div>
+        </div>
+      </div>
+      <h2>欢迎回来</h2>
+      <p>请输入管理员账号登录系统</p>
+
+      <div class="field">
+        <label>用户名</label>
+        <div class="field-wrap">
+          <input id="un" type="text" placeholder="请输入用户名" autocomplete="username"
+                 onfocus="loginCharsTyping(true)" onblur="loginCharsTyping(false)"
+                 onkeydown="if(event.key==='Enter')document.getElementById('pw').focus()">
+        </div>
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <div class="field-wrap">
+          <input id="pw" type="password" placeholder="••••••••" autocomplete="current-password"
+                 onfocus="loginCharsTyping(true)" onblur="loginCharsTyping(false)" oninput="loginCharsPwInput()"
+                 onkeydown="if(event.key==='Enter') { event.preventDefault(); doLogin(); }">
+          <button type="button" class="pwd-toggle" id="pwd-toggle" onclick="loginCharsTogglePwd()" title="显示/隐藏密码">👁</button>
+        </div>
+      </div>
+
+      <div class="login-error" id="login-error">
+        <span>🔒</span>
+        <span id="login-error-msg">用户名或密码错误，请重试</span>
+      </div>
+
+      <button class="btn-login" id="login-btn" onclick="doLogin()">登录后台</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="mark">⚖</div>
+      <div class="txt">
+        <div class="name">HiMiao</div>
+        <div class="ver">后台管理 v3.0</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">主菜单</div>
+      <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard',this)">
+        <span class="nav-icon">📊</span>数据概览
+      </div>
+      <div class="nav-item" data-section="products" onclick="showSection('products',this)">
+        <span class="nav-icon">📋</span>产品管理
+      </div>
+      <div class="nav-item" data-section="articles" onclick="showSection('articles',this)">
+        <span class="nav-icon">📰</span>文章管理
+      </div>
+      <div class="nav-item" data-section="academy" onclick="showSection('academy',this)">
+        <span class="nav-icon">🎓</span> 大讲堂管理
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">用户与营销</div>
+      <div class="nav-item" data-section="subscribers" onclick="showSection('subscribers',this)">
+        <span class="nav-icon">📮</span>订阅者
+      </div>
+      <div class="nav-item" data-section="brokers" onclick="showSection('brokers',this)">
+        <span class="nav-icon">👔</span>经纪人
+      </div>
+      <div class="nav-item" data-section="ads" onclick="showSection('ads',this)">
+        <span class="nav-icon">📢</span>广告位
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">V13 开发中</div>
+      <div class="nav-item" data-section="scraper" onclick="showSection('scraper',this)">
+        <span class="nav-icon">🕷️</span>抓取引擎
+      </div>
+      <div class="nav-item" data-section="approval" onclick="showSection('approval',this)">
+        <span class="nav-icon">✅</span>审批工作流
+      </div>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="nav-item" data-section="change-password" onclick="openChangePasswordModal()" style="margin-bottom:6px">
+        <span class="nav-icon">🔑</span>修改密码
+      </div>
+      <div class="sb-user" onclick="HiMiaoAPI.logout()">
+        <div class="sb-avatar" id="sb-avatar">A</div>
+        <div class="sb-user-info">
+          <div class="sb-username" id="sb-username">admin</div>
+          <div class="sb-role">超级管理员</div>
+        </div>
+        <div class="sb-logout" title="退出登录">↩</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="sec-dashboard" class="section active">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>数据概览</h2>
+          <p>欢迎回来，实时数据汇总</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost btn-sm" onclick="location.reload()">🔄 刷新页面</button>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">已发布产品</div>
+          <div class="stat-num blue" id="stat-products"><div class="spinner"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已发布文章</div>
+          <div class="stat-num blue" id="stat-articles"><div class="spinner"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">邮件订阅者</div>
+          <div class="stat-num green" id="stat-subscribers"><div class="spinner"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">认证经纪人</div>
+          <div class="stat-num" id="stat-brokers"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>系统状态</h3>
+            <p>当前运行环境信息</p>
+          </div>
+        </div>
+        <div style="padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">API 状态</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span id="api-status-dot" style="width:8px;height:8px;background:#9ca3af;border-radius:50%;display:inline-block"></span>
+              <span id="api-status-text" style="font-size:13px;font-weight:600">检测中...</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">后端地址</div>
+            <div style="font-size:12px;font-family:monospace;color:var(--charcoal)" id="api-base-display">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">数据库</div>
+            <div style="font-size:13px;font-weight:600;color:var(--charcoal)">SQLite · 云迁移就绪</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUCTS (M3-00) ═══ -->
+    <div id="sec-products" class="section">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>产品管理</h2>
+          <p>四大险种独立 CRUD，V8.0 合规，数据来自保司官方披露</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" id="pm3-add-btn" onclick="pm3OpenCreate()">＋ 新建产品</button>
+        </div>
+      </div>
+
+      <!-- ── Tab 导航 ── -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;background:white;border-radius:var(--radius-lg) var(--radius-lg) 0 0;overflow:hidden;box-shadow:var(--shadow);">
+        <button class="pm3-tab active" data-type="savings"   onclick="pm3SwitchTab('savings',this)">
+          <span style="font-size:16px">💰</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;line-height:1.2">储蓄险</div>
+            <div style="font-size:10px;opacity:.65">Savings</div>
+          </div>
+        </button>
+        <button class="pm3-tab" data-type="medical"  onclick="pm3SwitchTab('medical',this)">
+          <span style="font-size:16px">🏥</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;line-height:1.2">医疗险</div>
+            <div style="font-size:10px;opacity:.65">Medical</div>
+          </div>
+        </button>
+        <button class="pm3-tab" data-type="critical" onclick="pm3SwitchTab('critical',this)">
+          <span style="font-size:16px">❤️</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;line-height:1.2">重疾险</div>
+            <div style="font-size:10px;opacity:.65">Critical</div>
+          </div>
+        </button>
+        <button class="pm3-tab" data-type="annuity"  onclick="pm3SwitchTab('annuity',this)">
+          <span style="font-size:16px">🎯</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;line-height:1.2">年金险</div>
+            <div style="font-size:10px;opacity:.65">Annuity</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- ── 险种面板（四合一，按 data-type 切换） ── -->
+      <div class="card" id="pm3-card">
+        <div class="card-head">
+          <div>
+            <h3 id="pm3-card-title">储蓄险产品列表</h3>
+            <p style="font-size:12px;color:var(--gray);margin-top:2px">点击发布开关可快速上线/下线</p>
+          </div>
+          <div class="card-actions">
+            <select class="filter-select" id="pm3-f-insurer" onchange="pm3Load()">
+              <option value="">全部保司</option>
+              <option value="AIA">AIA 友邦</option>
+              <option value="Prudential">Prudential 保诚</option>
+              <option value="Manulife">Manulife 宏利</option>
+              <option value="HSBC Life">HSBC Life 汇丰</option>
+              <option value="Sun Life">Sun Life 永明</option>
+              <option value="Bowtie">Bowtie</option>
+            </select>
+            <select class="filter-select" id="pm3-f-published" onchange="pm3Load()">
+              <option value="">全部状态</option>
+              <option value="true">已发布</option>
+              <option value="false">未发布</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="pm3Load()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr id="pm3-thead"></tr></thead>
+            <tbody id="pm3-tbody">
+              <tr><td colspan="10"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pm3-pagination" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ═══ ARTICLES ═══ -->
+    <div id="sec-articles" class="section">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>文章管理</h2>
+          <p>在这里写文章、改文章、设置哪篇放在最显眼的位置</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="openArticleModal()">✏️ 写新文章</button>
+        </div>
+      </div>
+
+      <!-- 快捷说明卡片 -->
+      <div style="background:var(--blue-lt);border:1px solid #bae6fd;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#0369a1;line-height:1.7">
+        💡 <strong>使用提示：</strong>点击「✏️ 写新文章」填写标题和内容即可发布。标题填好后系统自动生成文章链接，不需要手动填写。封面图只需粘贴图片网址，会自动预览。
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div><h3 id="articles-list-title">已发布文章</h3><p id="articles-count" style="font-size:12px;color:var(--gray);margin-top:2px"></p></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div style="display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:white">
+              <button id="art-tab-published" onclick="artSwitchTab('published')"
+                style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:var(--blue);color:white">已发布</button>
+              <button id="art-tab-draft" onclick="artSwitchTab('draft')"
+                style="padding:6px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:white;color:var(--charcoal)">草稿</button>
+            </div>
+            <select class="filter-select" id="f-acat" onchange="loadArticles()">
+              <option value="">全部分类</option>
+              <option value="market">📊 市场情报</option>
+              <option value="alert">🔴 避雷预警</option>
+              <option value="policy">📋 政策解读</option>
+              <option value="audit">⚖️ 产品审计</option>
+              <option value="guide">🧭 新手指南</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--charcoal);cursor:pointer;padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;background:white">
+              <input type="checkbox" id="f-ahot" onchange="loadArticles()" style="accent-color:var(--blue)">
+              🔥 仅热读
+            </label>
+            <button class="btn btn-ghost btn-sm" onclick="loadArticles()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th style="width:56px">封面</th>
+              <th>文章标题</th>
+              <th>分类</th>
+              <th>热读</th>
+              <th>发布时间</th>
+              <th>操作</th>
+            </tr></thead>
+            <tbody id="articles-tbody">
+              <tr><td colspan="6">
+                <div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ACADEMY ═══ -->
+    <div id="sec-academy" class="section">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>大讲堂管理</h2>
+          <p>管理大讲堂知识文章，支持 Markdown 格式</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="openAcademyEditor(null)">✏️ 新建文章</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>大讲堂文章</h3>
+            <p id="academy-count" style="font-size:12px;color:var(--gray);margin-top:2px"></p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select class="filter-select" id="f-acad-cat" onchange="loadAcademyArticles()">
+              <option value="">全部分类</option>
+              <option value="savings">🏦 储蓄险入门</option>
+              <option value="ci">🏥 重疾险解析</option>
+              <option value="compare">⚖️ 内地VS港险</option>
+              <option value="claims">📋 理赔实战</option>
+              <option value="reg">📊 监管与合规</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="loadAcademyArticles()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>标题</th>
+              <th>分类</th>
+              <th>状态</th>
+              <th>发布时间</th>
+              <th>操作</th>
+            </tr></thead>
+            <tbody id="academy-tbody">
+              <tr><td colspan="5">
+                <div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SUBSCRIBERS ═══ -->
+    <div id="sec-subscribers" class="section">
+      <div class="topbar">
+        <div class="topbar-left"><h2>订阅者管理</h2><p>邮件审计周报订阅列表</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>订阅者列表</h3><p id="sub-count">—</p></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="exportSubscribersCSV()">⬇ 导出 CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadSubscribers()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>邮箱</th><th>来源</th><th>订阅时间</th><th>操作</th>
+            </tr></thead>
+            <tbody id="subscribers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BROKERS ═══ -->
+    <div id="sec-brokers" class="section">
+      <div class="topbar">
+        <div class="topbar-left"><h2>经纪人管理</h2><p>认证经纪人名录管理</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>经纪人列表</h3></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="openBrokerModal()">＋ 新增经纪人</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadBrokers()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>姓名</th><th>公司</th><th>牌照号</th><th>专长</th><th>认证</th><th>操作</th>
+            </tr></thead>
+            <tbody id="brokers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ADS ═══ -->
+    <div id="sec-ads" class="section">
+      <div class="topbar">
+        <div class="topbar-left"><h2>广告位管理</h2><p>前端广告位的配置与投放控制</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>广告位列表</h3></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="openAdModal()">＋ 新增广告位</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadAds()">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>广告位 Key</th><th>广告主</th><th>图片预览</th><th>类型</th><th>状态</th><th>操作</th>
+            </tr></thead>
+            <tbody id="ads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCRAPER ═══ -->
+    <div id="sec-scraper" class="section">
+      <div class="topbar">
+        <div class="topbar-left"><h2>🤖 自动化中心</h2><p>新闻自动抓取 · 手动触发 · 定时任务状态</p></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head">
+          <div><h3>📰 新闻抓取</h3><p>来源：保监局 · 强积金局 · AIA香港</p></div>
+          <button class="btn btn-primary" id="crawl-btn" onclick="scraperTriggerCrawl()">🕷 立即抓取</button>
+        </div>
+        <div style="padding:0 24px 20px">
+          <div id="crawl-status" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.7"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+            <div style="background:var(--green-lt);border:1px solid #bbf7d0;border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:22px;margin-bottom:6px">🏛</div>
+              <div style="font-weight:700;font-size:12px;color:var(--green)">保监局 HKIA</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:3px">监管政策 · 通告</div>
+            </div>
+            <div style="background:var(--blue-lt);border:1px solid #bae6fd;border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:22px;margin-bottom:6px">💼</div>
+              <div style="font-weight:700;font-size:12px;color:var(--blue-dk)">强积金局 MPFA</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:3px">市场资讯</div>
+            </div>
+            <div style="background:var(--amber-lt);border:1px solid #fde68a;border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:22px;margin-bottom:6px">🏢</div>
+              <div style="font-weight:700;font-size:12px;color:var(--amber)">AIA 香港</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:3px">产品 · 市场动态</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.8;background:#f8f9fc;border-radius:8px;padding:12px 14px;border:1px solid var(--border)">
+            抓到的文章自动进入 <b style="color:var(--charcoal)">「待审核」</b> 队列，不会直接发布。每次每源最多抓 5 篇新文章（已入库的自动跳过）。
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>📋 最近抓取记录</h3><p id="crawl-last-time">上次抓取时间：—</p></div>
+          <button class="btn btn-ghost btn-sm" onclick="scraperLoadHistory([])">🔄 刷新</button>
+        </div>
+        <div id="crawl-history" style="padding:24px;text-align:center;color:var(--gray);font-size:13px">点击「立即抓取」开始第一次抓取</div>
+      </div>
+    </div>
+
+    <!-- ═══ APPROVAL ═══ Master-Detail 布局 ── -->
+    <div id="sec-approval" class="section">
+      <div class="topbar">
+        <div class="topbar-left"><h2>📥 待审核内容</h2><p>AI抓取的新闻等你一键发布或忽略 · 点击左侧文章查看全文后操作</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadApproval()">🔄 刷新</button>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>新闻草稿队列</h3><p id="approval-count">加载中…</p></div>
+        </div>
+        <div id="approval-master-detail" style="display:grid;grid-template-columns:360px 1fr;gap:20px;min-height:480px">
+          <div id="approval-list" style="padding:12px;overflow-y:auto;max-height:560px;border-right:1px solid var(--border)"></div>
+          <div id="approval-detail" style="padding:20px;overflow-y:auto;background:var(--bg)">
+            <div id="approval-detail-placeholder" style="text-align:center;padding:80px 24px;color:var(--gray);font-size:14px">点击左侧文章查看完整正文后再进行审批</div>
+            <div id="approval-detail-content" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHANGE PASSWORD ═══ (modal-only – section not used) ═══ -->
+    <div id="sec-change-password" class="section">
+      <div class="topbar"><div class="topbar-left"><h2>修改密码</h2></div></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════════════════════
+     PRODUCT MODAL
+══════════════════════════════════════════════════════ -->
+<!-- ══ CHANGE PASSWORD MODAL ══════════════════════════════════════════ -->
+<div id="cp-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('cp-modal')">
+  <div class="modal" style="max-width:440px;width:100%;">
+    <div class="modal-head">
+      <div>
+        <h3>修改密码</h3>
+        <p style="font-size:12px;color:#8a9aaa;margin-top:2px;">修改成功后将自动退出登录</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('cp-modal')">✕</button>
+    </div>
+    <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
+      <div class="form-row">
+        <label>当前密码 <span class="req">*</span></label>
+        <div class="pwd-wrap">
+          <input class="form-ctrl" id="cp-old" type="password"
+                 placeholder="请输入当前密码" autocomplete="current-password">
+          <button type="button" class="pwd-eye" onclick="togglePwd('cp-old',this)" title="显示/隐藏密码" aria-label="显示/隐藏密码">👁</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>新密码 <span class="req">*</span></label>
+        <div class="pwd-wrap">
+          <input class="form-ctrl" id="cp-new" type="password"
+                 placeholder="至少 8 位，区分大小写" autocomplete="new-password">
+          <button type="button" class="pwd-eye" onclick="togglePwd('cp-new',this)" title="显示/隐藏密码" aria-label="显示/隐藏密码">👁</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>确认新密码 <span class="req">*</span></label>
+        <div class="pwd-wrap">
+          <input class="form-ctrl" id="cp-confirm" type="password"
+                 placeholder="再次输入新密码" autocomplete="new-password">
+          <button type="button" class="pwd-eye" onclick="togglePwd('cp-confirm',this)" title="显示/隐藏密码" aria-label="显示/隐藏密码">👁</button>
+        </div>
+      </div>
+      <div id="cp-error" style="display:none;color:#e53935;font-size:13px;
+           background:#fce8e8;padding:10px 14px;border-radius:8px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn" onclick="closeModal('cp-modal')">取消</button>
+        <button class="btn btn-primary" id="cp-submit-btn" onclick="doChangePassword()">
+          确认修改
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PM3 PRODUCT MODAL (M3-00 · 四险种动态表单) ══════════════════════════ -->
+<div id="m3-product-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('m3-product-modal')">
+  <div class="modal" style="width:820px;max-width:100%">
+    <div class="modal-head">
+      <div>
+        <h3 id="m3pm-title">新建产品</h3>
+        <p id="m3pm-sub" style="font-size:12px;color:var(--gray);margin-top:2px">填写客观精算数据，严禁主观推介字段</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('m3-product-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="m3pm-body">
+      <!-- 由 JS 动态注入，依险种切换字段 -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m3-product-modal')">取消</button>
+      <button class="btn btn-primary" id="m3pm-save-btn" onclick="pm3Save()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ══ BROKER MODAL ══ -->
+<div id="broker-modal" class="modal-overlay" style="display:none">
+  <div class="modal" style="width:520px">
+    <div class="modal-head">
+      <h3 id="broker-modal-title">新增经纪人</h3>
+      <button class="modal-close" onclick="closeModal('broker-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="bk-id">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>姓名 <span class="req">*</span></label>
+          <input class="form-ctrl" id="bk-name" placeholder="张三">
+        </div>
+        <div class="form-row">
+          <label>保监局牌照号</label>
+          <input class="form-ctrl" id="bk-license" placeholder="IA-XXXXXX">
+        </div>
+        <div class="form-row">
+          <label>所属公司</label>
+          <input class="form-ctrl" id="bk-company" placeholder="AIA 香港">
+        </div>
+        <div class="form-row">
+          <label>联系电话</label>
+          <input class="form-ctrl" id="bk-phone" placeholder="+852 XXXX XXXX">
+        </div>
+        <div class="form-row">
+          <label>电子邮件</label>
+          <input class="form-ctrl" id="bk-email" type="email" placeholder="broker@example.com">
+        </div>
+        <div class="form-row">
+          <label>微信号</label>
+          <input class="form-ctrl" id="bk-wechat" placeholder="wechat_id">
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <label>专长（逗号分隔）</label>
+        <input class="form-ctrl" id="bk-specialties" placeholder="储蓄险,重疾险,高端医疗险">
+      </div>
+      <div class="form-row">
+        <label>头像 URL</label>
+        <input class="form-ctrl" id="bk-avatar" placeholder="https://...">
+      </div>
+      <div class="form-row">
+        <label>简介</label>
+        <textarea class="form-ctrl" id="bk-intro" rows="3" placeholder="经纪人背景介绍…"></textarea>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:4px;cursor:pointer;font-size:13px;font-weight:600">
+        <input type="checkbox" id="bk-verified" style="accent-color:var(--green)">
+        ✅ 直接标记为已认证
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('broker-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveBroker()">保存经纪人</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AD SLOT MODAL ══ -->
+<div id="ad-modal" class="modal-overlay" style="display:none">
+  <div class="modal" style="width:520px">
+    <div class="modal-head">
+      <h3 id="ad-modal-title">新增广告位</h3>
+      <button class="modal-close" onclick="closeModal('ad-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ad-slot-key-orig">
+      <input type="hidden" id="ad-slot-key">
+      <div class="form-grid">
+        <div class="form-row" style="grid-column:1/-1">
+          <label>展示位置 <span class="req">*</span></label>
+          <select class="form-ctrl" id="ad-slot-select" onchange="onAdSlotSelect(this.value)">
+            <option value="">— 选择位置 —</option>
+            <optgroup label="首页推送图">
+              <option value="home_hero_1">首页大图（左侧主推）</option>
+              <option value="home_hero_2">首页小图 1（右侧第一张）</option>
+              <option value="home_hero_3">首页小图 2（右侧第二张）</option>
+            </optgroup>
+            <optgroup label="其他位置">
+              <option value="sidebar_top">侧边栏顶部</option>
+              <option value="ticker_1">顶部滚动条</option>
+            </optgroup>
+          </select>
+          <div class="form-hint" id="ad-slot-hint" style="color:var(--blue-dk)"></div>
+        </div>
+        <div class="form-row">
+          <label>标题 / 说明</label>
+          <input class="form-ctrl" id="ad-slot-name" placeholder="例：保诚储蓄险新品发布">
+        </div>
+        <div class="form-row">
+          <label>广告主（可选）</label>
+          <input class="form-ctrl" id="ad-advertiser" placeholder="例：保诚保险">
+        </div>
+      </div>
+      <input type="hidden" id="ad-type" value="banner">
+      <div class="form-row" style="margin-top:12px">
+        <label>图片</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+          <label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--gray-lt);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;color:var(--text);transition:background .15s;"
+                 onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='var(--gray-lt)'">
+            📎 上传图片
+            <input type="file" accept="image/*" style="display:none" onchange="uploadInputImage(this,'ad-image',function(u){var p=document.getElementById('ad-image-preview');if(p){p.src=u;p.style.display='block';}})">
+          </label>
+          <span id="ad-image-upload-status" style="font-size:11px;color:var(--gray)"></span>
+        </div>
+        <input class="form-ctrl" id="ad-image" placeholder="https://... 或点击上传">
+        <img id="ad-image-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin-top:6px;display:none">
+      </div>
+      <div class="form-row">
+        <label>点击跳转链接</label>
+        <input class="form-ctrl" id="ad-link" placeholder="https://...">
+      </div>
+      <div class="form-row">
+        <label>广告文案（纯文字广告用）</label>
+        <textarea class="form-ctrl" id="ad-content" rows="2" placeholder="广告正文内容…"></textarea>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-size:13px;font-weight:600">
+        <input type="checkbox" id="ad-active" style="accent-color:var(--green)">
+        🌐 立即投放
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('ad-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveAdSlot()">保存广告位</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ACADEMY EDITOR MODAL
+══════════════════════════════════════════════════════ -->
+<div id="modal-academy-editor" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal modal-lg" style="width:720px;max-width:100%">
+    <div class="modal-head">
+      <div>
+        <h3 id="acad-modal-title">✏️ 新建大讲堂文章</h3>
+        <p style="font-size:12px;color:var(--gray);margin-top:2px">支持 Markdown 格式，发布后在大讲堂公开展示</p>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal-academy-editor').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+
+        <!-- 标题 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <label>文章标题 <span class="req">*</span></label>
+          <input class="form-ctrl" id="acad-title" placeholder="例：储蓄险 IRR 怎么看？三个数字决定你亏不亏" style="font-size:15px;font-weight:600">
+        </div>
+
+        <!-- 分类 -->
+        <div class="form-row">
+          <label>文章分类 <span class="req">*</span></label>
+          <select class="form-ctrl" id="acad-cat">
+            <option value="savings">🏦 储蓄险入门</option>
+            <option value="ci">🏥 重疾险解析</option>
+            <option value="compare">⚖️ 内地VS港险</option>
+            <option value="claims">📋 理赔实战</option>
+            <option value="reg">📊 监管与合规</option>
+          </select>
+        </div>
+
+        <!-- 发布开关 -->
+        <div class="form-row" style="display:flex;align-items:flex-end">
+          <label class="check-row" style="width:100%;height:42px">
+            <input type="checkbox" id="acad-published">
+            <span>🌐 立即发布（勾选后读者可见）</span>
+          </label>
+        </div>
+
+        <!-- 摘要 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <label>文章摘要 <span style="color:var(--gray);font-weight:400;font-size:11px">（显示在文章列表，建议50字以内）</span></label>
+          <textarea class="form-ctrl" id="acad-excerpt" rows="2" placeholder="一两句话说明这篇文章讲什么，读者看到后决定要不要点进来看…"></textarea>
+        </div>
+
+        <!-- 正文 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <label style="margin-bottom:0">文章正文 <span class="req">*</span></label>
+            <span style="font-size:11px;color:var(--gray);font-family:monospace;background:var(--gray-lt);padding:3px 8px;border-radius:4px">
+              支持 Markdown：## 标题&nbsp;&nbsp;**粗体**&nbsp;&nbsp;&gt; 引用
+            </span>
+          </div>
+          <!-- 图片插入工具栏 -->
+          <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+            <label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--gray-lt);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;color:var(--text);transition:background .15s;"
+                   onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='var(--gray-lt)'">
+              📎 上传图片
+              <input type="file" accept="image/*" style="display:none" onchange="acadUploadImage(this)">
+            </label>
+            <button type="button" onclick="acadInsertImageUrl()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--gray-lt);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:background .15s;"
+                    onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='var(--gray-lt)'">
+              🔗 图片链接
+            </button>
+            <span id="acad-img-status" style="font-size:11px;color:var(--gray);"></span>
+          </div>
+          <textarea class="form-ctrl" id="acad-content" style="min-height:400px;line-height:1.8;font-family:monospace;font-size:13px"
+                    placeholder="在这里用 Markdown 格式写文章正文…
+
+## 第一节标题
+
+正文段落内容…
+
+## 第二节标题
+
+- 列表项一
+- 列表项二
+
+> 引用或重要提示内容"></textarea>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-academy-editor').style.display='none'">取消</button>
+      <button class="btn btn-primary" id="acad-save-btn" onclick="saveAcademyArticle()">💾 保存文章</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ARTICLE MODAL
+══════════════════════════════════════════════════════ -->
+<div id="article-modal" class="modal-overlay" style="display:none">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div><h3 id="article-modal-title">✏️ 写新文章</h3><p id="article-modal-sub">填好标题和正文，点发布就行</p></div>
+      <button class="modal-close" onclick="closeModal('article-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- 隐藏字段：slug（自动生成，用户不可见） -->
+      <input type="hidden" id="a-slug">
+
+      <div class="form-grid">
+
+        <!-- 标题 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <label>文章标题 <span class="req">*</span></label>
+          <input class="form-ctrl" id="a-title" placeholder="例：特朗普关税100天：你的美金保单受影响了吗？"
+                 oninput="autoGenSlug(this.value)" style="font-size:15px;font-weight:600">
+          <div class="form-hint" id="a-slug-hint" style="color:var(--blue)"></div>
+        </div>
+
+        <!-- 分类 -->
+        <div class="form-row">
+          <label>文章分类 <span class="req">*</span></label>
+          <select class="form-ctrl" id="a-cat">
+            <option value="market">📊 市场情报</option>
+            <option value="alert">🔴 避雷预警</option>
+            <option value="policy">📋 政策解读</option>
+            <option value="audit">⚖️ 产品审计</option>
+            <option value="guide">🧭 新手指南</option>
+          </select>
+        </div>
+
+        <!-- 热读开关 -->
+        <div class="form-row" style="display:flex;align-items:flex-end">
+          <label class="check-row" style="width:100%;height:42px">
+            <input type="checkbox" id="a-hot">
+            <span>🔥 设为本周热读（显示在侧边栏推荐）</span>
+          </label>
+        </div>
+
+        <!-- 封面图 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <label>封面图片</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--gray-lt);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;color:var(--text);transition:background .15s;"
+                   onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='var(--gray-lt)'">
+              📎 上传封面
+              <input type="file" accept="image/*" style="display:none" onchange="uploadInputImage(this,'a-cover',function(u){previewCover(u);})">
+            </label>
+            <span id="a-cover-upload-status" style="font-size:11px;color:var(--gray)"></span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <input class="form-ctrl" id="a-cover" placeholder="粘贴图片网址，例：https://images.unsplash.com/…"
+                   oninput="previewCover(this.value)" style="flex:1">
+            <img id="a-cover-preview" src="" alt=""
+                 style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:none;flex-shrink:0">
+          </div>
+          <div class="form-hint">可上传图片或粘贴网址，右侧自动预览</div>
+        </div>
+
+        <!-- 摘要 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <label style="margin-bottom:0">文章摘要 <span style="color:var(--gray);font-weight:400;font-size:11px">（显示在文章列表，建议50字以内）</span></label>
+          </div>
+          <textarea class="form-ctrl" id="a-excerpt" rows="2"
+                    placeholder="一两句话说明这篇文章讲什么，读者看到后决定要不要点进来看…"></textarea>
+        </div>
+
+        <!-- 正文 -->
+        <div class="form-row" style="grid-column:1/-1">
+          <label>文章正文 <span style="color:var(--gray);font-weight:400;font-size:11px">（直接写内容，不需要任何特殊格式）</span></label>
+          <textarea class="form-ctrl" id="a-body" style="min-height:260px;line-height:1.8"
+                    placeholder="在这里写文章正文内容…
+
+段落之间空一行即可，不需要任何特殊符号。
+
+例：
+香港保险市场在过去一个季度出现了明显变化……
+
+具体来看，储蓄险方面……"></textarea>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="closeModal('article-modal')">取消</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-warning" onclick="saveArticleDraft()">💾 存草稿</button>
+        <button class="btn btn-primary" id="article-save-btn" onclick="saveArticle()">📤 发布文章</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DIALOG ══ -->
+<div id="confirm-overlay" class="confirm-overlay" style="display:none">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title">确认操作？</div>
+    <div class="confirm-msg" id="confirm-msg">此操作不可撤销，请确认。</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="resolveConfirm(false)">取消</button>
+      <button class="btn btn-danger" id="confirm-ok-btn" onclick="resolveConfirm(true)">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST CONTAINER ══ -->
+<div id="toast-container"></div>
+
+<script src="js/api-client.js?v=2.2"></script>
+<script>
+/* ════════════════════════════════════════════════════════════
+   HiMiao Admin JS v3.0
+   ════════════════════════════════════════════════════════════ */
+const API = window.HiMiaoAPI;
+
+/* ══ LOGIN 动画角色 (CareerCompass 风格) ═══════════════════════════════ */
+(function() {
+  var mouseX = 0, mouseY = 0;
+  var isTyping = false, isLookingAtEachOther = false;
+  var showPassword = false, passwordLength = 0, isPurplePeeking = false;
+  var purpleBlink = false, blackBlink = false;
+
+  document.addEventListener('mousemove', function(e) { mouseX = e.clientX; mouseY = e.clientY; });
+
+  function calcPupilPos(el, maxDist) {
+    maxDist = maxDist || 5;
+    if (!el) return { x: 0, y: 0 };
+    var r = el.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    var dx = mouseX - cx, dy = mouseY - cy;
+    var dist = Math.min(Math.sqrt(dx * dx + dy * dy), maxDist);
+    var angle = Math.atan2(dy, dx);
+    return { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist };
+  }
+
+  function calcPosition(el) {
+    if (!el) return { faceX: 0, faceY: 0, bodySkew: 0 };
+    var r = el.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 3;
+    var dx = mouseX - cx, dy = mouseY - cy;
+    return {
+      faceX: Math.max(-15, Math.min(15, dx / 20)),
+      faceY: Math.max(-10, Math.min(10, dy / 30)),
+      bodySkew: Math.max(-6, Math.min(6, -dx / 120))
+    };
+  }
+
+  function updatePupils() {
+    var screen = document.getElementById('login-screen');
+    if (!screen || screen.style.display === 'none') return;
+
+    var entranceDone = (Date.now() - (window._loginCharsStart || 0)) > 500;
+    var isHidingPassword = passwordLength > 0 && !showPassword;
+
+    var pupils = ['p1','p2','b1','b2','o1','o2','y1','y2'];
+    var forceLook = null;
+    if (isLookingAtEachOther) forceLook = { x: 3, y: 4 };
+    else if (passwordLength > 0 && showPassword && isPurplePeeking) forceLook = { x: 4, y: 5 };
+    else if (passwordLength > 0 && showPassword && !isPurplePeeking) forceLook = { x: -4, y: -4 };
+
+    pupils.forEach(function(id) {
+      var p = document.getElementById('pupil-' + id);
+      if (!p) return;
+      var pos = forceLook && (id === 'p1' || id === 'p2') ? forceLook :
+                forceLook && (id === 'b1' || id === 'b2') ? { x: 0, y: -4 } :
+                forceLook && (id === 'o1' || id === 'o2' || id === 'y1' || id === 'y2') ? { x: -5, y: -4 } :
+                calcPupilPos(p.parentElement.classList.contains('login-char-eye') ? p.parentElement : p, 5);
+      p.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+    });
+
+    var purple = document.getElementById('char-purple');
+    var black = document.getElementById('char-black');
+    var orange = document.getElementById('char-orange');
+    var yellow = document.getElementById('char-yellow');
+    var ep = document.getElementById('eyes-purple');
+    var eb = document.getElementById('eyes-black');
+    var eo = document.getElementById('eyes-orange');
+    var ey = document.getElementById('eyes-yellow');
+    var mouth = document.getElementById('mouth-y');
+
+    if (entranceDone) {
+      var pp = calcPosition(purple), bp = calcPosition(black);
+      var op = calcPosition(orange), yp = calcPosition(yellow);
+
+      if (purple) {
+        purple.style.height = (isTyping || isHidingPassword) ? '440px' : '400px';
+        var ptr = (passwordLength > 0 && showPassword) ? 'skewX(0deg)' :
+          isHidingPassword ? 'skewX(' + ((pp.bodySkew || 0) - 15) + 'deg) translateX(55px)' :
+          (isTyping ? 'skewX(' + ((pp.bodySkew || 0) - 12) + 'deg) translateX(40px)' :
+          'skewX(' + (pp.bodySkew || 0) + 'deg)');
+        purple.style.transform = ptr;
+      }
+      if (ep) {
+        var pl = (passwordLength > 0 && showPassword) ? 20 : isLookingAtEachOther ? 55 : 45 + (pp.faceX || 0);
+        var pt = (passwordLength > 0 && showPassword) ? 35 : isLookingAtEachOther ? 65 : 40 + (pp.faceY || 0);
+        ep.style.left = pl + 'px'; ep.style.top = pt + 'px';
+      }
+
+      if (black) {
+        var btr = (passwordLength > 0 && showPassword) ? 'skewX(0deg)' :
+          isLookingAtEachOther ? 'skewX(' + ((bp.bodySkew || 0) * 1.5 + 10) + 'deg) translateX(20px)' :
+          (isTyping || isHidingPassword) ? 'skewX(' + ((bp.bodySkew || 0) * 1.5) + 'deg)' :
+          'skewX(' + (bp.bodySkew || 0) + 'deg)';
+        black.style.transform = btr;
+      }
+      if (eb) {
+        var bl = (passwordLength > 0 && showPassword) ? 10 : isLookingAtEachOther ? 32 : 26 + (bp.faceX || 0);
+        var bt = (passwordLength > 0 && showPassword) ? 28 : isLookingAtEachOther ? 12 : 32 + (bp.faceY || 0);
+        eb.style.left = bl + 'px'; eb.style.top = bt + 'px';
+      }
+
+      if (orange) {
+        orange.style.transform = (passwordLength > 0 && showPassword) ? 'skewX(0deg)' : 'skewX(' + (op.bodySkew || 0) + 'deg)';
+      }
+      if (eo) {
+        var ol = (passwordLength > 0 && showPassword) ? 50 : 82 + (op.faceX || 0);
+        var ot = (passwordLength > 0 && showPassword) ? 85 : 90 + (op.faceY || 0);
+        eo.style.left = ol + 'px'; eo.style.top = ot + 'px';
+      }
+
+      if (yellow) {
+        yellow.style.transform = (passwordLength > 0 && showPassword) ? 'skewX(0deg)' : 'skewX(' + (yp.bodySkew || 0) + 'deg)';
+      }
+      if (ey) {
+        var yl = (passwordLength > 0 && showPassword) ? 20 : 52 + (yp.faceX || 0);
+        var yt = (passwordLength > 0 && showPassword) ? 35 : 40 + (yp.faceY || 0);
+        ey.style.left = yl + 'px'; ey.style.top = yt + 'px';
+      }
+      if (mouth) {
+        mouth.style.left = ((passwordLength > 0 && showPassword) ? 10 : 40 + (yp.faceX || 0)) + 'px';
+        mouth.style.top = ((passwordLength > 0 && showPassword) ? 88 : 88 + (yp.faceY || 0)) + 'px';
+      }
+    }
+  }
+
+  function blinkLoop() {
+    function sched() {
+      setTimeout(function() {
+        purpleBlink = true;
+        setTimeout(function() { purpleBlink = false; sched(); }, 150);
+      }, Math.random() * 4000 + 3000);
+    }
+    sched();
+  }
+  function blinkLoopBlack() {
+    function sched() {
+      setTimeout(function() {
+        blackBlink = true;
+        setTimeout(function() { blackBlink = false; sched(); }, 150);
+      }, Math.random() * 4000 + 3000);
+    }
+    sched();
+  }
+
+  function tick() {
+    var e1 = document.getElementById('eye-p1'), e2 = document.getElementById('eye-p2');
+    var b1 = document.getElementById('eye-b1'), b2 = document.getElementById('eye-b2');
+    if (e1) e1.classList.toggle('blink', purpleBlink);
+    if (e2) e2.classList.toggle('blink', purpleBlink);
+    if (b1) b1.classList.toggle('blink', blackBlink);
+    if (b2) b2.classList.toggle('blink', blackBlink);
+    updatePupils();
+    requestAnimationFrame(tick);
+  }
+
+  window.loginCharsTyping = function(on) {
+    isTyping = on;
+    if (on) {
+      isLookingAtEachOther = true;
+      setTimeout(function() { isLookingAtEachOther = false; }, 800);
+    }
+  };
+
+  window.loginCharsPwInput = function() {
+    passwordLength = (document.getElementById('pw') || {}).value.length;
+  };
+
+  window.loginCharsTogglePwd = function() {
+    var pw = document.getElementById('pw');
+    var btn = document.getElementById('pwd-toggle');
+    if (!pw || !btn) return;
+    showPassword = !showPassword;
+    pw.type = showPassword ? 'text' : 'password';
+    btn.textContent = showPassword ? '🙈' : '👁';
+    passwordLength = pw.value.length;
+  };
+
+  window._loginCharsStart = Date.now();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      window._loginCharsStart = Date.now();
+      blinkLoop(); blinkLoopBlack();
+      setInterval(function() {
+        if (passwordLength > 0 && showPassword && Math.random() < 0.02) {
+          isPurplePeeking = true;
+          setTimeout(function() { isPurplePeeking = false; }, 800);
+        }
+      }, 500);
+      tick();
+    });
+  } else {
+    blinkLoop(); blinkLoopBlack();
+    setInterval(function() {
+      if (passwordLength > 0 && showPassword && Math.random() < 0.02) {
+        isPurplePeeking = true;
+        setTimeout(function() { isPurplePeeking = false; }, 800);
+      }
+    }, 500);
+    tick();
+  }
+})();
+
+/* ══ INIT ═══════════════════════════════════════════════════ */
+// _appReady 标志：防止 token 尚未稳定时的 401 误触发 logout
+// showApp() 完成后才置 true；api-client.js 里的 logout-on-401 应检查此标志
+window._appReady = false;
+
+(function init() {
+  document.getElementById('api-base-display').textContent =
+    typeof API_BASE !== 'undefined' ? API_BASE : '（请检查 api-client.js）';
+
+  if (API.getToken()) {
+    showApp();
+  }
+
+  // Health check（与登录流程完全隔离，失败不影响登录状态）
+  checkAPIHealth();
+})();
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // 先置 ready，再加载数据——确保 token 稳定后 401 才允许触发 logout
+  window._appReady = true;
+
+  // 加上明确的 catch 拦截，死死按住异常，绝对不让它往外抛导致闪退
+  loadDashboard().catch(e => console.error("拦截到 Dashboard 异常:", e));
+  pm3Load().catch(e => console.error("拦截到 PM3 Products 异常:", e));
+}
+
+/* ══ HEALTH CHECK ════════════════════════════════════════════ */
+async function checkAPIHealth() {
+  const dot  = document.getElementById('api-status-dot');
+  const text = document.getElementById('api-status-text');
+  try {
+    const base = (typeof API_BASE !== 'undefined')
+      ? API_BASE.replace('/api/v1', '')
+      : window.location.origin;
+    const res = await fetch(base + '/health', { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      dot.style.background  = '#16a34a';
+      text.textContent      = '运行正常';
+      text.style.color      = '#16a34a';
+    } else {
+      throw new Error();
+    }
+  } catch {
+    dot.style.background = '#dc2626';
+    text.textContent     = '连接失败（请检查后端服务）';
+    text.style.color     = '#dc2626';
+  }
+}
+
+/* ══ LOGIN ════════════════════════════════════════════════════ */
+async function doLogin() {
+  const un  = document.getElementById('un').value.trim();
+  const pw  = document.getElementById('pw').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  const msg = document.getElementById('login-error-msg');
+
+  err.classList.remove('visible');
+
+  if (!un || !pw) {
+    err.classList.add('visible');
+    msg.textContent = '请填写用户名和密码';
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.textContent = '登录中…';
+
+  try {
+    await API.login(un, pw);
+    // 确保 token 已写入 localStorage 后，再切换到 App 界面
+    // 用 setTimeout(0) 让 storage 写操作在当前调用栈完成后再执行 showApp
+    await new Promise(r => setTimeout(r, 0));
+    showApp();
+  } catch (e) {
+    err.classList.add('visible');
+    const status = e.message || '';
+    if (status.includes('Failed to fetch') || status.includes('NetworkError')) {
+      msg.textContent = '无法连接后端服务，请检查 API 地址和后端是否运行';
+    } else {
+      msg.textContent = '用户名或密码错误';
+    }
+    document.getElementById('pw').focus();
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '登录后台';
+  }
+}
+
+/* ══ NAV ════════════════════════════════════════════════════ */
+function toggleSidebar() {
+  const sb  = document.querySelector('.sidebar');
+  const ov  = document.getElementById('sb-overlay');
+  const open = sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('show', open);
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  const ov = document.getElementById('sb-overlay');
+  if (ov) ov.classList.remove('show');
+}
+
+function showSection(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  closeSidebar(); // 手机端选菜单后自动收起侧边栏
+
+  // Lazy load per section
+  const loaders = {
+    articles:    loadArticles,
+    subscribers: loadSubscribers,
+    brokers:     loadBrokers,
+    ads:         loadAds,
+    products:    () => { pm3InitIfNeeded(); setTimeout(pm3CheckOllamaStatus, 500); },
+    scraper:     () => {},
+    approval:    loadApproval,
+    academy:     loadAcademyArticles,
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+/* ══ DASHBOARD ═══════════════════════════════════════════════ */
+async function loadDashboard() {
+  try {
+    // 虽然已经是 Promise.allSettled，但给每个请求再上一层 catch 兜底防弹衣
+    // 报错直接返回默认空值，让 allSettled 永远当作 fulfilled 处理
+    const [products, articles, subs, brokers] = await Promise.allSettled([
+      API.getProducts().catch(() => []),
+      API.getArticles().catch(() => []),
+      API.adminFetchSafe('/subscribers').then(r => r || { total: 0 }),
+      API.adminFetchSafe('/brokers/admin/all').then(r => r || []),
+    ]);
+
+    const set = (id, val, isError) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = isError ? '加载失败' : (val ?? '—');
+        if (isError) el.style.color = 'var(--red)';
+      }
+    };
+
+    // 无论底层报 401 还是 404，前端只做 UI 降级展示，只显示 0 或失败
+    const pVal = products.status === 'fulfilled' ? products.value : [];
+    const aVal = articles.status === 'fulfilled' ? articles.value : [];
+    const sVal = subs.status === 'fulfilled' ? subs.value : { total: 0 };
+    const bVal = brokers.status === 'fulfilled' ? brokers.value : [];
+
+    set('stat-products',    pVal?.length, products.status === 'rejected' || !products.value);
+    set('stat-articles',    aVal?.length, articles.status === 'rejected' || !articles.value);
+    set('stat-subscribers', sVal?.total,  false); // 401 时静默显示 0
+    set('stat-brokers',     bVal?.length, false); // 404 时静默显示 0
+
+  } catch (e) {
+    console.error('仪表盘渲染遭到致命错误，已拦截:', e);
+  }
+}
+
+/* ══ PM3 — 四险种 CRUD (M3-00) ════════════════════════════════
+   API 路由对照表（对接 Step A 后端）：
+   储蓄险  GET/POST /api/v1/products/savings
+           PUT/PATCH/DELETE /api/v1/products/savings/{product_code}
+   医疗险  /api/v1/products/medical/{product_code}
+   重疾险  /api/v1/products/critical/{product_code}
+   年金险  /api/v1/products/annuity/{product_code}
+
+   合规红线(V8.0)：
+   ✗ 严禁出现 is_recommended / suitable_for / best_for 等主观字段
+   ✓ 所有字段仅为客观精算数值与公开披露事实
+   ═══════════════════════════════════════════════════════════ */
+
+const PM3_TYPE_META = {
+  savings: {
+    label: '储蓄险', pill: 'type-savings', icon: '💰',
+    route: '/products',
+    thead: ['产品代码','产品名称','保司','币种','20Y IRR','回本年','实现率','发布','操作'],
+    rowFn: (p) => [
+      `<span class="td-mono" style="font-size:11px">${escHtml(p.id)}</span>`,
+      `<div class="td-main">${escHtml(p.meta?.name||'')}</div><div class="td-sub">${escHtml(p.meta?.name_en||'')}</div>`,
+      escHtml(p.meta?.company||''),
+      `<span class="badge badge-blue">${escHtml(p.meta?.currency||'')}</span>`,
+      `<span class="td-mono">${p.actuarial?.irr_20y!=null?p.actuarial.irr_20y+'%':'—'}</span>`,
+      p.actuarial?.breakeven_year!=null?`第 ${p.actuarial.breakeven_year} 年`:'—',
+      p.actuarial?.dividend_fulfillment_5y!=null?p.actuarial.dividend_fulfillment_5y+'%':'—',
+    ],
+    formFn: pm3FormSavings,
+    readFn: pm3ReadSavings,
+    requiredFields: ['product_code','product_name_cn','insurer','currency'],
+  },
+  medical: {
+    label: '医疗险', pill: 'type-medical', icon: '🏥',
+    route: '/products',
+    thead: ['产品代码','产品名称','保司','年限额(HKD)','免赔额','保障地域','发布','操作'],
+    rowFn: (p) => [
+      `<span class="td-mono" style="font-size:11px">${escHtml(p.id)}</span>`,
+      `<div class="td-main">${escHtml(p.meta?.name||'')}</div><div class="td-sub">${escHtml(p.meta?.name_en||'')}</div>`,
+      escHtml(p.meta?.company||''),
+      p.actuarial?.annual_limit_hkd!=null?'HK$'+Number(p.actuarial.annual_limit_hkd).toLocaleString():'—',
+      p.actuarial?.deductible_min!=null?'HK$'+Number(p.actuarial.deductible_min).toLocaleString():'—',
+      escHtml(p.specifications?.area_of_coverage||'—'),
+    ],
+    formFn: pm3FormMedical,
+    readFn: pm3ReadMedical,
+    requiredFields: ['product_code','product_name_cn','insurer','currency'],
+  },
+  critical: {
+    label: '重疾险', pill: 'type-ci', icon: '❤️',
+    route: '/products',
+    thead: ['产品代码','产品名称','保司','病种数','轻症数','多重赔付','发布','操作'],
+    rowFn: (p) => [
+      `<span class="td-mono" style="font-size:11px">${escHtml(p.id)}</span>`,
+      `<div class="td-main">${escHtml(p.meta?.name||'')}</div><div class="td-sub">${escHtml(p.meta?.name_en||'')}</div>`,
+      escHtml(p.meta?.company||''),
+      p.actuarial?.covered_conditions_count!=null?p.actuarial.covered_conditions_count+'种':'—',
+      p.specifications?.early_stage_conditions!=null?p.specifications.early_stage_conditions+'种':'—',
+      p.actuarial?.multi_pay?'支持':'—',
+    ],
+    formFn: pm3FormCritical,
+    readFn: pm3ReadCritical,
+    requiredFields: ['product_code','product_name_cn','insurer','currency'],
+  },
+  annuity: {
+    label: '年金险', pill: 'type-annuity', icon: '🎯',
+    route: '/products',
+    thead: ['产品代码','产品名称','保司','起领年龄','保证期','月领(保证)','实现率','发布','操作'],
+    rowFn: (p) => [
+      `<span class="td-mono" style="font-size:11px">${escHtml(p.id)}</span>`,
+      `<div class="td-main">${escHtml(p.meta?.name||'')}</div><div class="td-sub">${escHtml(p.meta?.name_en||'')}</div>`,
+      escHtml(p.meta?.company||''),
+      p.specifications?.annuity_start_age!=null?p.specifications.annuity_start_age+'岁':'—',
+      p.specifications?.guaranteed_period_years!=null?p.specifications.guaranteed_period_years+'年':'—',
+      p.specifications?.monthly_income_example!=null?(p.meta?.currency||'')+' '+Number(p.specifications.monthly_income_example).toLocaleString():'—',
+      p.actuarial?.dividend_fulfillment_5y!=null?p.actuarial.dividend_fulfillment_5y+'%':'—',
+    ],
+    formFn: pm3FormAnnuity,
+    readFn: pm3ReadAnnuity,
+    requiredFields: ['product_code','product_name_cn','insurer','currency'],
+  },
+};
+
+let pm3CurrentType = 'savings';
+let pm3CurrentCode = null; // null = create, string = editing product_code
+let pm3Cache = {};         // {savings:[...], medical:[...], ...}
+
+/* ── Tab 切换 ──────────────────────────────────────────────── */
+function pm3SwitchTab(type, tabEl) {
+  pm3CurrentType = type;
+  document.querySelectorAll('.pm3-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  const meta = PM3_TYPE_META[type];
+  document.getElementById('pm3-card-title').textContent = meta.label + '产品列表';
+  document.getElementById('pm3-add-btn').textContent = '＋ 新建' + meta.label;
+  pm3Load();
+}
+
+/* ── 加载列表 ─────────────────────────────────────────────── */
+async function pm3Load() {
+  const meta      = PM3_TYPE_META[pm3CurrentType];
+  const insurer   = document.getElementById('pm3-f-insurer')?.value || '';
+  const published = document.getElementById('pm3-f-published')?.value || '';
+  const tbody     = document.getElementById('pm3-tbody');
+  const thead     = document.getElementById('pm3-thead');
+
+  // thead
+  thead.innerHTML = meta.thead.map(h => `<th>${h}</th>`).join('');
+
+  tbody.innerHTML = `<tr><td colspan="${meta.thead.length}"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></td></tr>`;
+
+  const PM3_TYPE_API = { critical: 'critical_illness' };
+  const apiType = PM3_TYPE_API[pm3CurrentType] || pm3CurrentType;
+  let url = meta.route + '?type=' + apiType + '&limit=100';
+  if (insurer)   url += `&company=${encodeURIComponent(insurer)}`;
+  if (published) url += `&is_published=${published}`;
+
+  try {
+    const items = await API.adminFetch(url) || [];
+    pm3Cache[pm3CurrentType] = items;
+    pm3RenderTable(items);
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="${meta.thead.length}"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">加载失败</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+
+/* ── 渲染表格 ─────────────────────────────────────────────── */
+function pm3RenderTable(items) {
+  const meta  = PM3_TYPE_META[pm3CurrentType];
+  const tbody = document.getElementById('pm3-tbody');
+
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="${meta.thead.length}"><div class="empty-state"><div class="empty-icon">${meta.icon}</div><div class="empty-text">暂无${meta.label}产品</div><div class="empty-sub">点击右上角「新建产品」添加</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(p => {
+    const cols   = meta.rowFn(p);
+    const pubChk = p.is_published ? 'checked' : '';
+    const code   = escHtml(p.id);
+    return `<tr>
+      ${cols.map(c => `<td>${c}</td>`).join('')}
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label class="toggle-switch" title="${p.is_published?'点击下线':'点击上线'}" onclick="pm3TogglePublish('${code}',this)">
+            <input type="checkbox" ${pubChk} readonly>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="pub-label" style="font-size:11px;font-weight:600;color:${p.is_published?'var(--green)':'var(--gray)'}">
+            ${p.is_published?'已上线':'草稿'}
+          </span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="pm3OpenEdit('${code}')">编辑</button>
+          <button class="btn btn-danger btn-sm" onclick="pm3ConfirmDelete('${code}')">删除</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── 发布开关 ─────────────────────────────────────────────── */
+async function pm3TogglePublish(code, labelEl) {
+  const chk = labelEl.querySelector('input');
+  const newState = !chk.checked;
+  chk.checked = newState;
+  const textLabel = labelEl.parentElement?.querySelector('.pub-label');
+  if (textLabel) {
+    textLabel.textContent = newState ? '已上线' : '草稿';
+    textLabel.style.color = newState ? 'var(--green)' : 'var(--gray)';
+  }
+  const route = PM3_TYPE_META[pm3CurrentType].route;
+  try {
+    await API.adminFetch(`${route}/${code}`, {
+      method: 'PATCH', body: JSON.stringify({ is_published: newState }),
+    });
+    // 同步更新缓存，防止切换险种tab时状态回滚
+    const cache = pm3Cache[pm3CurrentType];
+    if (cache) {
+      const item = cache.find(p => p.id === code);
+      if (item) item.is_published = newState;
+    }
+    toast(newState ? '✅ 已上线' : '⏸ 已下线', 'info');
+  } catch(e) {
+    chk.checked = !newState;
+    if (textLabel) {
+      textLabel.textContent = !newState ? '已上线' : '草稿';
+      textLabel.style.color = !newState ? 'var(--green)' : 'var(--gray)';
+    }
+    toast('❌ 操作失败：' + e.message, 'error');
+  }
+}
+
+/* ── 删除 ──────────────────────────────────────────────────── */
+function pm3ConfirmDelete(code) {
+  const meta = PM3_TYPE_META[pm3CurrentType];
+  confirm_(`删除${meta.label}`, `确认删除产品「${code}」？此操作不可撤销。`, async () => {
+    await API.adminFetch(`${meta.route}/${code}`, { method: 'DELETE' });
+    toast(`✅ 已删除`, 'info');
+    pm3Load();
+  });
+}
+
+/* ── 打开新建 Modal ─────────────────────────────────────────── */
+function pm3OpenCreate() {
+  pm3CurrentCode = null;
+  const meta = PM3_TYPE_META[pm3CurrentType];
+  document.getElementById('m3pm-title').textContent = `新建${meta.label}`;
+  document.getElementById('m3pm-sub').textContent   = `所有字段均为客观精算数据，V8.0 合规 · 严禁主观推介`;
+  document.getElementById('m3pm-body').innerHTML    =
+    pm3AiParsePanel() + meta.formFn(null);
+  clearConfidence();
+  document.getElementById('m3-product-modal').style.display = 'flex';
+}
+
+/* ── AI 填入面板 HTML ── */
+function pm3AiParsePanel() {
+  return `
+  <div id="ai-parse-panel" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:#0369a1;margin-bottom:10px;">
+      🤖 AI 智能填入 <span id="ai-status-dot" style="font-size:11px;font-weight:400;margin-left:8px;color:#64748b">检查 Ollama 状态中…</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:140px;">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">保司名称</div>
+        <input id="ai-insurer" class="form-ctrl" placeholder="AIA / Prudential / Manulife" style="font-size:13px;">
+      </div>
+      <div style="flex:2;min-width:200px;">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">产品名称</div>
+        <input id="ai-product-name" class="form-ctrl" placeholder="例：充裕未来 III" style="font-size:13px;">
+      </div>
+      <div style="flex:3;min-width:240px;">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">官方PDF链接（可选，有链接更准确）</div>
+        <input id="ai-pdf-url" class="form-ctrl" placeholder="https://www.aia.com.hk/...pdf（不填也可以）" style="font-size:13px;">
+      </div>
+      <button onclick="pm3AiParse()" id="ai-parse-btn"
+        style="background:#0ea5e9;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;height:38px;">
+        🤖 AI 填入
+      </button>
+    </div>
+    <div id="ai-parse-msg" style="margin-top:10px;font-size:12px;color:#64748b;display:none;"></div>
+  </div>`;
+}
+
+/* ── 置信度定义 ──────────────────────────────────────────────
+   HIGH  绿色：基础信息，AI几乎不会填错
+   MED   黄色：精算数字，AI知道但可能有版本偏差，留意一下
+   LOW   橙色：细节数字，AI猜测成分较大，优先核实
+──────────────────────────────────────────────────────────── */
+const AI_CONFIDENCE = {
+  'title_zh':               'high',
+  'title_en':               'high',
+  'company':                'high',
+  'company_full':           'high',
+  'currency':               'high',
+  'premium_years':          'high',
+  'content_zh':             'high',
+  'irr_20y':                'med',
+  'breakeven_year':         'med',
+  'loan_ltv':               'med',
+  'premium_annual':         'med',
+  'dividend_fulfillment_5y':'low',
+  'non_guaranteed_ratio':   'low',
+  'max_early_exit_loss_pct':'low',
+  'irr_10y':                'low',
+  'guaranteed_cash_value_10y':'low',
+  'total_cash_value_20y':   'low',
+  'source_pdf_url':         'low',
+};
+
+const CONF_STYLE = {
+  high: { bg:'#f0fdf4', border:'#bbf7d0', color:'#16a34a', label:'✓ AI可信' },
+  med:  { bg:'#fffbeb', border:'#fde68a', color:'#d97706', label:'⚠ 留意核实' },
+  low:  { bg:'#fff7ed', border:'#fed7aa', color:'#ea580c', label:'⚡ 重点核实' },
+};
+
+/* 给字段加置信度高亮 */
+function applyConfidence(fieldId, confKey) {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  const level = AI_CONFIDENCE[confKey] || 'med';
+  const s = CONF_STYLE[level];
+
+  // 找到父级 form-row，整行标色
+  const row = el.closest('.form-row');
+  if (row) {
+    row.style.background    = s.bg;
+    row.style.border        = `1px solid ${s.border}`;
+    row.style.borderRadius  = '8px';
+    row.style.padding       = '8px 10px';
+    row.style.margin        = '2px 0';
+    // 加置信度标签（避免重复）
+    if (!row.querySelector('.conf-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'conf-badge';
+      badge.style.cssText = `font-size:10px;font-weight:700;color:${s.color};
+        background:${s.border};border-radius:4px;padding:1px 6px;margin-left:8px;
+        white-space:nowrap;vertical-align:middle`;
+      badge.textContent = s.label;
+      const label = row.querySelector('label');
+      if (label) label.appendChild(badge);
+    }
+  }
+}
+
+/* 清除所有置信度高亮（关闭弹窗或重新填入时） */
+function clearConfidence() {
+  document.querySelectorAll('.form-row').forEach(row => {
+    row.style.background   = '';
+    row.style.border       = '';
+    row.style.borderRadius = '';
+    row.style.padding      = '';
+    row.style.margin       = '';
+    row.querySelectorAll('.conf-badge').forEach(b => b.remove());
+  });
+}
+
+/* ── AI 填入逻辑 ── */
+async function pm3AiParse() {
+  const insurer  = document.getElementById('ai-insurer')?.value.trim();
+  const prodName = document.getElementById('ai-product-name')?.value.trim();
+  const pdfUrl   = document.getElementById('ai-pdf-url')?.value.trim() || null;
+  const btn      = document.getElementById('ai-parse-btn');
+  const msg      = document.getElementById('ai-parse-msg');
+
+  if (!insurer || !prodName) {
+    toast('❌ 请填写保司名称和产品名称', 'error'); return;
+  }
+
+  // 清除上一次的置信度高亮
+  clearConfidence();
+
+  btn.disabled = true;
+  btn.textContent = '⏳ AI 解析中…';
+  msg.style.display = 'block';
+  msg.style.color = '#64748b';
+  msg.textContent = `正在调用 deepseek 解析「${insurer} · ${prodName}」，请稍候（约15-30秒）…`;
+
+  try {
+    const res = await API.adminFetch('/products/ai-parse', {
+      method: 'POST',
+      body: JSON.stringify({
+        insurer, product_name: prodName,
+        product_type: pm3CurrentType,
+        pdf_url: pdfUrl || undefined,
+      }),
+    });
+    if (!res?.ok) throw new Error(res?.detail || '解析失败');
+
+    const d = res.data;
+
+    /* ── 填入表单 + 打置信度标签 ── */
+    const set = (fieldId, val, confKey) => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      if (val != null && val !== '') {
+        el.value = val;
+        applyConfidence(fieldId, confKey || fieldId);
+      }
+    };
+
+    // 基础信息（高置信）
+    set('m3-product_name_cn', d.title_zh,      'title_zh');
+    set('m3-product_name_en', d.title_en,      'title_en');
+    set('m3-insurer',         d.company,       'company');
+    set('m3-insurer_full',    d.company_full,  'company_full');
+    set('m3-currency',        d.currency,      'currency');
+    set('m3-premium_years',   d.premium_years, 'premium_years');
+    set('m3-premium_annual',  d.premium_annual,'premium_annual');
+    set('m3-data_source_url', d.source_pdf_url,'source_pdf_url');
+    set('m3-audit_note',      d.specifications?.content_zh || d.content_zh,    'content_zh');
+
+    // 精算核心字段（中/低置信）
+    set('m3-irr_20y',               d.irr_20y,                'irr_20y');
+    set('m3-breakeven_year',        d.breakeven_year,         'breakeven_year');
+    set('m3-dividend_fulfillment_5y',d.dividend_fulfillment_5y,'dividend_fulfillment_5y');
+    set('m3-max_early_exit_loss_pct',d.max_early_exit_loss_pct,'max_early_exit_loss_pct');
+    set('m3-policy_loan_ltv',       d.loan_ltv,               'loan_ltv');
+
+    if (d.specifications) {
+      set('m3-irr_10y',                   d.specifications.irr_10y,                'irr_10y');
+      set('m3-non_guaranteed_ratio',      d.specifications.non_guaranteed_ratio,    'non_guaranteed_ratio');
+      set('m3-guaranteed_cash_value_10y', d.specifications.guaranteed_cash_value_10y,'guaranteed_cash_value_10y');
+      set('m3-total_cash_value_20y',      d.specifications.total_cash_value_20y,    'total_cash_value_20y');
+    }
+
+    // 统计各级别字段数量
+    const low  = document.querySelectorAll('.conf-badge').length > 0
+      ? [...document.querySelectorAll('.conf-badge')].filter(b=>b.textContent.includes('重点')).length : 0;
+    const med  = [...document.querySelectorAll('.conf-badge')].filter(b=>b.textContent.includes('留意')).length;
+    const high = [...document.querySelectorAll('.conf-badge')].filter(b=>b.textContent.includes('可信')).length;
+
+    msg.innerHTML = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span style="color:#16a34a;font-weight:700">✅ AI填入完成</span>
+        <span style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:1px 8px;font-size:11px;color:#16a34a">✓ 可信 ×${high}</span>
+        <span style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:1px 8px;font-size:11px;color:#d97706">⚠ 留意 ×${med}</span>
+        <span style="background:#fff7ed;border:1px solid #fed7aa;border-radius:4px;padding:1px 8px;font-size:11px;color:#ea580c">⚡ 重点核实 ×${low}</span>
+      </div>
+      <div style="margin-top:6px;color:#64748b;font-size:11px;line-height:1.6">
+        绿色字段直接采用即可 · 黄色字段留意一下 · <b style="color:#ea580c">橙色字段是精算细节，AI有一定把握但建议和经纪人确认</b>
+      </div>`;
+    msg.style.color = '';
+    toast('✅ AI填入完成，橙色字段请重点关注', 'success');
+
+  } catch(e) {
+    msg.style.color = '#dc2626';
+    const errMsg = e.message === 'UNAUTHORIZED' ? 'Token已过期，请重新登录' :
+                   e.message === 'NO_TOKEN' ? '未登录' : e.message;
+    msg.textContent = `❌ 解析失败：${errMsg}`;
+    toast('❌ AI解析失败：' + errMsg, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 AI 填入';
+  }
+}
+
+/* ── 初始化时检查 Ollama 状态 ── */
+async function pm3CheckOllamaStatus() {
+  const dot = document.getElementById('ai-status-dot');
+  if (!dot) return;
+  // 用 adminFetchSafe：失败返回 null，不卡死、不 throw
+  const res = await API.adminFetchSafe('/products/ai-health');
+  if (res?.status === 'ok' && res?.model_ready) {
+    dot.textContent = '● Ollama 在线';
+    dot.style.color = '#16a34a';
+  } else if (res?.status === 'ok') {
+    dot.textContent = `⚠ ${res.message}`;
+    dot.style.color = '#d97706';
+  } else if (res) {
+    dot.textContent = `● 离线：${res.message || '无法连接'}`;
+    dot.style.color = '#dc2626';
+  } else {
+    dot.textContent = '● 离线（请求失败）';
+    dot.style.color = '#dc2626';
+  }
+}
+
+/* ── 打开编辑 Modal ─────────────────────────────────────────── */
+async function pm3OpenEdit(code) {
+  const meta = PM3_TYPE_META[pm3CurrentType];
+  pm3CurrentCode = code;
+  document.getElementById('m3pm-title').textContent = `编辑${meta.label} · ${code}`;
+  document.getElementById('m3pm-sub').textContent   = `修改后点击保存，系统自动调用 PATCH 接口`;
+  document.getElementById('m3pm-body').innerHTML    = meta.formFn(null);
+  document.getElementById('m3-product-modal').style.display = 'flex';
+  try {
+    const p = await API.adminFetch(`${meta.route}/${code}`);
+    document.getElementById('m3pm-body').innerHTML = meta.formFn(p);
+  } catch(e) {
+    toast('加载数据失败：' + e.message, 'error');
+  }
+}
+
+/* ── 保存（新建/编辑） ─────────────────────────────────────── */
+async function pm3Save() {
+  const meta = PM3_TYPE_META[pm3CurrentType];
+  const body = meta.readFn();
+  if (!body) return; // validation failed inside readFn
+
+  const btn = document.getElementById('m3pm-save-btn');
+  btn.textContent = '保存中…'; btn.disabled = true;
+
+  try {
+    if (pm3CurrentCode) {
+      // PATCH 局部更新（product_code 不可修改，从路由传入）
+      await API.adminFetch(`${meta.route}/${pm3CurrentCode}`, {
+        method: 'PATCH', body: JSON.stringify(body),
+      });
+      toast(`✅ ${meta.label}已更新`, 'success');
+    } else {
+      // POST 新建
+      await API.adminFetch(meta.route, {
+        method: 'POST', body: JSON.stringify(body),
+      });
+      toast(`✅ ${meta.label}已创建`, 'success');
+    }
+    closeModal('m3-product-modal');
+    pm3Load();
+  } catch(e) {
+    const msg = e.message || '';
+    toast('❌ 保存失败：' + (msg.includes('已存在') || msg.includes('already') ? '产品代码已存在，请更换' : msg), 'error');
+  } finally {
+    btn.textContent = '💾 保存'; btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   PM3 表单生成器 — 严格对应 Pydantic Models
+   ⚠️  V8.0 合规红线：每行注释标注字段来源
+   每个 section title 的 colspan 用 form-section-title class
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 公共基础字段 HTML（四险种共用） ─────────────────────────── */
+function pm3BaseFields(p, readonlyCode) {
+  const dis = readonlyCode ? 'disabled style="background:var(--gray-lt);cursor:not-allowed"' : '';
+  // API 返回嵌套结构：p.id / p.meta.name / p.meta.company / p.actuarial.xxx
+  const code      = p?.id || '';
+  const nameCn    = p?.meta?.name        || '';
+  const nameEn    = p?.meta?.name_en     || '';
+  const company   = p?.meta?.company     || '';
+  const compFull  = p?.meta?.company_full|| '';
+  const currency  = p?.meta?.currency    || 'USD';
+  const premYrs   = p?.actuarial?.premium_years   ?? '';
+  const premAmt   = p?.actuarial?.premium_annual  ?? '';
+  const srcUrl    = p?.source_pdf_url    || '';
+  const published = p?.is_published      || false;
+  const launchYr  = p?.launch_year       ?? '';
+  const auditNote = p?.content_zh        || '';
+  return `
+  <div class="form-section-title">📋 基础信息（公共字段）</div>
+
+  <div class="form-row">
+    <label>产品代码 product_code <span class="req">*</span></label>
+    <input class="form-ctrl" id="m3-product_code" value="${esc(code)}" placeholder="aia_wp3（英文+下划线）" ${dis}>
+    <div class="form-hint">创建后不可修改，用于 API 路由唯一标识</div>
+  </div>
+  <div class="form-row">
+    <label>产品中文名 product_name_cn <span class="req">*</span></label>
+    <input class="form-ctrl" id="m3-product_name_cn" value="${esc(nameCn)}" placeholder="充裕未来 III">
+  </div>
+  <div class="form-row">
+    <label>产品英文名 product_name_en</label>
+    <input class="form-ctrl" id="m3-product_name_en" value="${esc(nameEn)}" placeholder="Wealth Prestige III">
+  </div>
+  <div class="form-row">
+    <label>上市年份 launch_year</label>
+    <input class="form-ctrl" id="m3-launch_year" type="number" min="2000" max="2099" step="1" value="${esc(launchYr)}" placeholder="2023">
+    <div class="form-hint">前台「按年份筛选」使用</div>
+  </div>
+  <div class="form-row">
+    <label>保司简称 insurer <span class="req">*</span></label>
+    <input class="form-ctrl" id="m3-insurer" value="${esc(company)}" placeholder="AIA">
+  </div>
+  <div class="form-row">
+    <label>保司全称 insurer_full</label>
+    <input class="form-ctrl" id="m3-insurer_full" value="${esc(compFull)}" placeholder="友邦保险（国际）有限公司">
+  </div>
+  <div class="form-row">
+    <label>币种 currency</label>
+    <select class="form-ctrl" id="m3-currency">
+      <option value="USD" ${currency==='USD'||!p?'selected':''}>USD（美元）</option>
+      <option value="HKD" ${currency==='HKD'?'selected':''}>HKD（港元）</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label>缴费年期 premium_years（年）</label>
+    <input class="form-ctrl" id="m3-premium_years" type="number" step="1" min="1" max="100" value="${esc(premYrs)}" placeholder="5">
+  </div>
+  <div class="form-row">
+    <label>假设年缴保费 premium_annual</label>
+    <input class="form-ctrl" id="m3-premium_annual" type="number" step="0.01" min="0" value="${esc(premAmt)}" placeholder="50000">
+  </div>
+  <div class="form-row">
+    <label>数据来源 URL data_source_url</label>
+    <input class="form-ctrl" id="m3-data_source_url" value="${esc(srcUrl)}" placeholder="https://保司官方披露文件链接">
+  </div>
+  <div class="form-row">
+    <label>精算备注 audit_note（客观陈述）</label>
+    <textarea class="form-ctrl" id="m3-audit_note" rows="2" placeholder="客观精算备注，不得含主观推介语言">${esc(auditNote)}</textarea>
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label class="check-row" style="width:fit-content">
+      <input type="checkbox" id="m3-is_published" ${published?'checked':''}>
+      <span>🌐 立即发布到前端</span>
+    </label>
+  </div>
+  <div class="form-divider"></div>`;
+}
+
+/* ── 公共字段读取 ──────────────────────────────────────────── */
+function pm3ReadBase() {
+  const code = document.getElementById('m3-product_code').value.trim();
+  const name = document.getElementById('m3-product_name_cn').value.trim();
+  const ins  = document.getElementById('m3-insurer').value.trim();
+  let valid  = true;
+  [['m3-product_code',code],['m3-product_name_cn',name],['m3-insurer',ins]].forEach(([id,v])=>{
+    const el = document.getElementById(id);
+    if (!v && !el.disabled) { el.classList.add('error'); valid=false; }
+    else el.classList.remove('error');
+  });
+  if (!valid) { toast('❌ 请填写必填项', 'error'); return null; }
+  return {
+    slug:           code,                                    // Model: slug
+    product_type:   pm3CurrentType === 'critical' ? 'critical_illness' : pm3CurrentType,
+    title_zh:       name,                                    // Model: title_zh
+    title_en:       getVal('m3-product_name_en') || null,   // Model: title_en
+    company:        ins,                                     // Model: company
+    company_full:   getVal('m3-insurer_full') || null,      // Model: company_full
+    currency:       getVal('m3-currency') || 'USD',
+    launch_year:    intVal('m3-launch_year'),
+    premium_years:  intVal('m3-premium_years'),
+    premium_annual: numVal('m3-premium_annual'),
+    source_pdf_url: getVal('m3-data_source_url') || null,   // Model: source_pdf_url
+    content_zh:     getVal('m3-audit_note') || null,        // Model: content_zh
+    is_published:   document.getElementById('m3-is_published')?.checked || false,
+  };
+}
+
+/* ════ 1. 储蓄险 Savings ════════════════════════════════════ */
+function pm3FormSavings(p) {
+  const irr20    = p?.actuarial?.irr_20y                   ?? '';
+  const irr10    = p?.specifications?.irr_10y              ?? '';
+  const bkyear   = p?.actuarial?.breakeven_year            ?? '';
+  const divFul   = p?.actuarial?.dividend_fulfillment_5y   ?? '';
+  const nonGuar  = p?.specifications?.non_guaranteed_ratio ?? '';
+  const exitLoss = p?.actuarial?.max_early_exit_loss_pct   ?? '';
+  const loanLtv  = p?.actuarial?.loan_ltv                  ?? '';
+  const gcv10    = p?.specifications?.guaranteed_cash_value_10y ?? '';
+  const tcv20    = p?.specifications?.total_cash_value_20y      ?? '';
+  return `<div class="form-grid">
+  ${pm3BaseFields(p, !!p)}
+  <div class="form-section-title">📊 精算核心指标（储蓄险专有）</div>
+
+  <div class="form-row">
+    <label>20年 IRR (%) irr_20y</label>
+    <input class="form-ctrl" id="m3-irr_20y" type="number" step="0.01" min="0" max="100" value="${esc(irr20)}" placeholder="5.82">
+  </div>
+  <div class="form-row">
+    <label>10年 IRR (%) irr_10y</label>
+    <input class="form-ctrl" id="m3-irr_10y" type="number" step="0.01" min="0" max="100" value="${esc(irr10)}" placeholder="3.50">
+  </div>
+  <div class="form-row">
+    <label>保证回本年 breakeven_year</label>
+    <input class="form-ctrl" id="m3-breakeven_year" type="number" step="1" min="1" value="${esc(bkyear)}" placeholder="7">
+    <div class="form-hint">保证现金价值 ≥ 已缴保费的年数</div>
+  </div>
+  <div class="form-row">
+    <label>过去5年分红实现率 (%) dividend_fulfillment_5y</label>
+    <input class="form-ctrl" id="m3-dividend_fulfillment_5y" type="number" step="0.1" min="0" max="200" value="${esc(divFul)}" placeholder="91">
+  </div>
+  <div class="form-row">
+    <label>非保证收益占比 (%) non_guaranteed_ratio</label>
+    <input class="form-ctrl" id="m3-non_guaranteed_ratio" type="number" step="0.1" min="0" max="100" value="${esc(nonGuar)}" placeholder="62">
+  </div>
+  <div class="form-row">
+    <label>早期退保最大损失 (%) max_early_exit_loss_pct</label>
+    <input class="form-ctrl" id="m3-max_early_exit_loss_pct" type="number" step="0.1" min="0" max="100" value="${esc(exitLoss)}" placeholder="21">
+  </div>
+  <div class="form-row">
+    <label>保单贷款成数上限 (%) policy_loan_ltv</label>
+    <input class="form-ctrl" id="m3-policy_loan_ltv" type="number" step="0.1" min="0" max="100" value="${esc(loanLtv)}" placeholder="90">
+  </div>
+  <div class="form-row">
+    <label>第10年保证现金价值 guaranteed_cash_value_10y</label>
+    <input class="form-ctrl" id="m3-guaranteed_cash_value_10y" type="number" step="0.01" min="0" value="${esc(gcv10)}" placeholder="48000">
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label>第20年总现金价值(中性) total_cash_value_20y</label>
+    <input class="form-ctrl" id="m3-total_cash_value_20y" type="number" step="0.01" min="0" value="${esc(tcv20)}" placeholder="120000">
+    <div class="form-hint">含非保证分红，中性情景，原币单位</div>
+  </div>
+  </div>`;
+}
+
+function pm3ReadSavings() {
+  const base = pm3ReadBase();
+  if (!base) return null;
+  return { ...base,
+    irr_20y:                numVal('m3-irr_20y'),
+    breakeven_year:         intVal('m3-breakeven_year'),
+    dividend_fulfillment_5y:numVal('m3-dividend_fulfillment_5y'),
+    max_early_exit_loss_pct:numVal('m3-max_early_exit_loss_pct'),
+    loan_ltv:               numVal('m3-policy_loan_ltv'),
+    specifications: {
+      irr_10y:                   numVal('m3-irr_10y'),
+      non_guaranteed_ratio:      numVal('m3-non_guaranteed_ratio'),
+      guaranteed_cash_value_10y: numVal('m3-guaranteed_cash_value_10y'),
+      total_cash_value_20y:      numVal('m3-total_cash_value_20y'),
+    },
+  };
+}
+
+/* ════ 2. 医疗险 Medical ════════════════════════════════════ */
+function pm3FormMedical(p) {
+  const b = (v, id) => `<input type="checkbox" id="${id}" ${v?'checked':''}> `;
+  const annualLmt  = p?.actuarial?.annual_limit_hkd         ?? '';
+  const deductMin  = p?.actuarial?.deductible_min           ?? '';
+  const areaOfCov  = p?.specifications?.area_of_coverage    || '';
+  const usSurcharge= p?.specifications?.us_coverage_surcharge_pct ?? '';
+  const netSize    = p?.specifications?.network_size        ?? '';
+  const preUw      = p?.specifications?.preexisting_underwriting  || '';
+  const prem30     = p?.specifications?.premium_age_30_annual ?? '';
+  const prem45     = p?.specifications?.premium_age_45_annual ?? '';
+  const hasOut     = p?.specifications?.has_outpatient  || false;
+  const hasDental  = p?.specifications?.has_dental      || false;
+  const hasMater   = p?.specifications?.has_maternity   || false;
+  return `<div class="form-grid">
+  ${pm3BaseFields(p, !!p)}
+  <div class="form-section-title">📊 精算核心指标（医疗险专有）</div>
+
+  <div class="form-row">
+    <label>年度赔付上限 (HKD) annual_limit_hkd</label>
+    <input class="form-ctrl" id="m3-annual_limit_hkd" type="number" step="0.01" min="0" value="${esc(annualLmt)}" placeholder="10000000">
+  </div>
+  <div class="form-row">
+    <label>免赔额 (HKD) deductible_hkd（0=零免赔）</label>
+    <input class="form-ctrl" id="m3-deductible_hkd" type="number" step="0.01" min="0" value="${esc(deductMin)}" placeholder="0">
+  </div>
+  <div class="form-row">
+    <label>保障地域 coverage_region</label>
+    <select class="form-ctrl" id="m3-coverage_region">
+      <option value="" ${!areaOfCov?'selected':''}>— 请选择 —</option>
+      <option value="全球" ${areaOfCov==='全球'?'selected':''}>全球</option>
+      <option value="全球（含美国）" ${areaOfCov==='全球（含美国）'?'selected':''}>全球（含美国）</option>
+      <option value="亚太" ${areaOfCov==='亚太'?'selected':''}>亚太</option>
+      <option value="亚洲" ${areaOfCov==='亚洲'?'selected':''}>亚洲</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label>含美国保障附加费率 (%) us_coverage_surcharge_pct</label>
+    <input class="form-ctrl" id="m3-us_coverage_surcharge_pct" type="number" step="0.1" min="0" value="${esc(usSurcharge)}" placeholder="30">
+  </div>
+  <div class="form-row">
+    <label>直付网络医院数量（家）network_size</label>
+    <input class="form-ctrl" id="m3-network_size" type="number" step="1" min="0" value="${esc(netSize)}" placeholder="5000">
+  </div>
+  <div class="form-row">
+    <label>核保方式 preexisting_underwriting</label>
+    <select class="form-ctrl" id="m3-preexisting_underwriting">
+      <option value="" ${!preUw?'selected':''}>— 请选择 —</option>
+      <option value="MORATORIUM" ${preUw==='MORATORIUM'?'selected':''}>MORATORIUM（观察期）</option>
+      <option value="FMU" ${preUw==='FMU'?'selected':''}>FMU（全面医疗承保）</option>
+      <option value="CPME" ${preUw==='CPME'?'selected':''}>CPME（认可预存条件）</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label>30岁投保参考年保费 premium_age_30_annual</label>
+    <input class="form-ctrl" id="m3-premium_age_30_annual" type="number" step="0.01" min="0" value="${esc(prem30)}" placeholder="12000">
+  </div>
+  <div class="form-row">
+    <label>45岁投保参考年保费 premium_age_45_annual</label>
+    <input class="form-ctrl" id="m3-premium_age_45_annual" type="number" step="0.01" min="0" value="${esc(prem45)}" placeholder="28000">
+  </div>
+  <div class="form-section-title" style="grid-column:1/-1">保障选项（客观布尔值）</div>
+  <div class="form-row">
+    <label class="check-row" style="width:100%">
+      <input type="checkbox" id="m3-has_outpatient" ${hasOut?'checked':''}>
+      <span>涵盖门诊 has_outpatient</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label class="check-row" style="width:100%">
+      <input type="checkbox" id="m3-has_dental" ${hasDental?'checked':''}>
+      <span>涵盖牙科 has_dental</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label class="check-row" style="width:100%">
+      <input type="checkbox" id="m3-has_maternity" ${hasMater?'checked':''}>
+      <span>涵盖生育 has_maternity</span>
+    </label>
+  </div>
+  </div>`;
+}
+
+function pm3ReadMedical() {
+  const base = pm3ReadBase();
+  if (!base) return null;
+  return { ...base,
+    annual_limit_hkd:          numVal('m3-annual_limit_hkd'),
+    deductible_hkd:            numVal('m3-deductible_hkd'),
+    coverage_region:           getVal('m3-coverage_region') || null,
+    us_coverage_surcharge_pct: numVal('m3-us_coverage_surcharge_pct'),
+    network_size:              numVal('m3-network_size'),
+    preexisting_underwriting:  getVal('m3-preexisting_underwriting') || null,
+    premium_age_30_annual:     numVal('m3-premium_age_30_annual'),
+    premium_age_45_annual:     numVal('m3-premium_age_45_annual'),
+    has_outpatient:            document.getElementById('m3-has_outpatient')?.checked ?? null,
+    has_dental:                document.getElementById('m3-has_dental')?.checked ?? null,
+    has_maternity:             document.getElementById('m3-has_maternity')?.checked ?? null,
+  };
+}
+
+/* ════ 3. 重疾险 Critical Illness ══════════════════════════ */
+function pm3FormCritical(p) {
+  const covCond   = p?.actuarial?.covered_conditions_count ?? '';
+  const earlyCond = p?.specifications?.early_stage_conditions ?? '';
+  const multiMax  = p?.specifications?.multipay_max_pct    ?? '';
+  const multiTimes= p?.specifications?.multipay_times      ?? '';
+  const sumEx     = p?.specifications?.sum_assured_example ?? '';
+  const premEx    = p?.specifications?.premium_example_annual ?? '';
+  const ropYear   = p?.specifications?.return_of_premium_year ?? '';
+  const cancerRel = p?.specifications?.cancer_relapse_covered || false;
+  const premWaiv  = p?.specifications?.premium_waiver_on_claim || false;
+  const sumPres   = p?.specifications?.sum_assured_preserves || false;
+  return `<div class="form-grid">
+  ${pm3BaseFields(p, !!p)}
+  <div class="form-section-title">📊 精算核心指标（重疾险专有）</div>
+
+  <div class="form-row">
+    <label>涵盖重疾病种总数 covered_conditions</label>
+    <input class="form-ctrl" id="m3-covered_conditions" type="number" step="1" min="1" value="${esc(covCond)}" placeholder="114">
+  </div>
+  <div class="form-row">
+    <label>早期/轻症病种数 early_stage_conditions</label>
+    <input class="form-ctrl" id="m3-early_stage_conditions" type="number" step="1" min="0" value="${esc(earlyCond)}" placeholder="80">
+  </div>
+  <div class="form-row">
+    <label>多重赔付上限 (%) multipay_max_pct</label>
+    <input class="form-ctrl" id="m3-multipay_max_pct" type="number" step="0.1" min="0" value="${esc(multiMax)}" placeholder="300">
+    <div class="form-hint">相对于基本保额的赔付上限百分比</div>
+  </div>
+  <div class="form-row">
+    <label>最大理赔次数 multipay_times</label>
+    <input class="form-ctrl" id="m3-multipay_times" type="number" step="1" min="1" value="${esc(multiTimes)}" placeholder="3">
+  </div>
+  <div class="form-row">
+    <label>示例保额 sum_assured_example（原币）</label>
+    <input class="form-ctrl" id="m3-sum_assured_example" type="number" step="0.01" min="0" value="${esc(sumEx)}" placeholder="1000000">
+  </div>
+  <div class="form-row">
+    <label>对应示例保额年缴保费 premium_example_annual</label>
+    <input class="form-ctrl" id="m3-premium_example_annual" type="number" step="0.01" min="0" value="${esc(premEx)}" placeholder="18000">
+  </div>
+  <div class="form-row">
+    <label>保费返还年期 return_of_premium_year（0=不返还）</label>
+    <input class="form-ctrl" id="m3-return_of_premium_year" type="number" step="1" min="0" value="${esc(ropYear)}" placeholder="0">
+  </div>
+  <div class="form-section-title" style="grid-column:1/-1">产品特性（客观布尔值）</div>
+  <div class="form-row">
+    <label class="check-row" style="width:100%">
+      <input type="checkbox" id="m3-cancer_relapse_covered" ${cancerRel?'checked':''}>
+      <span>癌症复发可独立再次理赔 cancer_relapse_covered</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label class="check-row" style="width:100%">
+      <input type="checkbox" id="m3-premium_waiver_on_claim" ${premWaiv?'checked':''}>
+      <span>理赔后豁免后续保费 premium_waiver_on_claim</span>
+    </label>
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label class="check-row" style="width:fit-content">
+      <input type="checkbox" id="m3-sum_assured_preserves" ${sumPres?'checked':''}>
+      <span>多重赔付后寿险保额不减 sum_assured_preserves</span>
+    </label>
+  </div>
+  </div>`;
+}
+
+function pm3ReadCritical() {
+  const base = pm3ReadBase();
+  if (!base) return null;
+  return { ...base,
+    covered_conditions_count: intVal('m3-covered_conditions'),
+    specifications: {
+      early_stage_conditions:  intVal('m3-early_stage_conditions'),
+      multipay_max_pct:        numVal('m3-multipay_max_pct'),
+      multipay_times:          intVal('m3-multipay_times'),
+      sum_assured_example:     numVal('m3-sum_assured_example'),
+      premium_example_annual:  numVal('m3-premium_example_annual'),
+      return_of_premium_year:  intVal('m3-return_of_premium_year'),
+      cancer_relapse_covered:  document.getElementById('m3-cancer_relapse_covered')?.checked ?? null,
+      premium_waiver_on_claim: document.getElementById('m3-premium_waiver_on_claim')?.checked ?? null,
+      sum_assured_preserves:   document.getElementById('m3-sum_assured_preserves')?.checked ?? null,
+    },
+  };
+}
+
+/* ════ 4. 年金险 Annuity ════════════════════════════════════ */
+function pm3FormAnnuity(p) {
+  const startAge  = p?.specifications?.annuity_start_age        ?? '';
+  const guarPer   = p?.specifications?.guaranteed_period_years  ?? '';
+  const monthGuar = p?.specifications?.monthly_income_example   ?? '';
+  const monthTot  = p?.specifications?.monthly_payout_total     ?? '';
+  const irr20     = p?.actuarial?.irr_20y                       ?? '';
+  const divFul    = p?.actuarial?.dividend_fulfillment_5y       ?? '';
+  const nonGuar   = p?.specifications?.non_guaranteed_ratio     ?? '';
+  const infNote   = p?.specifications?.inflation_hedge_note     || '';
+  const legFeat   = p?.specifications?.legacy_feature           || '';
+  const jointAvail= p?.specifications?.joint_insured_available  || false;
+  return `<div class="form-grid">
+  ${pm3BaseFields(p, !!p)}
+  <div class="form-section-title">📊 精算核心指标（年金险专有）</div>
+
+  <div class="form-row">
+    <label>起领年龄 annuity_start_age（岁）</label>
+    <input class="form-ctrl" id="m3-annuity_start_age" type="number" step="1" min="50" max="85" value="${esc(startAge)}" placeholder="65">
+  </div>
+  <div class="form-row">
+    <label>保证领取期 guaranteed_period_years（年）</label>
+    <input class="form-ctrl" id="m3-guaranteed_period_years" type="number" step="1" min="0" value="${esc(guarPer)}" placeholder="20">
+  </div>
+  <div class="form-row">
+    <label>保证月领金额 monthly_payout_guaranteed（原币）</label>
+    <input class="form-ctrl" id="m3-monthly_payout_guaranteed" type="number" step="0.01" min="0" value="${esc(monthGuar)}" placeholder="3000">
+  </div>
+  <div class="form-row">
+    <label>总月领金额(中性情景) monthly_payout_total（原币）</label>
+    <input class="form-ctrl" id="m3-monthly_payout_total" type="number" step="0.01" min="0" value="${esc(monthTot)}" placeholder="4200">
+    <div class="form-hint">含非保证分红，中性情景</div>
+  </div>
+  <div class="form-row">
+    <label>20年 IRR (%) irr_20y</label>
+    <input class="form-ctrl" id="m3-irr_20y" type="number" step="0.01" min="0" max="100" value="${esc(irr20)}" placeholder="4.20">
+  </div>
+  <div class="form-row">
+    <label>过去5年分红实现率 (%) dividend_fulfillment_5y</label>
+    <input class="form-ctrl" id="m3-dividend_fulfillment_5y" type="number" step="0.1" min="0" max="200" value="${esc(divFul)}" placeholder="94">
+  </div>
+  <div class="form-row">
+    <label>非保证占比 (%) non_guaranteed_ratio</label>
+    <input class="form-ctrl" id="m3-non_guaranteed_ratio" type="number" step="0.1" min="0" max="100" value="${esc(nonGuar)}" placeholder="35">
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label>通胀对冲机制客观描述 inflation_hedge_note</label>
+    <textarea class="form-ctrl" id="m3-inflation_hedge_note" rows="2" placeholder="如：分红挂钩消费者物价指数（客观陈述，不得含主观推介）">${esc(infNote)}</textarea>
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label>遗产规划特性 legacy_feature（客观描述）</label>
+    <textarea class="form-ctrl" id="m3-legacy_feature" rows="2" placeholder="如：身故赔付金额计算方式（客观陈述）">${esc(legFeat)}</textarea>
+  </div>
+  <div class="form-row" style="grid-column:1/-1">
+    <label class="check-row" style="width:fit-content">
+      <input type="checkbox" id="m3-joint_insured_available" ${jointAvail?'checked':''}>
+      <span>支持联合投保（夫妻/伴侣）joint_insured_available</span>
+    </label>
+  </div>
+  </div>`;
+}
+
+function pm3ReadAnnuity() {
+  const base = pm3ReadBase();
+  if (!base) return null;
+  return { ...base,
+    irr_20y:                 numVal('m3-irr_20y'),
+    dividend_fulfillment_5y: numVal('m3-dividend_fulfillment_5y'),
+    specifications: {
+      annuity_start_age:         intVal('m3-annuity_start_age'),
+      guaranteed_period_years:   intVal('m3-guaranteed_period_years'),
+      monthly_income_example:    numVal('m3-monthly_payout_guaranteed'),
+      monthly_payout_total:      numVal('m3-monthly_payout_total'),
+      non_guaranteed_ratio:      numVal('m3-non_guaranteed_ratio'),
+      inflation_hedge_note:      getVal('m3-inflation_hedge_note') || null,
+      legacy_feature:            getVal('m3-legacy_feature') || null,
+      joint_insured_available:   document.getElementById('m3-joint_insured_available')?.checked ?? null,
+    },
+  };
+}
+
+/* ── pm3 section helper ──────────────────────────────────── */
+// Initialize products tab on first load
+function pm3InitIfNeeded() {
+  if (!pm3Cache['savings']) pm3Load();
+}
+
+/* ── esc helper for form values ──────────────────────────── */
+function esc(v) { return escHtml(v ?? ''); }
+
+/* ═══ END PM3 ═══════════════════════════════════════════════ */
+
+/* ══ ARTICLES ════════════════════════════════════════════════ */
+
+/* ── 自动生成 slug（用户不可见，系统内部用） ── */
+function autoGenSlug(title) {
+  if (!title) { document.getElementById('a-slug-hint').textContent = ''; return; }
+  const slug = title.trim()
+    .toLowerCase()
+    .replace(/[\u4e00-\u9fa5]+/g, s => {
+      // 常见词映射，让slug更易读
+      const map = {
+        '特朗普':'trump','美元':'usd','香港':'hk','保险':'insurance',
+        '市场':'market','政策':'policy','产品':'product','分析':'analysis',
+        '解读':'guide','预警':'alert','审计':'audit','新手':'beginner',
+        '储蓄':'savings','医疗':'medical','重疾':'ci','年金':'annuity',
+      };
+      let r = s;
+      for (const [k,v] of Object.entries(map)) r = r.replace(new RegExp(k,'g'), '-'+v+'-');
+      return r.replace(/[\u4e00-\u9fa5]/g, '');
+    })
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60)
+    || 'article-' + Date.now();
+  document.getElementById('a-slug').value = slug;
+  document.getElementById('a-slug-hint').textContent = '文章链接：/article.html?slug=' + slug;
+}
+
+/* ── 封面图预览 ── */
+function previewCover(url) {
+  const preview = document.getElementById('a-cover-preview');
+  if (!url || !url.startsWith('http')) { preview.style.display = 'none'; return; }
+  preview.src = url;
+  preview.style.display = 'block';
+  preview.onerror = () => { preview.style.display = 'none'; };
+}
+
+/* ── 文章tab状态 ── */
+let artCurrentTab = 'published'; // 'published' | 'draft'
+
+function artSwitchTab(tab) {
+  artCurrentTab = tab;
+  const pubBtn   = document.getElementById('art-tab-published');
+  const draftBtn = document.getElementById('art-tab-draft');
+  const title    = document.getElementById('articles-list-title');
+  if (tab === 'published') {
+    pubBtn.style.background   = 'var(--blue)';   pubBtn.style.color   = 'white';
+    draftBtn.style.background = 'white';          draftBtn.style.color = 'var(--charcoal)';
+    title.textContent = '已发布文章';
+  } else {
+    draftBtn.style.background = 'var(--blue)';   draftBtn.style.color = 'white';
+    pubBtn.style.background   = 'white';          pubBtn.style.color   = 'var(--charcoal)';
+    title.textContent = '草稿文章';
+  }
+  loadArticles();
+}
+
+/* ── 加载文章列表 ── */
+async function loadArticles() {
+  const cat   = document.getElementById('f-acat')?.value || '';
+  const isHot = document.getElementById('f-ahot')?.checked;
+  const tbody = document.getElementById('articles-tbody');
+  tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></td></tr>`;
+
+  try {
+    // 使用 admin/all 接口可同时获取草稿和已发布，按tab过滤
+    let url = `/articles/admin/all?is_published=${artCurrentTab === 'published'}&limit=100`;
+    if (cat)   url += `&category=${encodeURIComponent(cat)}`;
+    const raw   = await API.adminFetch(url);
+    let items = raw?.items || [];
+    if (isHot) items = items.filter(a => a.is_hot);
+
+    const countEl = document.getElementById('articles-count');
+    if (countEl) countEl.textContent = `共 ${items.length} 篇`;
+
+    if (!items.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+        <div class="empty-icon">📰</div>
+        <div class="empty-text">${artCurrentTab === 'draft' ? '暂无草稿' : '暂无已发布文章'}</div>
+        <div class="empty-sub">${artCurrentTab === 'draft' ? '点击「存草稿」保存草稿，或去自动化中心抓取新闻' : '点击右上角「✏️ 写新文章」发布第一篇'}</div>
+      </div></td></tr>`;
+      return;
+    }
+
+    const CAT_BADGE = {
+      market: '<span class="badge badge-blue">📊 市场情报</span>',
+      alert:  '<span class="badge badge-red">🔴 避雷预警</span>',
+      policy: '<span class="badge" style="background:#eef2ff;color:#4338ca">📋 政策解读</span>',
+      audit:  '<span class="badge badge-green">⚖️ 产品审计</span>',
+      guide:  '<span class="badge badge-amber">🧭 新手指南</span>',
+    };
+
+    tbody.innerHTML = items.map(a => {
+      const dateStr = (a.published_at || a.created_at || '').split('T')[0] || '—';
+      const thumb   = a.cover_url
+        ? `<img src="${escHtml(a.cover_url)}" style="width:48px;height:36px;object-fit:cover;border-radius:5px;border:1px solid var(--border)" onerror="this.style.display='none'">`
+        : `<div style="width:48px;height:36px;border-radius:5px;background:var(--gray-lt);display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>`;
+      const draftBadge = !a.is_published ? '<span class="badge badge-amber" style="margin-left:4px">草稿</span>' : '';
+      return `
+      <tr>
+        <td>${thumb}</td>
+        <td>
+          <div class="td-main" style="max-width:320px;white-space:normal;line-height:1.4">${escHtml(a.title)}${draftBadge}</div>
+          <div class="td-sub" style="margin-top:2px">${escHtml(a.excerpt || '').slice(0,40)}${(a.excerpt||'').length>40?'…':''}</div>
+        </td>
+        <td>${CAT_BADGE[a.category] || '<span class="badge badge-gray">' + escHtml(a.category||'—') + '</span>'}</td>
+        <td>${a.is_hot ? '<span class="badge badge-amber">🔥 热读</span>' : '<span style="color:#d1d5db;font-size:12px">普通</span>'}</td>
+        <td style="font-size:12px;color:var(--gray);white-space:nowrap">${dateStr}</td>
+        <td>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${!a.is_published ? `<button class="btn btn-primary btn-sm" onclick="publishArticle('${escHtml(a.slug)}')">📤 发布</button>` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="editArticle('${escHtml(a.slug)}')">✏️ 编辑</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmDeleteArticle('${escHtml(a.slug)}')">🗑️ 删除</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <div class="empty-icon">⚠️</div>
+      <div class="empty-text" style="color:var(--red)">加载失败：${escHtml(e.message)}</div>
+      <div class="empty-sub">请检查网络连接，或点击刷新重试</div>
+    </div></td></tr>`;
+  }
+}
+
+/* ── 一键发布草稿 ── */
+async function publishArticle(slug) {
+  try {
+    await API.adminFetch(`/articles/${slug}`, { method: 'PATCH', body: JSON.stringify({ is_published: true }) });
+    toast('✅ 文章已发布', 'success');
+    loadArticles();
+  } catch(e) {
+    toast('❌ 发布失败：' + e.message, 'error');
+  }
+}
+
+/* ── 打开新建文章弹窗 ── */
+function openArticleModal() {
+  const modal = document.getElementById('article-modal');
+  ['a-title','a-cover','a-excerpt','a-body'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('a-slug').value = '';
+  document.getElementById('a-slug-hint').textContent = '';
+  document.getElementById('a-cover-preview').style.display = 'none';
+  document.getElementById('a-hot').checked = false;
+  document.getElementById('a-cat').value = 'market';
+  document.getElementById('article-modal-title').textContent = '✏️ 写新文章';
+  document.getElementById('article-modal-sub').textContent = '填好标题和正文，点发布就行';
+  document.getElementById('article-save-btn').textContent = '📤 发布文章';
+  modal.dataset.editingSlug = '';
+  modal.style.display = '';    // 清除残留inline style
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('a-title')?.focus(), 100);
+}
+
+/* ── 编辑已有文章 ── */
+async function editArticle(slug) {
+  const modal = document.getElementById('article-modal');
+  // 先打开弹窗，显示加载状态
+  ['a-title','a-cover','a-excerpt','a-body'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('a-slug').value = slug;
+  document.getElementById('a-slug-hint').textContent = '文章链接：/article.html?slug=' + slug;
+  document.getElementById('a-cover-preview').style.display = 'none';
+  document.getElementById('article-modal-title').textContent = '✏️ 编辑文章';
+  document.getElementById('article-modal-sub').textContent = '修改后点击「更新文章」保存';
+  document.getElementById('article-save-btn').textContent = '✅ 更新文章';
+  modal.dataset.editingSlug = slug;
+  modal.style.display = '';    // 清除残留inline style
+  modal.classList.add('open');
+
+  try {
+    const a = await API.adminFetch(`/articles/${slug}`);
+    if (!a) { toast('⚠️ 未找到该文章数据', 'error'); return; }
+    document.getElementById('a-cat').value     = a.category  || 'market';
+    document.getElementById('a-title').value   = a.title_zh  || a.title_en || '';
+    document.getElementById('a-cover').value   = a.cover_url || '';
+    document.getElementById('a-excerpt').value = a.excerpt   || '';
+    document.getElementById('a-body').value    = a.content_zh || a.content_en || '';
+    document.getElementById('a-hot').checked   = !!a.is_hot;
+    if (a.cover_url) previewCover(a.cover_url);
+  } catch(e) {
+    toast('加载文章内容失败：' + e.message, 'error');
+  }
+}
+
+/* ── 存草稿（保存但不发布） ── */
+async function saveArticleDraft() {
+  const title = getVal('a-title');
+  if (!title) { toast('⚠️ 请先填写文章标题', 'error'); return; }
+  if (!document.getElementById('a-slug').value) autoGenSlug(title);
+  await _doSaveArticle(false);
+}
+
+/* ── 发布文章 ── */
+async function saveArticle() {
+  const title = getVal('a-title');
+  if (!title) { toast('⚠️ 请先填写文章标题', 'error'); return; }
+  if (!document.getElementById('a-slug').value) autoGenSlug(title);
+  await _doSaveArticle(true);
+}
+
+async function _doSaveArticle(isPublished) {
+  const slug  = document.getElementById('a-slug').value;
+  const title = getVal('a-title');
+  if (!slug || !title) { toast('❌ 标题不能为空', 'error'); return; }
+
+  const payload = {
+    slug,
+    title,
+    category:     getVal('a-cat'),
+    cover_url:    getVal('a-cover')   || null,
+    excerpt:      getVal('a-excerpt') || null,
+    body:         getVal('a-body')    || null,
+    is_hot:       document.getElementById('a-hot').checked,
+    is_published: isPublished,
+  };
+
+  const btn = document.getElementById('article-save-btn');
+  const origText = btn.textContent;
+  btn.textContent = '保存中…'; btn.disabled = true;
+
+  const modal       = document.getElementById('article-modal');
+  const editingSlug = modal.dataset.editingSlug;
+
+  try {
+    if (editingSlug) {
+      await API.adminFetch(`/articles/${editingSlug}`, { method: 'PATCH', body: JSON.stringify(payload) });
+      toast(isPublished ? '✅ 文章已更新并发布' : '✅ 草稿已保存', 'success');
+    } else {
+      await API.adminFetch('/articles', { method: 'POST', body: JSON.stringify(payload) });
+      toast(isPublished ? '✅ 文章已成功发布！读者现在可以看到了' : '✅ 草稿已保存', 'success');
+    }
+    closeModal('article-modal');
+    loadArticles();
+  } catch(e) {
+    toast('❌ 保存失败：' + e.message, 'error');
+    btn.textContent = origText; btn.disabled = false;
+  }
+}
+
+/* ── 删除文章确认 ── */
+function confirmDeleteArticle(slug) {
+  confirm_('删除文章', `确认删除这篇文章吗？删除后无法恢复，读者将无法访问该文章。`, async () => {
+    await API.adminFetch(`/articles/${slug}`, { method: 'DELETE' });
+    toast('文章已删除', 'info');
+    loadArticles();
+  });
+}
+
+/* ══ SUBSCRIBERS ══════════════════════════════════════════════ */
+async function loadSubscribers() {
+  const data  = await API.adminFetch('/subscribers');
+  const items = data?.items || [];
+  const total = data?.total || 0;
+
+  const el = document.getElementById('sub-count');
+  if (el) el.textContent = `共 ${total} 位活跃订阅者`;
+
+  const tbody = document.getElementById('subscribers-tbody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📮</div><div class="empty-text">暂无订阅者</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(s => `
+    <tr>
+      <td class="td-main">${escHtml(s.email)}</td>
+      <td><span class="badge badge-gray">${escHtml(s.source || 'website')}</span></td>
+      <td style="color:var(--gray);font-size:12px">${new Date(s.created_at).toLocaleDateString('zh-CN')}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="confirmUnsubscribe(${s.id},'${escHtml(s.email)}')">移除</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function confirmUnsubscribe(id, email) {
+  confirm_('移除订阅者', `确认移除订阅者「${email}」？`, async () => {
+    await API.adminFetch(`/subscribers/${id}`, { method: 'DELETE' });
+    toast('已移除', 'info');
+    loadSubscribers();
+  });
+}
+
+/* ══ BROKERS ═════════════════════════════════════════════════ */
+async function loadBrokers() {
+  const data  = await API.adminFetch('/brokers/admin/all?is_active=true') || {};
+  const items = data.items || [];
+  const tbody = document.getElementById('brokers-tbody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👔</div><div class="empty-text">暂无经纪人</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(b => `
+    <tr>
+      <td class="td-main">${escHtml(b.name)}</td>
+      <td>${escHtml(b.company || '—')}</td>
+      <td class="td-mono" style="font-size:11px">${escHtml(b.license_no || '—')}</td>
+      <td style="font-size:12px;color:var(--gray)">${escHtml(b.specialties || '—')}</td>
+      <td>
+        ${b.is_verified
+          ? '<span class="badge badge-green">已认证</span>'
+          : `<button class="btn btn-success btn-sm" onclick="verifyBroker(${b.id})">✓ 认证</button>`}
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="openBrokerModal(${JSON.stringify(b).replace(/"/g,'&quot;')})">编辑</button>
+          ${b.is_verified ? `<button class="btn btn-ghost btn-sm" style="color:var(--warning)" onclick="unverifyBroker(${b.id})">取消认证</button>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="confirmDeleteBroker(${b.id},'${escHtml(b.name)}')">删除</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function verifyBroker(id) {
+  await API.adminFetch(`/brokers/${id}/verify`, { method: 'PATCH' });
+  toast('✅ 已认证', 'success');
+  loadBrokers();
+}
+async function confirmDeleteBroker(id, name) {
+  confirm_('删除经纪人', `确认删除经纪人「${name}」？`, async () => {
+    await API.adminFetch(`/brokers/${id}`, { method: 'DELETE' });
+    toast('已删除', 'info');
+    loadBrokers();
+  });
+}
+
+/* ══ ADS ══════════════════════════════════════════════════════ */
+async function loadAds() {
+  const data = await API.adminFetch('/ads/all') || {};
+  const items = Array.isArray(data) ? data : (data.items || []);
+  const tbody = document.getElementById('ads-tbody');
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📢</div><div class="empty-text">暂无广告位数据</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(a => `
+    <tr>
+      <td>
+        <div class="td-main">${escHtml(a.slot_key)}</div>
+        <div class="td-sub">${escHtml(a.slot_name || '')}</div>
+      </td>
+      <td>${escHtml(a.advertiser || '—')}</td>
+      <td>
+        ${a.image_url
+          ? `<img src="${escHtml(a.image_url)}" alt="ad" style="height:32px;width:auto;border-radius:4px;object-fit:cover;border:1px solid var(--border)">`
+          : '<span style="color:var(--gray);font-size:12px">无图片</span>'}
+      </td>
+      <td><span class="badge badge-gray">${escHtml(a.ad_type || '—')}</span></td>
+      <td>${a.is_active
+        ? '<span class="badge badge-green">投放中</span>'
+        : '<span class="badge badge-gray">未激活</span>'}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="openAdModal(${JSON.stringify(a).replace(/"/g,'&quot;')})">编辑</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleAd('${escHtml(a.slot_key)}',${!a.is_active})">
+            ${a.is_active ? '⏸ 暂停' : '▶ 激活'}
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function toggleAd(key, active) {
+  await API.adminFetch(`/ads/${key}`, { method: 'PATCH', body: JSON.stringify({ is_active: active }) });
+  toast(active ? '✅ 广告已激活' : '⏸ 广告已暂停', 'info');
+  loadAds();
+}
+
+/* ══ MODAL ════════════════════════════════════════════════════ */
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');  // 清除CSS class方式
+  el.style.display = '';        // 清除inline style，避免压制CSS class
+}
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+/* ══ CONFIRM DIALOG ══════════════════════════════════════════ */
+let _confirmResolve = null;
+
+function confirm_(title, msg, onConfirm) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent   = msg;
+  document.getElementById('confirm-overlay').style.display = 'flex';
+  _confirmResolve = onConfirm;
+}
+
+async function resolveConfirm(confirmed) {
+  document.getElementById('confirm-overlay').style.display = 'none';
+  if (confirmed && _confirmResolve) {
+    try {
+      await _confirmResolve();
+    } catch(e) {
+      toast('❌ 操作失败：' + e.message, 'error');
+    }
+  }
+  _confirmResolve = null;
+}
+
+/* ══ TOAST ════════════════════════════════════════════════════ */
+function toast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span>${escHtml(msg)}</span>`;
+  el.onclick = () => el.remove();
+  container.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+/* ══ HELPERS ═════════════════════════════════════════════════ */
+const getVal = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+const numVal = id => { const v = getVal(id); return v !== '' ? parseFloat(v) : null; };
+const intVal = id => { const v = getVal(id); return v !== '' ? parseInt(v, 10) : null; };
+const escHtml = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ══ BROKERS ══════════════════════════════════════════════════ */
+function openBrokerModal(broker) {
+  const isEdit = !!broker;
+  document.getElementById('broker-modal-title').textContent = isEdit ? '编辑经纪人' : '新增经纪人';
+  document.getElementById('bk-id').value         = broker?.id || '';
+  document.getElementById('bk-name').value       = broker?.name || '';
+  document.getElementById('bk-license').value    = broker?.license_no || '';
+  document.getElementById('bk-company').value    = broker?.company || '';
+  document.getElementById('bk-phone').value      = broker?.phone || '';
+  document.getElementById('bk-email').value      = broker?.email || '';
+  document.getElementById('bk-wechat').value     = broker?.wechat || '';
+  document.getElementById('bk-specialties').value= broker?.specialties || '';
+  document.getElementById('bk-avatar').value     = broker?.avatar_url || '';
+  document.getElementById('bk-intro').value      = broker?.intro || '';
+  document.getElementById('bk-verified').checked = broker?.is_verified || false;
+  document.getElementById('broker-modal').style.display = 'flex';
+}
+
+async function saveBroker() {
+  const id   = document.getElementById('bk-id').value;
+  const name = document.getElementById('bk-name').value.trim();
+  if (!name) { toast('请填写经纪人姓名', 'error'); return; }
+
+  const body = {
+    name,
+    license_no:  document.getElementById('bk-license').value.trim() || null,
+    company:     document.getElementById('bk-company').value.trim() || null,
+    phone:       document.getElementById('bk-phone').value.trim()   || null,
+    email:       document.getElementById('bk-email').value.trim()   || null,
+    wechat:      document.getElementById('bk-wechat').value.trim()  || null,
+    specialties: document.getElementById('bk-specialties').value.trim() || null,
+    avatar_url:  document.getElementById('bk-avatar').value.trim()  || null,
+    intro:       document.getElementById('bk-intro').value.trim()   || null,
+  };
+
+  try {
+    if (id) {
+      await API.adminFetch(`/brokers/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+    } else {
+      const res = await API.adminFetch('/brokers', { method: 'POST', body: JSON.stringify(body) });
+      // If "直接认证" checked, immediately verify
+      if (document.getElementById('bk-verified').checked && res?.id) {
+        await API.adminFetch(`/brokers/${res.id}/verify`, { method: 'PATCH' });
+      }
+    }
+    toast(id ? '✅ 经纪人信息已更新' : '✅ 经纪人已创建', 'success');
+    closeModal('broker-modal');
+    await loadBrokers();
+  } catch (e) {
+    toast('操作失败: ' + (e.message || ''), 'error');
+  }
+}
+
+async function unverifyBroker(id) {
+  await API.adminFetch(`/brokers/${id}/unverify`, { method: 'PATCH' });
+  toast('⚠️ 已取消认证', 'info');
+  await loadBrokers();
+}
+
+/* ══ AD SLOTS ══════════════════════════════════════════════════ */
+var AD_SLOT_HINTS = {
+  home_hero_1: '首页左侧大图（16:10 比例，建议 1200×750px）',
+  home_hero_2: '首页右侧小图 1（1:1 比例，建议 400×400px）',
+  home_hero_3: '首页右侧小图 2（1:1 比例，建议 400×400px）',
+  sidebar_top: '产品列表页侧边栏顶部横幅',
+  ticker_1:    '顶部跑马灯滚动文字',
+};
+
+function onAdSlotSelect(val) {
+  document.getElementById('ad-slot-key').value = val;
+  document.getElementById('ad-slot-hint').textContent = AD_SLOT_HINTS[val] || '';
+}
+
+function openAdModal(ad) {
+  const isEdit = !!ad;
+  document.getElementById('ad-modal-title').textContent = isEdit ? '编辑推送位' : '新增推送位';
+  document.getElementById('ad-slot-key-orig').value = ad?.slot_key || '';
+  document.getElementById('ad-slot-key').value      = ad?.slot_key || '';
+  // 下拉选中对应位置
+  var sel = document.getElementById('ad-slot-select');
+  sel.value = ad?.slot_key || '';
+  sel.disabled = isEdit;
+  document.getElementById('ad-slot-hint').textContent = AD_SLOT_HINTS[ad?.slot_key] || '';
+  document.getElementById('ad-slot-name').value     = ad?.slot_name || '';
+  document.getElementById('ad-advertiser').value    = ad?.advertiser || '';
+  document.getElementById('ad-image').value         = ad?.image_url || '';
+  document.getElementById('ad-link').value          = ad?.link_url || '';
+  document.getElementById('ad-content').value       = ad?.content || '';
+  document.getElementById('ad-active').checked      = ad?.is_active || false;
+  // 初始化图片预览
+  var imgPrev = document.getElementById('ad-image-preview');
+  if (imgPrev) { if (ad?.image_url) { imgPrev.src = ad.image_url; imgPrev.style.display = 'block'; } else { imgPrev.style.display = 'none'; } }
+  document.getElementById('ad-image-upload-status').textContent = '';
+  document.getElementById('ad-modal').style.display = 'flex';
+}
+
+async function saveAdSlot() {
+  const key     = document.getElementById('ad-slot-key').value.trim();
+  const origKey = document.getElementById('ad-slot-key-orig').value;
+  const isEdit  = !!origKey;
+
+  if (!isEdit && !key) { toast('请选择展示位置', 'error'); return; }
+
+  const body = {
+    slot_name:  document.getElementById('ad-slot-name').value.trim()  || null,
+    advertiser: document.getElementById('ad-advertiser').value.trim() || null,
+    ad_type:    document.getElementById('ad-type').value,
+    image_url:  document.getElementById('ad-image').value.trim()      || null,
+    link_url:   document.getElementById('ad-link').value.trim()       || null,
+    content:    document.getElementById('ad-content').value.trim()    || null,
+    is_active:  document.getElementById('ad-active').checked,
+  };
+
+  try {
+    if (isEdit) {
+      await API.adminFetch(`/ads/${origKey}`, { method: 'PATCH', body: JSON.stringify(body) });
+      toast('✅ 广告位已更新', 'success');
+    } else {
+      await API.adminFetch('/ads', { method: 'POST', body: JSON.stringify({ ...body, slot_key: key }) });
+      toast('✅ 广告位已创建', 'success');
+    }
+    closeModal('ad-modal');
+    await loadAds();
+  } catch (e) {
+    toast('操作失败: ' + (e.message || ''), 'error');
+  }
+}
+
+/* ══ SUBSCRIBERS EXPORT ════════════════════════════════════════ */
+function exportSubscribersCSV() {
+  const token = API.getToken ? API.getToken() : localStorage.getItem('hm_token');
+  const base  = (typeof API_BASE !== 'undefined') ? API_BASE : '/api/v1';
+  const url   = `${base}/subscribers/export?is_active=true`;
+  // Use hidden link to trigger download with auth header is not directly possible
+  // Instead open in new tab; the JWT will be sent via URL param fallback
+  // Production: use a signed download URL or cookie-based auth
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'subscribers.csv';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('ℹ️ CSV 下载已触发，如未自动下载请检查浏览器弹出窗口设置', 'info', 5000);
+}
+
+/* ══ PASSWORD VISIBILITY TOGGLE ══════════════════════════════ */
+function togglePwd(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  // 眼睛图标：睁开 vs 闭合（用 Unicode 变体区分）
+  btn.textContent = isHidden ? '🙈' : '👁';
+  btn.title = isHidden ? '隐藏密码' : '显示密码';
+}
+
+/* ══ CHANGE PASSWORD ══════════════════════════════════════════ */
+function openChangePasswordModal() {
+  /* Clear fields and error; reset password visibility to hidden */
+  ['cp-old','cp-new','cp-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = '';
+      el.type  = 'password';          // 重置为隐藏状态
+    }
+    // 同步重置对应眼睛按钮图标
+    const btn = el ? el.parentElement.querySelector('.pwd-eye') : null;
+    if (btn) { btn.textContent = '👁'; btn.title = '显示密码'; }
+  });
+  const err = document.getElementById('cp-error');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+  document.getElementById('cp-modal').style.display = 'flex';
+  setTimeout(() => { const el = document.getElementById('cp-old'); if (el) el.focus(); }, 50);
+}
+
+async function doChangePassword() {
+  const oldPw   = document.getElementById('cp-old').value.trim();
+  const newPw   = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const errEl   = document.getElementById('cp-error');
+  const btn     = document.getElementById('cp-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!oldPw || !newPw || !confirm) {
+    errEl.style.display = 'block';
+    errEl.textContent = '请填写所有字段';
+    return;
+  }
+  if (newPw !== confirm) {
+    errEl.style.display = 'block';
+    errEl.textContent = '两次输入的新密码不一致';
+    return;
+  }
+  if (newPw.length < 8) {
+    errEl.style.display = 'block';
+    errEl.textContent = '新密码长度不能少于 8 位';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '保存中…';
+  try {
+    const res = await API.adminFetch('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ old_password: oldPw, new_password: newPw }),
+    });
+    closeModal('cp-modal');
+    toast('密码修改成功，即将退出登录…', 'success');
+    setTimeout(() => API.logout(), 1500);
+  } catch (e) {
+    errEl.style.display = 'block';
+    errEl.textContent = e.message || '修改失败，请检查旧密码是否正确';
+    btn.disabled = false;
+    btn.textContent = '确认修改';
+  }
+}
+
+
+/* ══ 自动化中心 ═══════════════════════════════════════════════ */
+async function scraperTriggerCrawl() {
+  const btn    = document.getElementById('crawl-btn');
+  const status = document.getElementById('crawl-status');
+  btn.disabled = true;
+  btn.textContent = '⏳ 抓取中…';
+  status.style.cssText = 'display:block;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.7;margin-bottom:16px';
+  status.innerHTML = '🕷 正在连接各新闻源，请稍候（约30-60秒）…';
+  try {
+    const res = await API.adminFetch('/articles/crawl?limit=5', { method: 'POST' });
+    if (res && res.ok !== false) {
+      status.style.cssText = 'display:block;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.7;margin-bottom:16px';
+      status.innerHTML = `✅ 抓取完成！新增 <b>${res.saved||0}</b> 篇&nbsp;&nbsp;<span style="color:#64748b">跳过已有 ${res.skipped||0} 篇</span>${(res.failed||0)>0?`&nbsp;&nbsp;<span style="color:#dc2626">失败 ${res.failed} 篇</span>`:''}<br><span style="font-size:11px;color:#64748b;display:block;margin-top:4px">新文章已进入「待审核」队列</span>`;
+      const timeEl = document.getElementById('crawl-last-time');
+      if (timeEl) timeEl.textContent = `上次抓取：${new Date().toLocaleString('zh-HK')}，新增 ${res.saved||0} 篇`;
+      scraperLoadHistory(res.details || []);
+      toast((res.saved||0) > 0 ? `✅ 新增 ${res.saved} 篇草稿，请到「待审核」查看` : '本次无新内容', (res.saved||0) > 0 ? 'success' : 'info');
+    } else {
+      throw new Error(res?.detail || res?.message || '抓取失败');
+    }
+  } catch(e) {
+    status.style.cssText = 'display:block;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px';
+    status.innerHTML = `❌ 抓取失败：${escHtml(e.message)}`;
+    toast('❌ 抓取失败：' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🕷 立即抓取';
+  }
+}
+
+function scraperLoadHistory(details) {
+  const el = document.getElementById('crawl-history');
+  if (!el) return;
+  if (!details || details.length === 0) {
+    el.innerHTML = '<div style="color:var(--gray);font-size:13px;text-align:center;padding:16px">本次未抓到新文章</div>';
+    return;
+  }
+  const catLabel = { policy:'监管政策', market:'市场动态', alert:'风险提示', guide:'购险指南', audit:'精算分析' };
+  el.innerHTML = `<table style="width:100%;font-size:13px;border-collapse:collapse">
+    <thead><tr style="border-bottom:1px solid var(--border)">
+      <th style="text-align:left;padding:8px 12px;color:var(--gray);font-weight:600">标题</th>
+      <th style="text-align:left;padding:8px 12px;color:var(--gray);font-weight:600;width:80px">来源</th>
+      <th style="text-align:left;padding:8px 12px;color:var(--gray);font-weight:600;width:80px">分类</th>
+    </tr></thead>
+    <tbody>${details.map(d=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">${escHtml(d.title||d.slug||'')}</td>
+      <td style="padding:10px 12px;color:var(--gray)">${escHtml(d.source||'—')}</td>
+      <td style="padding:10px 12px"><span style="background:var(--blue-lt);color:var(--blue-dk);border-radius:4px;padding:2px 8px;font-size:11px">${catLabel[d.category]||d.category||'—'}</span></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+/* ══ 待审核队列 · Master-Detail 布局 ═══════════════════════════════════════════════ */
+let APPROVAL_ITEMS = [];
+let APPROVAL_SELECTED_SLUG = null;
+
+async function loadApproval() {
+  const list   = document.getElementById('approval-list');
+  const count  = document.getElementById('approval-count');
+  const detail = document.getElementById('approval-detail-content');
+  const placeholder = document.getElementById('approval-detail-placeholder');
+  if (!list) return;
+
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray)">加载中…</div>';
+  if (detail) { detail.style.display = 'none'; detail.innerHTML = ''; }
+  if (placeholder) placeholder.style.display = 'block';
+  APPROVAL_SELECTED_SLUG = null;
+
+  try {
+    const res   = await API.adminFetch('/articles/admin/all?is_published=false&limit=50');
+    const items = res?.items || [];
+    APPROVAL_ITEMS = items;
+    if (count) count.textContent = `共 ${items.length} 篇待审核`;
+
+    if (items.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:56px 24px"><div style="font-size:48px;margin-bottom:16px">📭</div><div style="font-weight:700;font-size:16px;color:#111;margin-bottom:8px">暂无待审核内容</div><div style="font-size:13px;color:var(--gray)">去「自动化中心」点「立即抓取」</div></div>`;
+      return;
+    }
+
+    const catLabel = { policy:'监管政策', market:'市场动态', alert:'风险提示', guide:'购险指南', audit:'精算分析' };
+    list.innerHTML = items.map(a => {
+      const title = escHtml(a.title || a.title_zh || a.slug || '');
+      const excerpt = escHtml((a.excerpt||'').substring(0,80));
+      const sel = APPROVAL_SELECTED_SLUG === a.slug ? ' approval-card selected' : ' approval-card';
+      return `<div class="${sel}" data-slug="${escHtml(a.slug)}" onclick="selectApprovalItem('${escHtml(a.slug)}')">
+        <div style="font-weight:700;font-size:13px;color:#111;margin-bottom:4px;line-height:1.4">${title}</div>
+        <div style="font-size:11px;color:var(--gray);line-height:1.5">${excerpt ? excerpt+'…' : '（无摘要）'}</div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-size:10px;background:var(--blue-lt);color:var(--blue-dk);border-radius:4px;padding:2px 6px">${catLabel[a.category]||a.category||'未分类'}</span>
+          <span style="font-size:10px;color:var(--gray)">${escHtml(a.author||'')}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--red);padding:24px;text-align:center">加载失败：${escHtml(e.message)}</div>`;
+  }
+}
+
+async function selectApprovalItem(slug) {
+  APPROVAL_SELECTED_SLUG = slug;
+  document.querySelectorAll('.approval-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.slug === slug);
+  });
+
+  const placeholder = document.getElementById('approval-detail-placeholder');
+  const detail = document.getElementById('approval-detail-content');
+  if (!detail) return;
+  placeholder.style.display = 'none';
+  detail.style.display = 'block';
+  detail.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray)">加载正文…</div>';
+
+  try {
+    const art = await API.adminFetch('/articles/' + slug);
+    if (!art) throw new Error('获取失败');
+    const body = (art.body || art.content || '').trim();
+    const catLabel = { policy:'监管政策', market:'市场动态', alert:'风险提示', guide:'购险指南', audit:'精算分析' };
+    detail.innerHTML = `
+      <div style="margin-bottom:20px">
+        ${art.cover_url ? `<img src="${escHtml(art.cover_url)}" alt="" style="width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin-bottom:16px" onerror="this.style.display='none'">` : ''}
+        <h2 style="font-size:20px;font-weight:800;color:#111;margin-bottom:12px;line-height:1.35">${escHtml(art.title || art.title_zh || art.slug || '')}</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:12px;color:var(--gray)">
+          <span style="background:var(--blue-lt);color:var(--blue-dk);border-radius:4px;padding:2px 8px">${catLabel[art.category]||art.category||'未分类'}</span>
+          <span>${escHtml(art.author||'')}</span>
+          <span>${art.created_at ? new Date(art.created_at).toLocaleDateString('zh-HK') : ''}</span>
+        </div>
+      </div>
+      <div style="font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap;margin-bottom:24px">${body ? escHtml(body) : '（无正文）'}</div>
+      <div style="display:flex;gap:10px;padding-top:16px;border-top:1px solid var(--border)">
+        <button class="btn btn-primary" onclick="approvalPublish('${escHtml(slug)}')">✅ 批准发布</button>
+        <button class="btn btn-ghost" onclick="approvalDelete('${escHtml(slug)}')">🗑 丢弃</button>
+      </div>`;
+  } catch(e) {
+    detail.innerHTML = `<div style="color:var(--red);padding:24px;text-align:center">加载失败：${escHtml(e.message)}</div>`;
+  }
+}
+
+async function approvalPublish(slug) {
+  try {
+    await API.adminFetch(`/articles/${slug}`, { method: 'PATCH', body: JSON.stringify({ is_published: true }) });
+    document.querySelector(`.approval-card[data-slug="${slug}"]`)?.remove();
+    APPROVAL_ITEMS = APPROVAL_ITEMS.filter(a => a.slug !== slug);
+    const c = document.getElementById('approval-count');
+    if (c) c.textContent = `共 ${APPROVAL_ITEMS.length} 篇待审核`;
+    if (APPROVAL_ITEMS.length === 0) { loadApproval(); return; }
+    const next = APPROVAL_ITEMS[0];
+    if (next) selectApprovalItem(next.slug);
+    else { document.getElementById('approval-detail-placeholder').style.display = 'block'; document.getElementById('approval-detail-content').style.display = 'none'; }
+    toast('✅ 已发布', 'success');
+  } catch(e) { toast('❌ 发布失败：' + e.message, 'error'); }
+}
+
+async function approvalDelete(slug) {
+  try {
+    await API.adminFetch(`/articles/${slug}`, { method: 'DELETE' });
+    document.querySelector(`.approval-card[data-slug="${slug}"]`)?.remove();
+    APPROVAL_ITEMS = APPROVAL_ITEMS.filter(a => a.slug !== slug);
+    const c = document.getElementById('approval-count');
+    if (c) c.textContent = `共 ${APPROVAL_ITEMS.length} 篇待审核`;
+    if (APPROVAL_ITEMS.length === 0) { loadApproval(); return; }
+    const next = APPROVAL_ITEMS[0];
+    if (next) selectApprovalItem(next.slug);
+    else { document.getElementById('approval-detail-placeholder').style.display = 'block'; document.getElementById('approval-detail-content').style.display = 'none'; }
+    toast('🗑 已忽略', 'success');
+  } catch(e) { toast('❌ 操作失败：' + e.message, 'error'); }
+}
+
+
+/* ══ ACADEMY MANAGEMENT ═══════════════════════════════════════════════ */
+
+var ACAD_CAT_BADGE = {
+  savings: '<span class="badge" style="background:#e3f6fd;color:#00a9e0">🏦 储蓄险入门</span>',
+  ci:      '<span class="badge" style="background:#f0faf4;color:#10b981">🏥 重疾险解析</span>',
+  compare: '<span class="badge" style="background:#eef2ff;color:#6366f1">⚖️ 内地VS港险</span>',
+  claims:  '<span class="badge" style="background:#fef9ec;color:#f59e0b">📋 理赔实战</span>',
+  reg:     '<span class="badge" style="background:#f5f5f5;color:#8e8e93">📊 监管与合规</span>',
+};
+
+async function loadAcademyArticles() {
+  var cat   = document.getElementById('f-acad-cat')?.value || '';
+  var tbody = document.getElementById('academy-tbody');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></td></tr>';
+
+  try {
+    var url = '/articles/admin/all?channel=academy&limit=200';
+    if (cat) url += '&category=' + encodeURIComponent(cat);
+    var raw   = await API.adminFetch(url);
+    var items = raw?.items || [];
+
+    var countEl = document.getElementById('academy-count');
+    if (countEl) countEl.textContent = '共 ' + items.length + ' 篇';
+
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' +
+        '<div class="empty-icon">🎓</div>' +
+        '<div class="empty-text">暂无大讲堂文章</div>' +
+        '<div class="empty-sub">点击右上角「✏️ 新建文章」创建第一篇</div>' +
+        '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = items.map(function(a) {
+      var dateStr = (a.published_at || a.created_at || '').split('T')[0] || '—';
+      var title   = (a.title_zh || a.title_en || '（无标题）');
+      var truncated = title.length > 40 ? title.slice(0, 40) + '…' : title;
+      var statusBadge = a.is_published
+        ? '<span class="badge badge-green">已发布</span>'
+        : '<span class="badge badge-gray">草稿</span>';
+      var catBadge = ACAD_CAT_BADGE[a.category] ||
+        '<span class="badge badge-gray">' + escHtml(a.category || '—') + '</span>';
+      return '<tr>' +
+        '<td><div class="td-main" style="max-width:300px;white-space:normal;line-height:1.4">' + escHtml(truncated) + '</div></td>' +
+        '<td>' + catBadge + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td style="font-size:12px;color:var(--gray);white-space:nowrap">' + escHtml(dateStr) + '</td>' +
+        '<td><div style="display:flex;gap:5px;flex-wrap:wrap">' +
+          '<button class="btn btn-ghost btn-sm" onclick="openAcademyEditor(\'' + escHtml(a.slug) + '\')">✏️ 编辑</button>' +
+          '<button class="btn btn-' + (a.is_published ? 'warning' : 'primary') + ' btn-sm" onclick="toggleAcademyPublish(\'' + escHtml(a.slug) + '\',' + a.is_published + ')">' +
+            (a.is_published ? '⏸ 下线' : '📤 发布') +
+          '</button>' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteAcademyArticle(\'' + escHtml(a.slug) + '\')">🗑️ 删除</button>' +
+        '</div></td>' +
+        '</tr>';
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' +
+      '<div class="empty-icon">⚠️</div>' +
+      '<div class="empty-text" style="color:var(--red)">加载失败：' + escHtml(e.message) + '</div>' +
+      '<div class="empty-sub">请检查网络连接，或点击刷新重试</div>' +
+      '</div></td></tr>';
+  }
+}
+
+async function openAcademyEditor(slug) {
+  var modal = document.getElementById('modal-academy-editor');
+
+  // Reset form
+  ['acad-title','acad-excerpt','acad-content'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('acad-cat').value = 'savings';
+  document.getElementById('acad-published').checked = false;
+  document.getElementById('acad-modal-title').textContent = slug ? '✏️ 编辑大讲堂文章' : '✏️ 新建大讲堂文章';
+  modal.dataset.editingSlug = slug || '';
+  modal.style.display = 'flex';
+
+  if (slug) {
+    try {
+      var a = await API.adminFetch('/articles/' + encodeURIComponent(slug));
+      if (!a) { toast('⚠️ 未找到该文章', 'error'); return; }
+      document.getElementById('acad-title').value     = a.title_zh   || a.title_en  || '';
+      document.getElementById('acad-cat').value       = a.category   || 'savings';
+      document.getElementById('acad-excerpt').value   = a.excerpt    || '';
+      document.getElementById('acad-content').value   = a.content_zh || a.content_en || '';
+      document.getElementById('acad-published').checked = !!a.is_published;
+    } catch(e) {
+      toast('加载文章失败：' + e.message, 'error');
+    }
+  }
+
+  setTimeout(function() { document.getElementById('acad-title')?.focus(); }, 80);
+}
+
+// ── 通用图片上传（填入指定 input）────────────────────────────────────
+async function uploadInputImage(input, targetInputId, onSuccess) {
+  var file = input.files[0];
+  if (!file) return;
+  // 找最近的 status span（同一个 parent 里的）
+  var statusId = targetInputId + '-upload-status';
+  var status = document.getElementById(statusId);
+  if (status) status.textContent = '上传中…';
+  var fd = new FormData();
+  fd.append('file', file);
+  try {
+    var token = localStorage.getItem('himiao_token');
+    var res = await fetch('/api/v1/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    var data = await res.json();
+    if (!data.ok) throw new Error(data.detail || '上传失败');
+    var target = document.getElementById(targetInputId);
+    if (target) target.value = data.url;
+    if (onSuccess) onSuccess(data.url);
+    if (status) status.textContent = '✅ 已上传';
+  } catch (e) {
+    if (status) status.textContent = '❌ ' + e.message;
+  }
+  input.value = '';
+  if (status) setTimeout(function() { status.textContent = ''; }, 3000);
+}
+
+// ── Academy image helpers ────────────────────────────────────────────
+function acadInsertAtCursor(text) {
+  var ta = document.getElementById('acad-content');
+  if (!ta) return;
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + text.length;
+  ta.focus();
+}
+
+async function acadUploadImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var status = document.getElementById('acad-img-status');
+  status.textContent = '上传中…';
+  var fd = new FormData();
+  fd.append('file', file);
+  try {
+    var token = localStorage.getItem('himiao_token');
+    var res = await fetch('/api/v1/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    var data = await res.json();
+    if (!data.ok) throw new Error(data.detail || '上传失败');
+    var alt = file.name.replace(/\.[^.]+$/, '') || '图片';
+    acadInsertAtCursor('\n![' + alt + '](' + data.url + ')\n');
+    status.textContent = '✅ 已插入';
+  } catch (e) {
+    status.textContent = '❌ ' + e.message;
+  }
+  input.value = '';
+  setTimeout(function() { status.textContent = ''; }, 3000);
+}
+
+function acadInsertImageUrl() {
+  var url = prompt('请输入图片 URL：');
+  if (!url || !url.trim()) return;
+  var alt = prompt('图片描述（可选，回车跳过）：') || '图片';
+  acadInsertAtCursor('\n![' + alt + '](' + url.trim() + ')\n');
+}
+
+async function saveAcademyArticle() {
+  var title   = document.getElementById('acad-title').value.trim();
+  var cat     = document.getElementById('acad-cat').value;
+  var excerpt = document.getElementById('acad-excerpt').value.trim();
+  var content = document.getElementById('acad-content').value.trim();
+  var published = document.getElementById('acad-published').checked;
+
+  if (!title) { toast('⚠️ 请填写文章标题', 'error'); return; }
+  if (!content) { toast('⚠️ 请填写文章正文', 'error'); return; }
+
+  var modal       = document.getElementById('modal-academy-editor');
+  var editingSlug = modal.dataset.editingSlug || '';
+  var saveBtn     = document.getElementById('acad-save-btn');
+  var origText    = saveBtn.textContent;
+  saveBtn.textContent = '保存中…'; saveBtn.disabled = true;
+
+  var payload = {
+    title_zh:     title,
+    category:     cat,
+    excerpt:      excerpt || null,
+    content_zh:   content,
+    is_published: published,
+    channel:      'academy',
+    auto_publish: true,
+  };
+
+  try {
+    if (editingSlug) {
+      await API.adminFetch('/articles/' + encodeURIComponent(editingSlug), {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      });
+      toast(published ? '✅ 文章已更新并发布' : '✅ 草稿已保存', 'success');
+    } else {
+      await API.adminFetch('/articles', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      toast(published ? '✅ 文章已发布' : '✅ 草稿已保存', 'success');
+    }
+    modal.style.display = 'none';
+    loadAcademyArticles();
+  } catch(e) {
+    toast('❌ 保存失败：' + e.message, 'error');
+    saveBtn.textContent = origText; saveBtn.disabled = false;
+  }
+}
+
+async function toggleAcademyPublish(slug, currentState) {
+  try {
+    await API.adminFetch('/articles/' + encodeURIComponent(slug), {
+      method: 'PATCH',
+      body: JSON.stringify({ is_published: !currentState }),
+    });
+    toast(!currentState ? '✅ 文章已发布' : '⏸ 文章已下线', currentState ? 'info' : 'success');
+    loadAcademyArticles();
+  } catch(e) {
+    toast('❌ 操作失败：' + e.message, 'error');
+  }
+}
+
+function deleteAcademyArticle(slug) {
+  confirm_('删除大讲堂文章', '确认删除这篇大讲堂文章吗？删除后无法恢复。', async function() {
+    await API.adminFetch('/articles/' + encodeURIComponent(slug), { method: 'DELETE' });
+    toast('文章已删除', 'info');
+    loadAcademyArticles();
+  });
+}
+
+</script>
+</body>
+</html>

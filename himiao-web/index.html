@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiMiao Audit | 香港保险独立精算审计平台</title>
+    <meta name="description" content="HiMiao Audit — 独立第三方香港保险精算数据终端。IRR 测算、产品横向对比、分红实现率追踪。不销售、不导流、不提供个人建议。">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://himiao.com/">
+    <meta property="og:title" content="HiMiao Audit | 香港保险独立精算审计">
+    <meta property="og:description" content="独立精算数据终端，对标彭博终端。IRR 测算、分红实现率、产品对比，数据来自保司官方披露。">
+    <meta property="og:type" content="website">
+    <script src="js/api-client.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        himiao: '#00a9e0',
+                        charcoal: '#4A4A4A',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fdfbf7;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a1a;
+            font-feature-settings: "palt" 1; /* CJK标点位置修正 */
+        }
+
+        .hero-gradient {
+            background: linear-gradient(180deg, rgba(253, 251, 247, 0) 0%, rgba(245, 242, 237, 1) 100%);
+        }
+
+        .nav-item {
+            color: #5e5e5e;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #00a9e0;
+        }
+
+        .rank-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .rank-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .writing-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 0.2em;
+        }
+
+        /* 滑轨样式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #E5E7EB;
+            border-radius: 2px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #00a9e0;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 0 2px white;
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .chat-enter {
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    
+/* ── Rank card metric: parameter tag semantics ── */
+</style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <div id="himiao-nav"></div>
+
+    <header class="relative pt-6 pb-12 hero-gradient">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+
+            <div class="pr-6">
+                <div
+                    class="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-white border border-gray-200 rounded-sm shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-himiao"></span>
+                    <span id="stat-products" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" data-i18n="hero_trust">
+                        已审计 128 款产品 · 覆盖 12 家保司
+                    </span>
+                </div>
+
+                <h1 class="text-5xl lg:text-6xl font-serif font-bold text-[#4A4A4A] leading-[1.15] mb-8"
+                    data-i18n="hero_title">
+                    在不确定的时代，<br><span class="text-himiao">锁定</span>确定的未来
+                </h1>
+                <p class="text-lg text-gray-500 mb-10 leading-relaxed max-w-lg" data-i18n="hero_subtitle">
+                    不仅仅是保险。我们通过全球视野的精算审计，为您在波动中建立购买力堡垒。
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="window.location.href='product-list.html?type=savings'"
+                        class="bg-[#00a9e0] text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#0083af] transition rounded-[2px] shadow-lg"
+                        data-i18n="hero_btn1">
+                        查看旗舰产品收录库
+                    </button>
+                    <button onclick="window.location.href='product-detail.html?id=aia_abundance_future_3'"
+                        class="bg-transparent border border-gray-300 text-gray-600 px-8 py-4 text-xs font-bold uppercase tracking-widest hover:border-himiao hover:text-himiao transition rounded-[2px] flex items-center justify-center gap-2"
+                        data-i18n="hero_btn2">
+                        查看示例报告 (No Sign-up)
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="flex bg-white rounded-sm shadow-2xl shadow-gray-200/50 border border-gray-50 w-full max-w-[480px] ml-auto overflow-hidden">
+                <div
+                    class="w-12 bg-gray-50 border-r border-gray-100 flex flex-col items-center justify-between py-6 flex-shrink-0">
+                    <div class="flex items-center gap-1.5 transform -rotate-90 origin-center translate-y-6">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Live</span>
+                    </div>
+                    <h2 class="text-xs font-bold text-[#4A4A4A] writing-vertical opacity-60" data-i18n="card_title">
+                        资产避险体检
+                    </h2>
+                </div>
+
+                <div class="flex-1 p-8 space-y-6">
+                    <!-- ── 静态模型基准 badge ── -->
+                    <div style="margin-bottom:4px;">
+                      <span style="display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:5px;padding:3px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;font-family:monospace;">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span data-i18n="calc_model_badge">[静态模型] 30岁 · 男 · 非吸烟</span>
+                      </span>
+                    </div>
+                    <div>
+                        <div
+                            class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                            <span data-i18n="calc_budget">假设年缴保费 (USD)</span>
+                        </div>
+                        <div
+                            class="flex items-center border-b border-gray-200 pb-2 hover:border-himiao transition duration-300">
+                            <span class="text-xl mr-3 text-gray-300 font-mono">$</span>
+                            <input type="text" value="50,000"
+                                class="w-full outline-none text-2xl font-mono font-bold text-[#4A4A4A] bg-transparent">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                                data-i18n="calc_duration">持有年限</label>
+                            <span id="yearDisplay"
+                                class="text-[10px] font-bold text-himiao font-mono bg-blue-50 px-2 py-0.5 rounded">20
+                                Years</span>
+                        </div>
+                        <input type="range" id="yearSlider" min="5" max="30" value="20" class="w-full"
+                            oninput="updateYear(this.value)">
+                        <div
+                            class="flex justify-between text-[9px] text-gray-300 font-mono mt-1 uppercase tracking-widest">
+                            <span>5Y</span><span>30Y</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-end justify-between pt-2">
+                        <div>
+                            <div class="text-[9px] text-gray-400 uppercase tracking-widest mb-1" data-i18n="calc_total">
+                                预期总价值</div>
+                            <div class="text-2xl font-mono font-bold text-himiao tracking-tighter">$1,842,000</div>
+                        </div>
+                        <div class="text-right pl-6 border-l border-gray-100">
+                            <div class="text-[9px] text-gray-400 uppercase tracking-widest mb-1"
+                                data-i18n="calc_breakeven">保证回本</div>
+                            <div class="text-sm font-bold text-[#4A4A4A] font-mono" data-i18n="calc_breakeven_val">第 8 年
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-full bg-[#00a9e0] text-white py-4 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-[#0092c9] transition shadow-lg shadow-blue-100 mt-1 rounded-[2px]"
+                        data-i18n="calc_btn">
+                        生成详细推演报告
+                    </button>
+                    <p style="font-size:9px;color:#9ca3af;text-align:center;margin-top:6px;line-height:1.5;" data-i18n="calc_disclaimer">
+                      本沙盘基于统一模型进行数学推演，不构成任何财务适配建议
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         全险种审计榜单 — 自动轮播 + 手动切换
+    ══════════════════════════════════════════════════════ -->
+    <section class="max-w-7xl mx-auto px-6 pt-12 pb-14" id="rankings-section">
+
+        <!-- 标题行 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.3em] text-himiao mb-2">Independent Audit</p>
+                <h2 class="text-3xl font-serif font-bold text-[#4A4A4A]" data-i18n="list_title">2026 年度资产精算收录库</h2>
+                <div class="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                    <span data-i18n="list_note">* 评分基于 HiMiao 公开审计模型计算</span>
+                    <button onclick="document.getElementById('methodology-modal').classList.remove('hidden')"
+                        class="underline hover:text-himiao transition" data-i18n="list_method">查看方法论</button>
+                </div>
+            </div>
+
+            <!-- 险种切换 Tab — 精致胶囊样式 -->
+            <div class="flex items-center gap-1 bg-gray-100 rounded-full p-1 self-start md:self-auto"
+                id="carousel-tabs">
+                <button onclick="carouselGoTo(0)" data-cidx="0"
+                    class="carousel-tab active-ctab text-xs font-bold px-4 py-2 rounded-full bg-himiao text-white transition-all whitespace-nowrap">
+                    <span data-i18n="tab_savings">储蓄险</span>
+                </button>
+                <button onclick="carouselGoTo(1)" data-cidx="1"
+                    class="carousel-tab text-xs font-bold px-4 py-2 rounded-full text-gray-400 hover:text-[#4A4A4A] transition-all whitespace-nowrap">
+                    <span data-i18n="tab_whole_life">终身寿险</span>
+                </button>
+                <button onclick="carouselGoTo(2)" data-cidx="2"
+                    class="carousel-tab text-xs font-bold px-4 py-2 rounded-full text-gray-400 hover:text-[#4A4A4A] transition-all whitespace-nowrap">
+                    <span data-i18n="tab_ci">重疾险</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 轮播容器 -->
+        <div class="relative overflow-hidden">
+            <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out">
+
+                <!-- ── Slide 0: 储蓄险 ── -->
+                <div class="carousel-slide min-w-full grid md:grid-cols-3 gap-6">
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-gray-300">
+                        <div class="text-[#4A4A4A] font-bold text-[10px] uppercase tracking-widest mb-4">Fastest
+                            Breakeven</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">SAVINGS · YFLife</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="card1_title">万通 YF ·
+                            富饶传承</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="card1_desc">4 年实现本金安全，回本期 4
+                            年，属全场最短，流动性窗口较早。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-gray-500 border-t border-gray-100 pt-4"
+                            data-i18n="card1_metric">回本期: 4 年</div>
+                        <button onclick="window.location.href='product-detail.html?id=manulife_global_currency'"
+                            class="w-full bg-transparent border border-[#00a9e0] text-[#00a9e0] py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-[#00a9e0] hover:text-white transition duration-300"
+                            data-i18n="btn_view">查看审计详情</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-himiao bg-blue-50/20">
+                        <div class="text-himiao font-bold text-[10px] uppercase tracking-widest mb-4" data-i18n="card2_badge">英式分红 · IRR 上四分位</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">SAVINGS · Prudential</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="card2_title">保诚 · 隽富多元货币
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="card2_desc">
+                            英式分红代表作，非保证收益占比高，历史波动较大，20年 IRR 处于市场上四分位区间，非保证成分较高。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-charcoal border-t border-gray-100 pt-4"
+                            data-i18n="card2_metric">20年IRR: 6.15%</div>
+                        <button onclick="window.location.href='product-detail.html?id=pru_wealth_together'"
+                            class="w-full bg-himiao text-white py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-[#0092c9] transition duration-300"
+                            data-i18n="btn_get">查看审计详情</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-red-500">
+                        <div
+                            class="text-red-500 font-bold text-[10px] uppercase tracking-widest mb-4 flex items-center gap-1">
+                            <span data-i18n="card3_badge">⚠ 早期退保高损</span>
+                            <span class="relative group cursor-pointer">
+                                <span
+                                    class="text-gray-300 border border-gray-200 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center text-[9px] leading-none">?</span>
+                                <span data-i18n="card3_tooltip"
+                                    class="absolute left-0 top-5 z-10 hidden group-hover:block w-56 bg-[#1a1a1a] text-white text-[10px] leading-relaxed p-2.5 rounded-lg shadow-xl">
+                                    触发条件：前3年累计现金价值 &lt; 已缴保费的 79%<br>数据来源：保司官方建议书现金价值表
+                                </span>
+                            </span>
+                        </div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">SAVINGS · AIA</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="card3_title">AIA 充裕未来
+                            III · 流动性约束</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="card3_desc">高分红背后的流动性锁死风险。⚠️
+                            核心数据观察：前3年退保损失最高 21%，第7年达现金价值回本点。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-red-500 border-t border-gray-100 pt-4"
+                            data-i18n="card3_metric">前3年退保损失最高 21%</div>
+                        <button onclick="window.location.href='product-detail.html?id=aia_abundance_future_3'"
+                            class="w-full bg-transparent border border-red-500 text-red-500 py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition duration-300"
+                            data-i18n="btn_read">阅读审计报告</button>
+                    </div>
+                </div>
+
+                <!-- ── Slide 1: 终身寿险 ── -->
+                <div class="carousel-slide min-w-full grid md:grid-cols-3 gap-6">
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-gray-300">
+                        <div class="text-[#4A4A4A] font-bold text-[10px] uppercase tracking-widest mb-4">Long-term Compounding</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">WHOLE LIFE · AIA</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="wl1_title">AIA 乐怡人生（终期红利）</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="wl1_desc">10年缴，至70年保单现金价值约21.7倍已缴保费，长期复利效应显著，终期红利不可锁定。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-gray-500 border-t border-gray-100 pt-4" data-i18n="wl1_metric">70年: 21.7x 已缴保费</div>
+                        <button onclick="window.location.href='product-list.html?type=whole_life'"
+                            class="w-full bg-transparent border border-[#00a9e0] text-[#00a9e0] py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-[#00a9e0] hover:text-white transition duration-300" data-i18n="wl1_btn">查看终身寿险数据</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-himiao bg-blue-50/20">
+                        <div class="text-himiao font-bold text-[10px] uppercase tracking-widest mb-4" data-i18n="wl2_badge">红利可锁定 · 身故不递减</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">WHOLE LIFE · SunLife</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="wl2_title">永明 佐佑传承 II</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="wl2_desc">周年红利+终期红利双重积累，终期红利可锁定增值，身故保额全程不递减，财富传承效应显著。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-charcoal border-t border-gray-100 pt-4" data-i18n="wl2_metric">30年: 2.9x · 70年: 14x+</div>
+                        <button onclick="window.location.href='product-list.html?type=whole_life'"
+                            class="w-full bg-himiao text-white py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-[#0092c9] transition duration-300" data-i18n="btn_view">查看审计详情</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-amber-400">
+                        <div class="text-amber-500 font-bold text-[10px] uppercase tracking-widest mb-4" data-i18n="wl3_badge">⚠ 注意死亡保障递减</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2" data-i18n="wl3_company">WHOLE LIFE · 部分产品</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="wl3_title">身故保额递减条款</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="wl3_desc">部分终身寿险设有保额递减条款，晚年身故保障可降至保额50%以下，适合以储蓄传承为主要诉求的投保人。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-amber-500 border-t border-gray-100 pt-4" data-i18n="wl3_metric">递减下限: 保额 50%</div>
+                        <button onclick="window.location.href='product-list.html?type=whole_life'"
+                            class="w-full bg-transparent border border-amber-400 text-amber-500 py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-amber-400 hover:text-white transition duration-300" data-i18n="wl3_btn">查看完整数据</button>
+                    </div>
+                </div>
+
+                <!-- ── Slide 2: 重疾险 ── -->
+                <div class="carousel-slide min-w-full grid md:grid-cols-3 gap-6">
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-rose-500">
+                        <div class="text-rose-500 font-bold text-[10px] uppercase tracking-widest mb-4">Core Coverage</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">CI · Prudential</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="ci1_title">保诚 PRUlife CI
+                            保障</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="ci1_desc">
+                            涵盖108种疾病，支持多重赔付，早期重疾可独立理赔，保费豁免机制完善。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-rose-500 border-t border-gray-100 pt-4"
+                            data-i18n="ci1_metric">保障: 108 种疾病</div>
+                        <button onclick="window.location.href='product-list.html?type=critical_illness'"
+                            class="w-full bg-transparent border border-rose-500 text-rose-500 py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-rose-500 hover:text-white transition duration-300"
+                            data-i18n="ci_btn_list">查看重疾险数据</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-himiao bg-blue-50/20">
+                        <div class="text-himiao font-bold text-[10px] uppercase tracking-widest mb-4"
+                            data-i18n="ci2_badge">多重赔付: 最高 300%</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2">CI · AIA</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="ci2_title">AIA 危疾加护保
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="ci2_desc">
+                            癌症复发额外赔付，多重赔付上限高，保终身寿险保额不减，复合保障。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-himiao border-t border-gray-100 pt-4"
+                            data-i18n="ci2_metric">多重赔付: 最高 300%</div>
+                        <button onclick="window.location.href='product-list.html?type=critical_illness'"
+                            class="w-full bg-himiao text-white py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-[#0092c9] transition duration-300"
+                            data-i18n="btn_view">查看审计详情</button>
+                    </div>
+                    <div class="rank-card p-8 rounded-2xl border-t-4 border-t-amber-400">
+                        <div class="text-amber-500 font-bold text-[10px] uppercase tracking-widest mb-4" data-i18n="ci3_waiting_badge">⚠ 注意等待期</div>
+                        <div class="text-[10px] text-gray-300 uppercase tracking-widest mb-2" data-i18n="ci3_waiting_company">CI · 数据观察</div>
+                        <h3 class="text-xl font-bold mb-3 font-serif text-[#4A4A4A]" data-i18n="ci3_waiting_title">等待期与首年免责条款</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed" data-i18n="ci3_waiting_desc">
+                            本样本11款重疾险中，标准等待期90天，部分附加癌症险等待期延至180天，首次确诊日计算方式各家不一致。</p>
+                        <div class="text-xl font-bold font-mono mb-6 italic text-amber-500 border-t border-gray-100 pt-4" data-i18n="ci3_waiting_metric">等待期: 90–180 天</div>
+                        <button onclick="window.location.href='product-list.html?type=critical_illness'"
+                            class="w-full bg-transparent border border-amber-400 text-amber-500 py-3 rounded-md text-xs font-bold uppercase tracking-widest hover:bg-amber-400 hover:text-white transition duration-300" data-i18n="ci3_waiting_btn">查看完整数据对比</button>
+                    </div>
+                </div>
+
+                
+            </div><!-- /carousel-track -->
+
+            <!-- 进度指示点 -->
+            <div class="flex justify-center gap-2 mt-8">
+                <button onclick="carouselGoTo(0)"
+                    class="carousel-dot w-6 h-1.5 rounded-full bg-[#00a9e0] transition-all" data-dot="0"></button>
+                <button onclick="carouselGoTo(1)"
+                    class="carousel-dot w-1.5 h-1.5 rounded-full bg-gray-200 transition-all" data-dot="1"></button>
+                <button onclick="carouselGoTo(2)"
+                    class="carousel-dot w-1.5 h-1.5 rounded-full bg-gray-200 transition-all" data-dot="2"></button>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ 方法论 Modal ══════════════════════════════════════ -->
+    <div id="methodology-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        onclick="if(event.target===this) this.classList.add('hidden')">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-8 relative">
+            <button onclick="document.getElementById('methodology-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-gray-300 hover:text-gray-600 text-xl leading-none">✕</button>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-himiao mb-2">Methodology</p>
+            <h3 class="text-xl font-serif font-bold text-[#4A4A4A] mb-6">HiMiao 精算审计方法论</h3>
+            <div class="space-y-4 text-sm text-gray-600">
+                <div class="flex gap-4 items-start">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-himiao font-bold text-xs shrink-0">
+                        IRR</div>
+                    <div>
+                        <div class="font-bold text-[#4A4A4A] mb-1">内部回报率 (IRR) · 权重 30%</div>
+                        <p class="leading-relaxed text-gray-500">基于保司官方建议书的非保证投影值，使用 20 年持有期进行标准化计算。</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-himiao font-bold text-xs shrink-0">
+                        BE</div>
+                    <div>
+                        <div class="font-bold text-[#4A4A4A] mb-1">回本年期 · 权重 25%</div>
+                        <p class="leading-relaxed text-gray-500">以保证现金价值 ≥ 已缴总保费为基准，评估早期流动性风险。</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-himiao font-bold text-xs shrink-0">
+                        DIV</div>
+                    <div>
+                        <div class="font-bold text-[#4A4A4A] mb-1">分红实现率 · 权重 25%</div>
+                        <p class="leading-relaxed text-gray-500">参考保司过去 5 年非保证红利实际发放率，数据来源：保司官方年报。</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-himiao font-bold text-xs shrink-0">
+                        LTV</div>
+                    <div>
+                        <div class="font-bold text-[#4A4A4A] mb-1">保单贷款成数 · 权重 20%</div>
+                        <p class="leading-relaxed text-gray-500">评估紧急流动性覆盖能力，以现金价值为基础的贷款成数。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 p-4 bg-gray-50 rounded-xl text-xs text-gray-400 leading-relaxed">
+                ⚠ 本方法论仅用于横向比较参考，不构成任何产品的销售邀约。精准数值请以各保司官方建议书为准。
+            </div>
+        </div>
+    </div>
+
+    <!-- 轮播 JS -->
+    <!-- i18n dict removed: now in components/lang.js -->
+
+
+
+
+
+
+
+    <section class="bg-white pt-12 pb-14 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-himiao mb-2">HIMIAO ACADEMY</h2>
+                    <p class="text-3xl serif text-[#4A4A4A]" data-i18n="news_main_title">大讲堂精选</p>
+                </div>
+                <a href="academy.html"
+                    class="text-xs font-bold border-b border-black pb-1 hover:text-himiao hover:border-himiao transition"
+                    data-i18n="news_view_all">进入讲堂</a>
+            </div>
+
+            <div id="indexNewsGrid" class="grid lg:grid-cols-2 gap-12 items-start">
+                <article class="group cursor-pointer hero-node" onclick="void(0)">
+                    <div class="aspect-[16/10] bg-gray-100 mb-6 overflow-hidden relative rounded-sm">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200"
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                            id="heroNewsImg">
+                    </div>
+                    <h3 class="text-2xl serif font-bold mb-4 text-[#4A4A4A] group-hover:text-himiao transition leading-tight"
+                        data-i18n="news1_title" id="heroNewsTitle">
+                        特朗普回归对你的美金保单意味着什么？
+                    </h3>
+                    <p class="text-gray-500 leading-relaxed text-sm mb-4" data-i18n="news1_desc" id="heroNewsDesc">
+                        在波动的政策环境中，美联储的下一步行动将如何影响储蓄险的分红实现率？
+                    </p>
+                    <span
+                        class="text-xs font-bold underline decoration-gray-300 underline-offset-4 group-hover:decoration-[#00AEEF]"
+                        data-i18n="read_full" id="heroNewsLink">阅读完整审计 →</span>
+                </article>
+
+                <div class="space-y-8">
+                    <div class="bg-gray-50 p-6 rounded-sm border border-gray-100">
+                        <h3 class="font-bold text-lg mb-2 text-[#4A4A4A]" data-i18n="sub_title">订阅审计周报</h3>
+                        <p class="text-xs text-gray-500 mb-4" data-i18n="sub_desc">每周一发送。只讲真话，不含广告。</p>
+                        <div class="flex gap-2">
+                            <input type="email" data-i18n-ph="sub_ph" placeholder=""
+                                class="w-full bg-white border border-gray-200 p-3 text-xs outline-none focus:border-himiao transition">
+                            <button
+                                class="bg-[#00a9e0] text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#0092c9] transition"
+                                data-i18n="sub_btn">订阅</button>
+                        </div>
+                    </div>
+
+                    <article class="flex gap-5 group cursor-pointer border-b border-gray-50 pb-6 list-article-item"
+                        onclick="void(0)">
+                        <div class="w-24 h-24 bg-gray-100 flex-shrink-0 overflow-hidden relative rounded-sm">
+                            <img src="https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=300"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1 tag-node"
+                                data-i18n="news2_tag">Alert ● 避雷预警</div>
+                            <h4 class="font-bold text-base mb-2 text-[#4A4A4A] group-hover:text-himiao transition leading-tight title-node"
+                                data-i18n="news2_title">警惕：这款“网红”分红险的回本期被隐形延长了 3 年</h4>
+                            <p class="text-xs text-gray-400 meta-node" data-i18n="news2_meta">2 小时前 · 储蓄险审计组</p>
+                        </div>
+                    </article>
+
+                    <article class="flex gap-5 group cursor-pointer border-b border-gray-50 pb-6 list-article-item"
+                        onclick="void(0)">
+                        <div class="w-24 h-24 bg-gray-100 flex-shrink-0 overflow-hidden relative rounded-sm">
+                            <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=300"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1 tag-node"
+                                data-i18n="news3_tag">Report ● 白皮书</div>
+                            <h4 class="font-bold text-base mb-2 text-[#4A4A4A] group-hover:text-himiao transition leading-tight title-node"
+                                data-i18n="news3_title">2026 香港重疾险审计：你真的需要“多重赔付”吗？</h4>
+                            <p class="text-xs text-gray-400 meta-node" data-i18n="news3_meta">1 天前 · 医疗资源组</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <script>
+                /* 首页文章 i18n 辅助 */
+                var AUTHOR_I18N = {
+                    'HiMiao 精算团队': { hk: 'HiMiao 精算團隊', en: 'HiMiao Actuarial Team' },
+                    'HiMiao 精算研究组': { hk: 'HiMiao 精算研究組', en: 'HiMiao Actuarial Team' },
+                    'HiMiao 编辑部': { hk: 'HiMiao 編輯部', en: 'HiMiao Editorial' },
+                    'HiMiao Actuarial Team': { cn: 'HiMiao 精算团队', hk: 'HiMiao 精算團隊' },
+                    'HiMiao Editorial': { cn: 'HiMiao 编辑部', hk: 'HiMiao 編輯部' },
+                    '新浪财经': { hk: '新浪財經', en: 'Sina Finance' },
+                    'Sina Finance': { cn: '新浪财经', hk: '新浪財經' }
+                };
+                function authorLabel(author) {
+                    if (!author) return '';
+                    var lang = (window.HM_I18N && window.HM_I18N.lang()) || 'cn';
+                    var m = AUTHOR_I18N[author];
+                    return (m && m[lang]) ? m[lang] : author;
+                }
+                function articleTitle(a) {
+                    if (!a) return '';
+                    var lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+                    var zh = (a.title_zh || a.title_cn || '').trim();
+                    var en = (a.title_en || '').trim();
+                    var fallback = (a.title || '').trim();
+                    if (lang === 'en') return en || zh || fallback;
+                    return zh || fallback || en;
+                }
+                function articleExcerpt(a) {
+                    if (!a) return '';
+                    var lang = (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+                    var en = (a.excerpt_en || '').trim();
+                    var zh = (a.excerpt || a.excerpt_zh || a.excerpt_cn || '').trim();
+                    var contentEn = (a.content_en || '').trim();
+                    var contentZh = (a.content_zh || a.content || '').trim();
+                    if (lang === 'en') {
+                        if (en) return en;
+                        if (contentEn) return contentEn.substring(0, 120) + '...';
+                        return zh || (contentZh ? contentZh.substring(0, 80) + '...' : '');
+                    }
+                    return zh || (contentZh ? contentZh.substring(0, 80) + '...' : '') || en;
+                }
+                async function fetchIndexArticles(ev) {
+                    try {
+                        // 优先从广告位读取首页推送图（home_hero_1/2/3）
+                        var heroSlots = null;
+                        try {
+                            var adsRaw = await window.HiMiaoAPI.getActiveAds();
+                            var ads = Array.isArray(adsRaw) ? adsRaw : (adsRaw.items || []);
+                            var h1 = ads.find(function(a){ return a.slot_key === 'home_hero_1'; });
+                            var h2 = ads.find(function(a){ return a.slot_key === 'home_hero_2'; });
+                            var h3 = ads.find(function(a){ return a.slot_key === 'home_hero_3'; });
+                            if (h1 || h2 || h3) heroSlots = [h1, h2, h3];
+                        } catch(e) {}
+
+                        if (heroSlots) {
+                            // 广告位模式：图片+链接直接来自广告位
+                            var s1 = heroSlots[0];
+                            if (s1 && s1.image_url) {
+                                document.getElementById("heroNewsImg").src = s1.image_url;
+                                var heroEl = document.querySelector('.hero-node');
+                                if (heroEl) heroEl.onclick = s1.link_url ? function(){ window.location.href = s1.link_url; } : null;
+                            }
+                            var listNodes = document.querySelectorAll('.list-article-item');
+                            [heroSlots[1], heroSlots[2]].forEach(function(slot, idx) {
+                                var node = listNodes[idx];
+                                if (!node) return;
+                                if (slot && slot.image_url) {
+                                    node.style.display = "flex";
+                                    var img = node.querySelector("img");
+                                    if (img) img.src = slot.image_url;
+                                    var titleNode = node.querySelector(".title-node");
+                                    if (titleNode && slot.slot_name) { titleNode.textContent = slot.slot_name; titleNode.removeAttribute("data-i18n"); }
+                                    var metaNode = node.querySelector(".meta-node");
+                                    if (metaNode) { metaNode.textContent = slot.advertiser || ''; metaNode.removeAttribute("data-i18n"); }
+                                    if (slot.link_url) node.onclick = function(){ window.location.href = slot.link_url; };
+                                } else {
+                                    node.style.display = "none";
+                                }
+                            });
+                            return;
+                        }
+
+                        // 回退：从讲堂文章读取
+                        const lang = (ev && ev.detail && ev.detail.lang) || (window.HM_I18N && window.HM_I18N.lang()) || window.HM_LANG || 'cn';
+                        const raw = await window.HiMiaoAPI.getArticles({ limit: 3, channel: 'academy' });
+                        const articles = Array.isArray(raw) ? raw : (raw.items || raw.data || []);
+                        if (!articles || articles.length === 0) return;
+
+                        const hero = articles[0];
+                        if (hero) {
+                            document.getElementById("heroNewsImg").src = hero.cover_url || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200";
+                            document.getElementById("heroNewsTitle").textContent = articleTitle(hero);
+                            document.getElementById("heroNewsDesc").textContent = articleExcerpt(hero) || (hero.content ? hero.content.substring(0, 80) + "..." : "");
+                            document.getElementById("heroNewsLink").textContent = (lang === "en" ? "Read Full Audit →" : lang === "hk" ? "閱讀完整審計 →" : "阅读完整审计 →");
+                            const heroArticleEl = document.querySelector('.hero-node');
+                            if (heroArticleEl && hero.slug) heroArticleEl.onclick = () => { window.location.href = `academy-article.html?slug=${hero.slug}`; };
+                        }
+
+                        const others = articles.slice(1);
+                        const nodes = document.querySelectorAll('.list-article-item');
+                        nodes.forEach((node, idx) => {
+                            const art = others[idx];
+                            if (art) {
+                                node.style.display = "flex";
+                                const img = node.querySelector("img");
+                                if (img) img.src = art.cover_url || "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=300";
+                                const titleNode = node.querySelector(".title-node");
+                                if (titleNode) { titleNode.textContent = articleTitle(art); titleNode.removeAttribute("data-i18n"); }
+                                const tagNode = node.querySelector(".tag-node");
+                                if (tagNode) {
+                                    const prefix = art.category === "alert" ? "Alert ● " + (lang === "en" ? "Pre-warning" : lang === "hk" ? "預警" : "预警") : "Report ● " + (lang === "en" ? "Audit Report" : lang === "hk" ? "審計報告" : "审计报告");
+                                    tagNode.textContent = prefix;
+                                    tagNode.removeAttribute("data-i18n");
+                                    tagNode.className = "text-[10px] font-bold uppercase tracking-widest mb-1 tag-node " + (art.category === "alert" ? "text-red-500" : "text-blue-500");
+                                }
+                                const metaNode = node.querySelector(".meta-node");
+                                if (metaNode) { var d = art.published_at || art.created_at || art.date; metaNode.textContent = `${d ? String(d).split("T")[0] : ""} · ${authorLabel(art.author) || ""}`; metaNode.removeAttribute("data-i18n"); }
+                                if (art.slug) node.onclick = () => { window.location.href = `academy-article.html?slug=${art.slug}`; };
+                            } else { node.style.display = "none"; }
+                        });
+                    } catch (e) { console.error('[HiMiao] fetchIndexArticles error:', e); }
+                }
+                document.addEventListener('DOMContentLoaded', fetchIndexArticles);
+                document.addEventListener('hm:langchange', fetchIndexArticles);
+            </script>
+        </div>
+    </section>
+
+    <footer-placeholder></footer-placeholder>
+
+    <ai-capsule-placeholder></ai-capsule-placeholder>
+
+    <script src="components/lang.js"></script>
+    <script src="components/i18n-engine.js"></script>
+    <script src="components/nav.js"></script>
+    <!-- applyPageLang removed: handled by i18n-engine.js -->
+
+
+
+    <script>
+        // ===================== 核心配置（精算级基准数据） =====================
+        const CONFIG = {
+            // 旗舰产品（AIA充裕未来III）5年缴费精算表
+            ACTUARIAL_TABLE: {
+                1: 0.00,  // 第1年退保全损（合规要求）
+                3: 0.30,  // 第3年亏损70%
+                5: 0.88,  // 第5年即将回本
+                8: 1.05,  // 第8年刚回本（Breakeven）
+                15: 1.85,
+                20: 2.82, // 20年翻近3倍（北极星指标）
+                30: 5.50
+            },
+            PREMIUM_YEARS: 5,        // 缴费期固定5年
+            FLAGSHIP_PRODUCT_ID: "aia_abundance_future_3", // 标杆产品ID
+            DEFAULT_ANNUAL_PREMIUM: 50000   // 默认年缴保费
+        };
+
+        // ===================== 核心精算计算引擎（修复缴费期逻辑） =====================
+        function calculateProjection(annualPremium, holdingYears) {
+            const totalPrincipal = annualPremium * CONFIG.PREMIUM_YEARS;
+            const multiplier = getInterpolatedMultiplier(holdingYears);
+            const totalValue = Math.round(totalPrincipal * multiplier);
+
+            return {
+                principal: totalPrincipal,
+                totalValue: totalValue,
+                isBreakeven: multiplier >= 1.0,
+                breakevenYear: 8
+            };
+        }
+
+        function getInterpolatedMultiplier(year) {
+            const years = Object.keys(CONFIG.ACTUARIAL_TABLE).map(Number).sort((a, b) => a - b);
+            if (year <= years[0]) return CONFIG.ACTUARIAL_TABLE[years[0]];
+            if (year >= years[years.length - 1]) return CONFIG.ACTUARIAL_TABLE[years[years.length - 1]];
+
+            for (let i = 0; i < years.length - 1; i++) {
+                const lower = years[i];
+                const upper = years[i + 1];
+                if (year >= lower && year <= upper) {
+                    const ratio = (year - lower) / (upper - lower);
+                    const valLower = CONFIG.ACTUARIAL_TABLE[lower];
+                    const valUpper = CONFIG.ACTUARIAL_TABLE[upper];
+                    return valLower + (valUpper - valLower) * ratio;
+                }
+            }
+            return 0;
+        }
+
+        // ===================== DOM 绑定 & 交互逻辑（适配实际结构） =====================
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. 获取页面核心元素
+            const yearSlider = document.getElementById('yearSlider');
+            const yearDisplay = document.getElementById('yearDisplay');
+            // 适配保费输入框：精确定位 value="50,000" 的 input
+            const premiumInput = document.querySelector('input[type="text"][value="50,000"]') || { value: CONFIG.DEFAULT_ANNUAL_PREMIUM };
+            const totalValueEl = document.querySelector('[data-i18n="calc_total"]')?.nextElementSibling;
+            const breakevenEl = document.querySelector('[data-i18n="calc_breakeven_val"]');
+            const calcBtn = document.querySelector('[data-i18n="calc_btn"]');
+
+            function parsePremium(val) {
+                if (!val) return CONFIG.DEFAULT_ANNUAL_PREMIUM;
+                return parseInt(String(val).replace(/,/g, '')) || CONFIG.DEFAULT_ANNUAL_PREMIUM;
+            }
+
+            // 2. 初始化
+            const initPremium = parsePremium(premiumInput.value);
+            const initYear = parseInt(yearSlider?.value) || 20;
+            if (yearDisplay) yearDisplay.innerText = `${initYear} Years`;
+            updateCalculator(initPremium, initYear);
+
+            // 3. 监听滑块
+            if (yearSlider) {
+                yearSlider.addEventListener('input', function () {
+                    const year = parseInt(this.value);
+                    if (yearDisplay) yearDisplay.innerText = `${year} Years`;
+                    updateCalculator(parsePremium(premiumInput.value), year);
+                });
+            }
+
+            // 4. 监听保费输入
+            if (premiumInput && premiumInput.addEventListener) {
+                premiumInput.addEventListener('input', function () {
+                    const premium = parsePremium(this.value);
+                    updateCalculator(premium, parseInt(yearSlider?.value) || 20);
+                });
+            }
+
+            // 5. 按钮跳转
+            if (calcBtn) {
+                calcBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const currentYear = parseInt(yearSlider?.value) || 20;
+                    const currentPremium = parsePremium(premiumInput.value);
+                    window.location.href = `product-detail.html?id=${CONFIG.FLAGSHIP_PRODUCT_ID}&premium=${currentPremium}&years=${currentYear}`;
+                });
+            }
+
+            // ===================== 计算器更新函数 =====================
+            function updateCalculator(premium, year) {
+                const result = calculateProjection(premium, year);
+
+                if (totalValueEl) {
+                    totalValueEl.innerText = '$' + result.totalValue.toLocaleString();
+                }
+
+                if (breakevenEl) {
+                    const _clang = localStorage.getItem('himiao-lang') || 'cn';
+                    const _bkNotYet = _clang === 'en' ? `Not yet (est. Year ${result.breakevenYear})` : _clang === 'hk' ? `尚未回本（估計第${result.breakevenYear}年）` : `尚未回本（第${result.breakevenYear}年回本）`;
+                    const _bkDone = _clang === 'en' ? `Breakeven at Year ${result.breakevenYear}` : _clang === 'hk' ? `已回本（第${result.breakevenYear}年）` : `已回本（第${result.breakevenYear}年）`;
+                    if (!result.isBreakeven) {
+                        breakevenEl.innerText = _bkNotYet;
+                        breakevenEl.style.color = "#ef4444";
+                    } else {
+                        breakevenEl.innerText = _bkDone;
+                        breakevenEl.style.color = "#4A4A4A";
+                    }
+                }
+            }
+        });
+
+    </script>
+
+    <script>
+        // ══ V8.0 Geo 软隔离 ══════════════════════════════
+        // 检测内地 IP：优先读 Cloudflare CF-IPCountry meta（上云后由 Worker 注入）
+        // NAS MVP 阶段：通过 ip-api.com 检测（免费，无需 key）
+        (function () {
+            function showMainlandBanner() {
+                var banner = document.createElement('div');
+                banner.id = 'geo-mainland-banner';
+                banner.style.cssText = [
+                    'position:fixed;top:0;left:0;right:0;z-index:9999',
+                    'background:#1d4ed8;color:white;font-size:12px',
+                    'padding:10px 20px;text-align:center;line-height:1.6',
+                    'box-shadow:0 2px 8px rgba(0,0,0,0.2)'
+                ].join(';');
+                banner.innerHTML = '【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地开展任何保险推介、报告下载或业务引导服务。' +
+                    ' / This platform provides actuarial data only and does not offer insurance services in Mainland China.';
+                document.body.insertBefore(banner, document.body.firstChild);
+
+                // 隐藏下载和留资组件
+                var hideSelectors = [
+                    '.dl-btn', '#download-btn', '[data-geo-hide]',
+                    'input[type=email]', 'form', '.contact-form'
+                ];
+                hideSelectors.forEach(function (sel) {
+                    document.querySelectorAll(sel).forEach(function (el) {
+                        el.style.display = 'none';
+                    });
+                });
+                document.body.style.paddingTop = '46px';
+            }
+
+            // 先检查 CF-IPCountry meta（上云后由 Cloudflare Worker 注入）
+            var cfMeta = document.querySelector('meta[name="cf-ipcountry"]');
+            if (cfMeta && cfMeta.content === 'CN') {
+                showMainlandBanner(); return;
+            }
+
+            // MVP 降级：ip-api.com（异步，不影响页面加载）
+            fetch('https://ip-api.com/json/?fields=countryCode', { cache: 'no-store' })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { if (d.countryCode === 'CN') showMainlandBanner(); })
+                .catch(function () { }); // 网络失败静默处理
+        })();
+    </script>
+
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════
+           HiMiao Index · Carousel Engine v2.0
+           ── 独立模块，不依赖任何 i18n 或翻译对象 ──
+           生命周期：HTML 已完整 → DOMContentLoaded → init → autoplay
+           事件委托：所有 onclick="carouselGoTo(n)" 直接调用 window 上的函数
+                     按钮本身的 onclick 不受重渲染影响（因为卡片 DOM 从不被替换）
+        ═══════════════════════════════════════════════════════════════════ */
+        (function () {
+            'use strict';
+
+            var current = 0;
+            var total = 3;        // slides: 储蓄 / 终身寿 / 重疾
+            var timer = null;
+            var AUTO_MS = 5000;     // 自动翻页间隔
+
+            /* ── 核心：跳转到指定 slide ── */
+            function goTo(idx) {
+                if (idx < 0) idx = total - 1;
+                if (idx >= total) idx = 0;
+                current = idx;
+
+                /* 1. 移动轨道 */
+                var track = document.getElementById('carousel-track');
+                if (track) {
+                    track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+                }
+
+                /* 2. 更新胶囊 Tab 样式 */
+                document.querySelectorAll('.carousel-tab').forEach(function (btn) {
+                    var active = parseInt(btn.dataset.cidx, 10) === idx;
+                    /* 激活态：品牌蓝背景 + 白字 */
+                    btn.classList.toggle('bg-himiao', active);
+                    btn.classList.toggle('text-white', active);
+                    btn.classList.toggle('shadow-sm', active);
+                    btn.classList.toggle('active-ctab', active);
+                    /* 未激活态：灰色文字，无背景 */
+                    btn.classList.toggle('text-gray-400', !active);
+                    if (active) {
+                        btn.classList.remove('text-gray-400');
+                    } else {
+                        btn.classList.remove('bg-himiao', 'text-white', 'shadow-sm', 'active-ctab');
+                    }
+                });
+
+                /* 3. 更新进度点 */
+                document.querySelectorAll('.carousel-dot').forEach(function (dot) {
+                    var active = parseInt(dot.dataset.dot, 10) === idx;
+                    /* 激活：宽胶囊 + 品牌蓝 */
+                    dot.classList.toggle('w-6', active);
+                    dot.classList.toggle('bg-[#00a9e0]', active);
+                    /* 未激活：小圆点 + 灰色 */
+                    dot.classList.toggle('w-1\\.5', !active);
+                    dot.classList.toggle('bg-gray-200', !active);
+                    if (active) {
+                        dot.classList.remove('w-1\\.5', 'bg-gray-200');
+                    } else {
+                        dot.classList.remove('w-6', 'bg-[#00a9e0]');
+                    }
+                });
+
+                resetTimer();
+            }
+
+            /* ── 自动播放 ── */
+            function autoNext() {
+                goTo((current + 1) % total);
+            }
+
+            function resetTimer() {
+                if (timer) clearInterval(timer);
+                timer = setInterval(autoNext, AUTO_MS);
+            }
+
+            /* ── 暴露到 window（供 onclick="carouselGoTo(n)" 调用）── */
+            window.carouselGoTo = goTo;
+
+            /* ── 启动（等 DOM 就绪）── */
+            function init() {
+                /* 确保初始状态正确（slide 0 active）*/
+                goTo(0);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init(); /* 若脚本在 DOM 之后加载，直接执行 */
+            }
+        })();
+    </script>
+
+    <script>
+        fetch('/api/v1/products?limit=200').then(r=>r.json()).then(d=>{
+            var el = document.getElementById('stat-products');
+            if(el && Array.isArray(d)) {
+                var companies = new Set(d.map(p => p.meta?.company || p.company).filter(Boolean));
+                el.textContent = '已审计 '+d.length+' 款产品 · 覆盖 '+companies.size+' 家保司';
+            }
+        }).catch(function(){});
+    </script>
+
+</body>
+
+</html>

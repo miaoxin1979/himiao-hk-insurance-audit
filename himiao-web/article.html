@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">文章详情 | HiMiao Audit</title>
+<meta name="description" id="page-desc" content="HiMiao 精算团队出品，香港保险市场独立分析">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:#fdfbf7;--paper-2:#f5f1e8;--paper-3:#ede8de;
+  --ink:#1c1c1e;--ink-2:#48484a;--ink-3:#8e8e93;--ink-4:#c7c7cc;
+  --blue:#00a9e0;--blue-d:#0083af;--blue-l:#e3f6fd;
+  --red:#c0392b;--red-l:#fdf2f1;
+  --amber:#b45309;--amber-l:#fef9ec;
+  --green:#1e7e44;--green-l:#f0faf4;
+  --navy:#0f1d2e;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;font-feature-settings:"palt" 1;}
+
+#reading-bar{position:fixed;top:0;left:0;height:3px;background:var(--blue);z-index:999;width:0;transition:width .08s linear;pointer-events:none;}
+
+.breadcrumb{padding:12px 0;font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.breadcrumb a{color:var(--blue);text-decoration:none;font-weight:600;}
+.breadcrumb a:hover{opacity:.75;}
+
+/* 与 news.html 完全一致的分类徽标 */
+.cat-badge{display:inline-flex;padding:3px 12px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.cat-badge.market{background:var(--blue-l);color:var(--blue-d);}
+.cat-badge.alert{background:var(--red-l);color:var(--red);}
+.cat-badge.policy{background:#eef2ff;color:#4338ca;}
+.cat-badge.audit{background:var(--green-l);color:var(--green);}
+.cat-badge.guide{background:var(--amber-l);color:var(--amber);}
+
+/* V2.0 已移除顶部大 Banner，Typography-first */
+
+/* 正文排版 */
+.article-body{font-size:16px;line-height:1.9;color:var(--ink-2);}
+.article-body h1,.article-body h2,.article-body h3{font-family:'Noto Serif SC',serif;color:var(--ink);line-height:1.3;margin:2em 0 .75em;}
+.article-body h1{font-size:26px;}
+.article-body h2{font-size:21px;border-bottom:2px solid var(--paper-3);padding-bottom:8px;}
+.article-body h3{font-size:17px;color:var(--blue-d);}
+.article-body p{margin-bottom:1.4em;}
+.article-body strong{color:var(--ink);font-weight:700;}
+.article-body em{font-style:italic;}
+.article-body ul,.article-body ol{margin:1em 0 1.4em 1.5em;}
+.article-body li{margin-bottom:.5em;}
+.article-body blockquote{border-left:4px solid var(--blue);padding:12px 20px;margin:1.5em 0;background:var(--blue-l);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink-2);}
+.article-body hr{border:none;border-top:2px solid var(--paper-3);margin:2.5em 0;}
+.article-body a{color:var(--blue);text-decoration:underline;text-underline-offset:3px;}
+.article-body code{background:var(--paper-2);padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+/* 讲堂富文本（Quill HTML） */
+.article-body.is-html img{max-width:100%;height:auto;border-radius:8px;display:block;margin:1.2em auto;}
+.article-body.is-html p{margin-bottom:1.2em;}
+.article-body.is-html h1,.article-body.is-html h2,.article-body.is-html h3{font-family:'Noto Serif SC',serif;}
+/* 讲堂模式：与列表页一致的终端感 */
+body.is-academy .article-meta-v2{border-top-color:var(--blue);}
+body.is-academy #article-auto-cover .ac-label{font-family:'JetBrains Mono',monospace;}
+
+/* V2.0 文章头部：H1 顶置，紧凑金融专业感（采纳方案 A：meta 区 2px 顶边） */
+.article-header-v2{margin-bottom:28px;}
+.article-title-v2{font-family:'Noto Serif SC',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.28;color:var(--ink);margin:0 0 14px;letter-spacing:-.4px;}
+.article-meta-v2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink-3);padding-top:14px;border-top:2px solid var(--ink);}
+.article-meta-v2 .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--ink-4);}
+.article-meta-v2 .meta-read{font-family:'JetBrains Mono',monospace;font-size:11px;}
+
+/* 无图时：分类渐变块（采纳方案 B） */
+.article-auto-cover{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;border-radius:12px;margin-bottom:32px;color:rgba(255,255,255,.92);text-shadow:0 4px 12px rgba(0,0,0,.25);}
+.article-auto-cover.market{background:linear-gradient(135deg,#00a9e0 0%,#0f1d2e 100%);}
+.article-auto-cover.alert{background:linear-gradient(135deg,#ef4444 0%,#450a0a 100%);}
+.article-auto-cover.policy{background:linear-gradient(135deg,#6366f1 0%,#1e1b4b 100%);}
+.article-auto-cover.audit{background:linear-gradient(135deg,#10b981 0%,#064e3b 100%);}
+.article-auto-cover.guide{background:linear-gradient(135deg,#f59e0b 0%,#451a03 100%);}
+.article-auto-cover .ac-icon{font-size:48px;margin-bottom:12px;}
+.article-auto-cover .ac-label{font-size:14px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;opacity:.9;font-family:'JetBrains Mono',monospace;}
+.meta-avatar{width:24px;height:24px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.meta-dot{width:3px;height:3px;border-radius:50%;background:var(--ink-4);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hot-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--red);}
+.hot-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1.8s infinite;}
+
+.article-layout{display:grid;grid-template-columns:1fr 272px;gap:48px;align-items:start;}
+
+.sidebar{position:sticky;top:80px;}
+.sidebar-card{background:white;border:1px solid var(--paper-3);border-radius:12px;padding:20px;margin-bottom:16px;}
+.sidebar-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-family:'JetBrains Mono',monospace;margin-bottom:14px;}
+
+.related-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--paper-3);text-decoration:none;cursor:pointer;}
+.related-item:last-child{border-bottom:none;}
+.related-item:hover h4{color:var(--blue);}
+.related-thumb{width:60px;height:46px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--paper-2);}
+.related-item h4{font-size:12px;font-weight:700;color:var(--ink);line-height:1.4;transition:color .15s;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.related-item span{font-size:10px;color:var(--ink-3);}
+
+.sub-card{background:linear-gradient(135deg,var(--navy) 0%,#1a2e44 100%);border-radius:12px;padding:22px 18px;}
+.sub-card h3{font-size:14px;font-weight:700;color:white;margin-bottom:5px;}
+.sub-card p{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.6;}
+.sub-input{width:100%;padding:8px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:white;font-size:12px;outline:none;font-family:'DM Sans',sans-serif;margin-bottom:7px;}
+.sub-input::placeholder{color:rgba(255,255,255,.3);}
+.sub-input:focus{border-color:var(--blue);}
+.sub-btn{width:100%;padding:9px;background:var(--blue);color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;}
+.sub-btn:hover{background:var(--blue-d);}
+
+.state-center{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px 20px;}
+.spinner{width:34px;height:34px;border:3px solid var(--paper-3);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#back-top{position:fixed;bottom:24px;right:24px;width:42px;height:42px;border-radius:50%;background:var(--ink);color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-size:16px;box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:0;transition:opacity .3s,transform .3s;transform:translateY(8px);z-index:90;}
+#back-top.show{opacity:1;transform:translateY(0);}
+#back-top:hover{background:var(--blue);}
+
+@media(max-width:768px){
+  .article-layout{grid-template-columns:1fr;}
+  .sidebar{position:static;border-top:2px solid var(--paper-3);padding-top:28px;margin-top:8px;}
+  .article-title-v2{font-size:20px;}
+  .article-body{font-size:15px;}
+  #back-top{bottom:16px;right:16px;width:38px;height:38px;}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .4s ease both;}
+</style>
+</head>
+<body>
+
+<div id="reading-bar"></div>
+<div id="himiao-nav"></div>
+<script src="components/lang.js"></script>
+<script src="components/i18n-engine.js"></script>
+<script src="components/nav.js"></script>
+<script src="js/api-client.js"></script>
+
+<main style="max-width:1280px;margin:0 auto;padding:0 20px 80px;">
+
+  <nav class="breadcrumb" id="article-breadcrumb">
+    <a href="index.html">首页</a><span>›</span>
+    <a id="bc-parent" href="news.html">加载中…</a><span>›</span>
+    <span id="bc-title" style="color:var(--ink-2);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">文章</span>
+  </nav>
+
+  <!-- 加载中 -->
+  <div id="state-loading" class="state-center">
+    <div class="spinner"></div>
+    <p style="color:var(--ink-3);font-size:14px;">正在加载…</p>
+  </div>
+
+  <!-- 错误 -->
+  <div id="state-error" class="state-center" style="display:none;">
+    <div style="font-size:48px;">😕</div>
+    <p style="font-weight:700;font-size:16px;color:var(--ink);">文章未找到</p>
+    <p id="error-msg" style="font-size:14px;color:var(--ink-3);">该文章可能已下架或链接有误</p>
+    <a href="academy.html" style="margin-top:6px;padding:10px 24px;background:var(--blue);color:white;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">返回 HiMiao讲堂</a>
+  </div>
+
+  <!-- 文章主体 V2.0：无大 Banner，Typography-first -->
+  <div id="article-wrap" style="display:none;" class="fade-up">
+    <div class="article-layout">
+      <article>
+        <header class="article-header-v2">
+          <div id="article-cat" style="margin-bottom:10px;"></div>
+          <h1 class="article-title-v2" id="article-title"></h1>
+          <div class="article-meta-v2">
+            <div class="meta-avatar" id="meta-avatar">HM</div>
+            <span id="meta-author" style="font-weight:600;color:var(--ink-2);"></span>
+            <span class="meta-dot"></span>
+            <span id="meta-date"></span>
+            <span id="meta-readmin" class="meta-read" style="display:none;"></span>
+            <span id="meta-hot" class="hot-badge" style="display:none;">实时热议</span>
+          </div>
+        </header>
+
+        <!-- 无图时显示分类渐变块（采纳方案 B） -->
+        <div id="article-auto-cover" class="article-auto-cover" style="display:none;"></div>
+
+        <div class="article-body" id="article-body"></div>
+
+        <!-- 原文链接 & 内容不足提示（由 renderArticle 动态写入） -->
+        <div id="article-source-bar" style="display:none;margin-top:24px;padding:14px 18px;background:var(--paper-2);border-radius:10px;border:1px solid var(--paper-3);font-size:13px;color:var(--ink-3);line-height:1.8;"></div>
+
+        <div id="article-footer-box" style="margin-top:44px;padding:22px;background:var(--paper-2);border-radius:12px;border:1px solid var(--paper-3);">
+          <p id="disc-news" style="font-size:12px;color:var(--ink-3);line-height:1.7;">
+            <strong style="color:var(--ink-2);">免责声明</strong><br>
+            本文由 HiMiao 精算团队独立出品，仅供一般信息参考，不构成任何投资建议或保险购买建议。所有数据来源于保司官方披露文件，以官方最新版本为准。
+          </p>
+          <p id="disc-academy" style="display:none;font-size:12px;color:var(--ink-3);line-height:1.7;">
+            <strong style="color:var(--blue-d);">教育声明</strong><br>
+            本文为通识教育内容，旨在帮助理解保险相关概念，不构成针对任何个人或产品的投保、投资建议或销售要约。决策请结合您自身情况并咨询持牌顾问。
+          </p>
+          <div style="margin-top:14px;display:flex;gap:14px;flex-wrap:wrap;">
+            <a id="foot-back" href="news.html" style="font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;">← 返回</a>
+            <span style="color:var(--ink-4);">|</span>
+            <a id="foot-products" href="product-list.html" style="font-size:13px;font-weight:700;color:var(--ink-3);text-decoration:none;">查看产品审计库 →</a>
+          </div>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <div class="sub-card" style="margin-bottom:16px;">
+          <h3>订阅审计周报</h3>
+          <p>每周一送达，精算师亲写，不含广告。</p>
+          <input type="email" class="sub-input" id="sub-email" placeholder="your@email.com">
+          <button class="sub-btn" onclick="handleSubscribe()">免费订阅</button>
+          <p style="font-size:10px;color:rgba(255,255,255,.2);margin-top:8px;">已有 2,847 位读者 · 随时可退订</p>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-label" id="sidebar-related-label">更多文章</div>
+          <div id="related-list"><p style="font-size:12px;color:var(--ink-3);text-align:center;padding:16px 0;">加载中…</p></div>
+        </div>
+
+        <div class="sidebar-card" style="background:var(--paper-2);">
+          <div class="sidebar-label" id="sidebar-cta-label">延伸阅读</div>
+          <p id="sidebar-cta-desc" style="font-size:12px;color:var(--ink-3);margin-bottom:12px;line-height:1.6;">读完本篇，可查阅精算审计过的客观产品数据。</p>
+          <a href="product-list.html"
+             style="display:block;width:100%;padding:10px;background:var(--ink);color:white;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:.05em;text-align:center;text-decoration:none;"
+             onmouseover="this.style.background='var(--blue)'" onmouseout="this.style.background='var(--ink)'">
+            进入产品审计库 →
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">↑</button>
+<footer-placeholder></footer-placeholder>
+<ai-capsule-placeholder></ai-capsule-placeholder>
+
+<script>
+var CAT = {market:'市场情报',alert:'避雷预警',policy:'政策解读',audit:'产品审计',guide:'新手指南'};
+var ACADEMY_CAT = {guide:'投保指南',policy:'条款与权益',market:'市场通识',audit:'产品理解'};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function inline(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>');
+}
+
+function renderMd(text){
+  if(!text) return '<p style="color:var(--ink-3);font-style:italic;">（暂无正文内容）</p>';
+  // 若正文没有换行（爬取的连续长文），按中文句终符断句以形成段落
+  if(text.indexOf('\n')===-1){
+    text=text.replace(/([。！？…]{1,2})\s*/g,'$1\n').trim();
+  }
+  var lines=text.split('\n'),html='',inUl=false,inOl=false;
+  function closeList(){if(inUl){html+='</ul>';inUl=false;}if(inOl){html+='</ol>';inOl=false;}}
+  lines.forEach(function(line){
+    if(line.startsWith('### ')){closeList();html+='<h3>'+esc(line.slice(4))+'</h3>';}
+    else if(line.startsWith('## ')){closeList();html+='<h2>'+esc(line.slice(3))+'</h2>';}
+    else if(line.startsWith('# ')){closeList();html+='<h1>'+esc(line.slice(2))+'</h1>';}
+    else if(line.match(/^---+$/)){closeList();html+='<hr>';}
+    else if(line.startsWith('> ')){closeList();html+='<blockquote>'+inline(line.slice(2))+'</blockquote>';}
+    else if(line.startsWith('- ')||line.startsWith('* ')){
+      if(inOl){html+='</ol>';inOl=false;}
+      if(!inUl){html+='<ul>';inUl=true;}
+      html+='<li>'+inline(line.slice(2))+'</li>';
+    }
+    else if(line.match(/^\d+\. /)){
+      if(inUl){html+='</ul>';inUl=false;}
+      if(!inOl){html+='<ol>';inOl=true;}
+      html+='<li>'+inline(line.replace(/^\d+\. /,''))+'</li>';
+    }
+    else if(line.trim()===''){closeList();}
+    else{closeList();html+='<p>'+inline(line)+'</p>';}
+  });
+  closeList();
+  return html;
+}
+
+function renderArticle(a){
+  var titleText=a.title_zh||a.title_en||a.title||'文章';
+  var bodyText=a.content_zh||a.content_en||a.body||'';
+  document.title=titleText+' | HiMiao Audit';
+  document.getElementById('page-desc').content=a.excerpt||'HiMiao 精算团队出品';
+  var bc=document.getElementById('bc-title');
+  bc.textContent=titleText;bc.title=titleText;
+  /* V2.0 已移除顶部大 Banner */
+  var cat=a.category||'market';
+  var catLabel=(a.channel==='academy'&&ACADEMY_CAT[cat])?ACADEMY_CAT[cat]:(CAT[cat]||cat);
+  document.getElementById('article-cat').innerHTML='<span class="cat-badge '+esc(cat)+'">'+catLabel+'</span>';
+  document.getElementById('article-title').textContent=titleText;
+  var author=a.author||'HiMiao 精算研究组';
+  var initials=author.replace(/[^A-Za-z\u4e00-\u9fa5]/g,'').slice(0,2).toUpperCase()||'HM';
+  document.getElementById('meta-avatar').textContent=initials;
+  document.getElementById('meta-author').textContent=author;
+  document.getElementById('meta-date').textContent=(a.published_at||a.created_at||'').split('T')[0]||'';
+  if(a.read_min){
+    var rm=document.getElementById('meta-readmin');
+    rm.textContent=a.read_min+' min read';rm.style.display='inline';
+  }
+  if(a.is_hot) document.getElementById('meta-hot').style.display='inline-flex';
+
+  var acEl=document.getElementById('article-auto-cover');
+  if(a.cover_url){ acEl.style.display='none'; }
+  else {
+    var ICON_MAP={market:'📊',alert:'🔴',policy:'📋',audit:'⚖',guide:'🧭'};
+    acEl.className='article-auto-cover '+cat;
+    var coverLabel=(a.channel==='academy')?'HiMiao Academy':'HiMiao Terminal';
+    acEl.innerHTML='<div class="ac-icon">'+(ICON_MAP[cat]||'📰')+'</div><div class="ac-label">'+coverLabel+'</div>';
+    acEl.style.display='flex';
+  }
+
+  var isHtml = (a.content_format === 'html');
+  document.body.classList.toggle('is-academy', a.channel === 'academy');
+  var bodyEl=document.getElementById('article-body');
+  bodyEl.classList.toggle('is-html', !!isHtml);
+  bodyEl.innerHTML = isHtml ? bodyText : renderMd(bodyText);
+
+  var bp = document.getElementById('bc-parent');
+  var fb = document.getElementById('foot-back');
+  if (a.channel === 'academy') {
+    if (bp) { bp.href = 'academy.html'; bp.textContent = 'HiMiao讲堂'; }
+    if (fb) { fb.href = 'academy.html'; fb.textContent = '← 返回 HiMiao讲堂'; }
+  } else {
+    /* 资讯文章：主导航已隐藏情报站，面包屑仍链到 news.html 供老链接使用 */
+    if (bp) { bp.href = 'news.html'; bp.textContent = '市场资讯'; }
+    if (fb) { fb.href = 'news.html'; fb.textContent = '← 返回市场资讯'; }
+  }
+
+  // 原文链接栏：内容不足时提示 + 始终显示来源链接（HTML 讲堂文一般不展示摘要提示）
+  var srcBar = document.getElementById('article-source-bar');
+  if (srcBar) {
+    var parts = [];
+    if (!isHtml && bodyText.length < 300 && a.source_url) {
+      parts.push('<span style="color:var(--orange,#f59e0b);font-weight:600;">⚠ 当前仅显示摘要，完整内容请点击原文链接阅读。</span>');
+    }
+    if (a.source_url) {
+      parts.push('📰 原文来源：<a href="'+esc(a.source_url)+'" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600;text-decoration:underline;text-underline-offset:3px;">'+esc(a.author||a.source_url)+'</a>');
+    }
+    if (parts.length) { srcBar.innerHTML = parts.join('<br>'); srcBar.style.display='block'; }
+    else { srcBar.style.display='none'; srcBar.innerHTML=''; }
+  }
+
+  var dn=document.getElementById('disc-news');
+  var da=document.getElementById('disc-academy');
+  if(a.channel==='academy'){
+    if(dn) dn.style.display='none';
+    if(da) da.style.display='block';
+  }else{
+    if(dn) dn.style.display='block';
+    if(da) da.style.display='none';
+  }
+  var srl=document.getElementById('sidebar-related-label');
+  var scl=document.getElementById('sidebar-cta-label');
+  var scd=document.getElementById('sidebar-cta-desc');
+  if(a.channel==='academy'){
+    if(srl) srl.textContent='更多讲堂文章';
+    if(scl) scl.textContent='延伸阅读';
+    if(scd) scd.textContent='学完本篇，可返回 HiMiao讲堂 浏览更多通识文章，或对照产品审计库了解客观数据。';
+  }else{
+    if(srl) srl.textContent='更多文章';
+    if(scl) scl.textContent='延伸阅读';
+    if(scd) scd.textContent='读完本篇，可查阅精算审计过的客观产品数据。';
+  }
+
+  document.getElementById('state-loading').style.display='none';
+  document.getElementById('article-wrap').style.display='block';
+}
+
+function renderRelated(list,currentSlug){
+  var items=(Array.isArray(list)?list:(list&&(list.items||list.data)||[]))
+    .filter(function(a){return a.slug!==currentSlug&&a.is_published!==false;})
+    .slice(0,4);
+  var el=document.getElementById('related-list');
+  if(!items.length){el.innerHTML='<p style="font-size:12px;color:var(--ink-3);text-align:center;padding:10px 0;">暂无其他文章</p>';return;}
+  el.innerHTML=items.map(function(a){
+    var cat=a.category||'market';
+    var date=(a.published_at||a.created_at||'').split('T')[0];
+    var thumb=a.cover_url
+      ?'<img class="related-thumb" src="'+esc(a.cover_url)+'" alt="" loading="lazy" onerror="this.style.background=\'var(--paper-2)\';this.removeAttribute(\'src\')">'
+      :'<div class="related-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px;">📄</div>';
+    return '<a class="related-item" href="article.html?slug='+encodeURIComponent(a.slug||'')+'">'
+      +thumb+'<div style="flex:1;min-width:0;">'
+      +'<span class="cat-badge '+esc(cat)+'" style="font-size:9px;padding:1px 7px;margin-bottom:5px;display:inline-block;">'+(CAT[cat]||cat)+'</span>'
+      +'<h4>'+esc(a.title_zh||a.title_en||a.title||'')+'</h4><span>'+date+'</span></div></a>';
+  }).join('');
+}
+
+async function handleSubscribe(){
+  var email=document.getElementById('sub-email').value.trim();
+  if(!email||!email.includes('@')){alert('请输入有效邮箱');return;}
+  var btn=document.querySelector('.sub-btn');
+  btn.textContent='提交中…';btn.disabled=true;
+  try{
+    await window.HiMiaoAPI.subscribe(email);
+    document.getElementById('sub-email').value='';
+    btn.textContent='✓ 订阅成功！';btn.style.background='#1e7e44';
+    setTimeout(function(){btn.textContent='免费订阅';btn.style.background='';btn.disabled=false;},3000);
+  }catch(e){btn.textContent='免费订阅';btn.disabled=false;alert('订阅失败，请稍后重试');}
+}
+
+async function init(){
+  var slug=new URLSearchParams(window.location.search).get('slug');
+  if(!slug){
+    document.getElementById('state-loading').style.display='none';
+    document.getElementById('state-error').style.display='flex';
+    document.getElementById('error-msg').textContent='未指定文章链接，请从 HiMiao讲堂 或市场资讯列表进入';
+    return;
+  }
+  try{
+    // 单篇：优先 getArticle(slug)；列表接口不支持 slug 参数
+    var article = await window.HiMiaoAPI.getArticle(slug).catch(function(){return null;});
+    // 兜底：fetch 单篇
+    if(!article){
+      try{
+        var base=(typeof API_BASE!=='undefined')?API_BASE:'/api/v1';
+        var r=await fetch(base+'/articles/'+encodeURIComponent(slug));
+        if(r.ok) article=await r.json();
+      }catch(e2){}
+    }
+
+    if(!article) throw new Error('文章不存在或已下架');
+
+    var ch = (article.channel === 'academy') ? 'academy' : 'news';
+    var listRes = await window.HiMiaoAPI.getArticles({limit:20,page:1,is_published:true,channel:ch}).catch(function(){return [];});
+
+    renderArticle(article);
+    renderRelated(listRes, slug);
+  }catch(err){
+    console.error('[HiMiao article]',err);
+    document.getElementById('state-loading').style.display='none';
+    document.getElementById('state-error').style.display='flex';
+    document.getElementById('error-msg').textContent=err.message||'加载失败，请刷新重试';
+  }
+}
+
+window.addEventListener('scroll',function(){
+  var total=document.body.scrollHeight-window.innerHeight;
+  if(total>0) document.getElementById('reading-bar').style.width=(window.scrollY/total*100)+'%';
+  document.getElementById('back-top').classList.toggle('show',window.scrollY>400);
+});
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+
+<script>
+(function(){
+  function showBanner(){
+    var b=document.createElement('div');
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#1d4ed8;color:white;font-size:12px;padding:10px 20px;text-align:center;line-height:1.6;';
+    b.textContent='【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地开展任何保险推介或业务引导服务。';
+    document.body.insertBefore(b,document.body.firstChild);
+    document.body.style.paddingTop='46px';
+  }
+  var cf=document.querySelector('meta[name="cf-ipcountry"]');
+  if(cf&&cf.content==='CN'){showBanner();return;}
+  fetch('https://ip-api.com/json/?fields=countryCode',{cache:'no-store'})
+    .then(function(r){return r.json();}).then(function(d){if(d.countryCode==='CN')showBanner();}).catch(function(){});
+})();
+</script>
+
+</body>
+</html>

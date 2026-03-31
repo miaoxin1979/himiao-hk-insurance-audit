@@ -1,0 +1,394 @@
+{
+  "version": "2026-Q1",
+  "updated": "2026-02-18",
+  "products": [
+    {
+      "id": "aia_wp3",
+      "meta": {
+        "name": "充裕未来 III",
+        "name_en": "Wealth Prestige Plus",
+        "company": "AIA",
+        "company_full": "友邦保险 AIA Hong Kong",
+        "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/AIA_Group_logo.svg/300px-AIA_Group_logo.svg.png",
+        "currency": "USD",
+        "product_type": "whole_life",
+        "rating": "AA+",
+        "version": "2023.08",
+        "highlight": true,
+        "editor_choice": true
+      },
+      "scores": {
+        "total": 80,
+        "liquidity": 3.5,
+        "return_potential": 8.2,
+        "insurer_credit": 9.0,
+        "transparency": 6.5,
+        "dividend_reliability": 7.2,
+        "exit_mechanism": 4.5
+      },
+      "tags": [
+        "储蓄险",
+        "分红型",
+        "美元计价"
+      ],
+      "actuarial": {
+        "premium_annual": 100000,
+        "premium_total": 500000,
+        "breakeven_year": 7,
+        "breakeven_guaranteed_year": 15,
+        "irr_10y": 3.21,
+        "irr_20y": 5.82,
+        "irr_30y": 6.14,
+        "reinvestment_rate_assumption": 6.5,
+        "non_guaranteed_ratio_25y": 47.3,
+        "solvency_ratio": 317,
+        "loan_ltv": 90,
+        "loan_rate": 5.25,
+        "dividend_fulfillment_5y": 91,
+        "max_early_exit_loss_pct": 21.3,
+        "scenarios": {
+          "optimistic": {
+            "rate": 0.065
+          },
+          "neutral": {
+            "rate": 0.045
+          },
+          "pessimistic": {
+            "rate": 0.025
+          }
+        },
+        "premium_years": 5
+      },
+      "audit_data": {
+        "timeline": {
+          "1": {
+            "gcv": 0,
+            "div_opt": 0
+          },
+          "3": {
+            "gcv": 180000,
+            "div_opt": 6000
+          },
+          "5": {
+            "gcv": 380000,
+            "div_opt": 120000
+          },
+          "7": {
+            "gcv": 510000,
+            "div_opt": 185000
+          },
+          "10": {
+            "gcv": 410000,
+            "div_opt": 235000
+          },
+          "20": {
+            "gcv": 890000,
+            "div_opt": 620000
+          }
+        }
+      },
+      "review": "市场分红锁定功能最强，保司信用AA+无虞，但前3年退保几乎全损，是典型的「时间换收益」产品。",
+      "features": [
+        "分红锁定功能",
+        "9种货币切换",
+        "保单贷款90%现价"
+      ],
+      "risks": [
+        "前3年退保本金损失最高21%",
+        "非保证收益占比达47%"
+      ],
+      "source_doc": "AIA官网计划书2023.08"
+    },
+    {
+      "id": "pru_wt",
+      "meta": {
+        "name": "隽富多元货币计划",
+        "name_en": "Wealth Treassure",
+        "company": "Prudential",
+        "company_full": "保诚保险 Prudential Hong Kong",
+        "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/Prudential_plc_logo.svg/300px-Prudential_plc_logo.svg.png",
+        "currency": "USD",
+        "product_type": "whole_life",
+        "rating": "AA-",
+        "version": "2024.01",
+        "highlight": true,
+        "editor_choice": false
+      },
+      "scores": {
+        "total": 82,
+        "liquidity": 4.0,
+        "return_potential": 9.0,
+        "insurer_credit": 8.5,
+        "transparency": 6.0,
+        "dividend_reliability": 6.8,
+        "exit_mechanism": 5.0
+      },
+      "tags": [
+        "英式分红",
+        "高收益",
+        "多币种"
+      ],
+      "actuarial": {
+        "premium_annual": 100000,
+        "premium_total": 500000,
+        "breakeven_year": 6,
+        "breakeven_guaranteed_year": 14,
+        "irr_10y": 3.8,
+        "irr_20y": 6.15,
+        "irr_30y": 6.8,
+        "reinvestment_rate_assumption": 6.75,
+        "non_guaranteed_ratio_25y": 52.1,
+        "solvency_ratio": 285,
+        "loan_ltv": 85,
+        "loan_rate": 5.5,
+        "dividend_fulfillment_5y": 88,
+        "max_early_exit_loss_pct": 18.5,
+        "scenarios": {
+          "optimistic": {
+            "rate": 0.0675
+          },
+          "neutral": {
+            "rate": 0.048
+          },
+          "pessimistic": {
+            "rate": 0.026
+          }
+        },
+        "premium_years": 5
+      },
+      "audit_data": {
+        "timeline": {
+          "1": {
+            "gcv": 0,
+            "div_opt": 0
+          },
+          "3": {
+            "gcv": 165000,
+            "div_opt": 8000
+          },
+          "5": {
+            "gcv": 350000,
+            "div_opt": 140000
+          },
+          "7": {
+            "gcv": 490000,
+            "div_opt": 210000
+          },
+          "10": {
+            "gcv": 380000,
+            "div_opt": 280000
+          },
+          "20": {
+            "gcv": 860000,
+            "div_opt": 720000
+          }
+        }
+      },
+      "review": "英式分红体系，历史波动较大但长期回报领跑同类，无限换受保人功能是传承规划利器，适合风险偏好略高的家族。",
+      "features": [
+        "无限次更换受保人",
+        "开枝散叶分拆选项",
+        "多货币计价转换"
+      ],
+      "risks": [
+        "英式分红波动性高于美式",
+        "非保证比例超52%"
+      ],
+      "source_doc": "Prudential官网计划书2024.01"
+    },
+    {
+      "id": "manulife_gc",
+      "meta": {
+        "name": "环球货币保障计划",
+        "name_en": "Global Currency Protection",
+        "company": "Manulife",
+        "company_full": "宏利人寿保险 Manulife Hong Kong",
+        "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Manulife_logo.svg/300px-Manulife_logo.svg.png",
+        "currency": "USD",
+        "product_type": "whole_life",
+        "rating": "A+",
+        "version": "2023.10",
+        "highlight": false,
+        "editor_choice": false
+      },
+      "scores": {
+        "total": 75,
+        "liquidity": 5.0,
+        "return_potential": 7.2,
+        "insurer_credit": 8.8,
+        "transparency": 7.5,
+        "dividend_reliability": 7.8,
+        "exit_mechanism": 5.5
+      },
+      "tags": [
+        "稳健型",
+        "老牌资管",
+        "高透明度"
+      ],
+      "actuarial": {
+        "premium_annual": 100000,
+        "premium_total": 500000,
+        "breakeven_year": 7,
+        "breakeven_guaranteed_year": 16,
+        "irr_10y": 2.95,
+        "irr_20y": 5.5,
+        "irr_30y": 5.9,
+        "reinvestment_rate_assumption": 6.0,
+        "non_guaranteed_ratio_25y": 38.5,
+        "solvency_ratio": 310,
+        "loan_ltv": 80,
+        "loan_rate": 5.0,
+        "dividend_fulfillment_5y": 94,
+        "max_early_exit_loss_pct": 16.0,
+        "scenarios": {
+          "optimistic": {
+            "rate": 0.06
+          },
+          "neutral": {
+            "rate": 0.043
+          },
+          "pessimistic": {
+            "rate": 0.024
+          }
+        },
+        "premium_years": 5
+      },
+      "audit_data": {
+        "timeline": {
+          "1": {
+            "gcv": 0,
+            "div_opt": 0
+          },
+          "3": {
+            "gcv": 190000,
+            "div_opt": 4000
+          },
+          "5": {
+            "gcv": 400000,
+            "div_opt": 90000
+          },
+          "7": {
+            "gcv": 530000,
+            "div_opt": 160000
+          },
+          "10": {
+            "gcv": 430000,
+            "div_opt": 200000
+          },
+          "20": {
+            "gcv": 910000,
+            "div_opt": 530000
+          }
+        }
+      },
+      "review": "分红实现率94%为同类最高，非保证比例仅38%，数据透明度业内标杆。IRR略低于AIA和保诚，以稳定性换取了波动保护。",
+      "features": [
+        "非保证部分波动最小",
+        "条款透明度业内第一",
+        "24小时全球客服支援"
+      ],
+      "risks": [
+        "长期IRR低于竞品约0.5%",
+        "贷款成数仅80%"
+      ],
+      "source_doc": "Manulife官网计划书2023.10"
+    },
+    {
+      "id": "yf_rl",
+      "meta": {
+        "name": "富饶传承储蓄计划",
+        "name_en": "Rich Legacy",
+        "company": "YF Life",
+        "company_full": "万通人寿保险 YF Life",
+        "logo": "https://placehold.co/120x40/f5f1e8/4A4A4A?text=YF+Life",
+        "currency": "HKD",
+        "product_type": "whole_life",
+        "rating": "A",
+        "version": "2023.06",
+        "highlight": false,
+        "editor_choice": false
+      },
+      "scores": {
+        "total": 71,
+        "liquidity": 6.5,
+        "return_potential": 6.8,
+        "insurer_credit": 7.0,
+        "transparency": 6.0,
+        "dividend_reliability": 6.5,
+        "exit_mechanism": 6.8
+      },
+      "tags": [
+        "回本最快",
+        "港元计价",
+        "短缴期"
+      ],
+      "actuarial": {
+        "premium_annual": 100000,
+        "premium_total": 300000,
+        "breakeven_year": 4,
+        "breakeven_guaranteed_year": 12,
+        "irr_10y": 3.1,
+        "irr_20y": 5.1,
+        "irr_30y": 5.5,
+        "reinvestment_rate_assumption": 5.8,
+        "non_guaranteed_ratio_25y": 41.0,
+        "solvency_ratio": 248,
+        "loan_ltv": 85,
+        "loan_rate": 5.25,
+        "dividend_fulfillment_5y": 86,
+        "max_early_exit_loss_pct": 12.0,
+        "scenarios": {
+          "optimistic": {
+            "rate": 0.058
+          },
+          "neutral": {
+            "rate": 0.04
+          },
+          "pessimistic": {
+            "rate": 0.022
+          }
+        },
+        "premium_years": 3
+      },
+      "audit_data": {
+        "timeline": {
+          "1": {
+            "gcv": 0,
+            "div_opt": 0
+          },
+          "3": {
+            "gcv": 280000,
+            "div_opt": 5000
+          },
+          "5": {
+            "gcv": 330000,
+            "div_opt": 75000
+          },
+          "7": {
+            "gcv": 370000,
+            "div_opt": 130000
+          },
+          "10": {
+            "gcv": 310000,
+            "div_opt": 165000
+          },
+          "20": {
+            "gcv": 650000,
+            "div_opt": 430000
+          }
+        }
+      },
+      "review": "回本速度全场最快仅4年，非常适合短期内有流动性压力但仍想配置港险的客户。长期IRR低于美元产品，以「快」换「稳」。",
+      "features": [
+        "第2年可锁定红利",
+        "保证现金价值占比最高",
+        "3年缴清最短缴期"
+      ],
+      "risks": [
+        "保司评级A低于AIA/保诚",
+        "港元计价受汇率影响"
+      ],
+      "source_doc": "YF Life官网计划书2023.06"
+    }
+  ]
+}

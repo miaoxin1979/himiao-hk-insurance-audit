@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情报站 · 港险市场深度分析 | HiMiao Audit</title>
+<meta name="description" content="HiMiao 精算团队出品：香港保险市场最深度的独立分析，避雷预警、政策解读、产品审计，为你省去踩坑的代价。">
+<!-- 静态资源版本标记：部署后若样式未更新请强制刷新 Ctrl+F5；并确认服务器使用的是本文件而非旧目录副本 -->
+<meta name="himiao-news-build" content="20250321-brand-thumb-v2">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: { extend: { colors: { himiao: '#00a9e0', charcoal: '#2d2d2d' }, fontFamily: { serif: ['"Noto Serif SC"','serif'], sans:['"DM Sans"','sans-serif'], mono:['"JetBrains Mono"','monospace'] } } }
+  }
+</script>
+<style>
+/* ── Design Tokens ── */
+:root {
+  --paper:   #fdfbf7;
+  --paper-2: #f5f1e8;
+  --paper-3: #ede8de;
+  --ink:     #1c1c1e;
+  --ink-2:   #48484a;
+  --ink-3:   #8e8e93;
+  --ink-4:   #c7c7cc;
+  --blue:    #00a9e0;
+  --blue-d:  #0083af;
+  --blue-l:  #e3f6fd;
+  --red:     #c0392b;
+  --red-l:   #fdf2f1;
+  --amber:   #b45309;
+  --amber-l: #fef9ec;
+  --green:   #1e7e44;
+  --green-l: #f0faf4;
+  --navy:    #0f1d2e;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ── Nav ── */
+.nav-item { color: #5e5e5e; font-weight: 700; font-size: 14px; letter-spacing: 0.1em; text-decoration: none; transition: color 0.2s; }
+.nav-item:hover, .nav-item.active { color: var(--blue); }
+
+/* ── Category Chips ── */
+.cat-chip {
+  display: inline-flex; align-items: center; padding: 6px 16px;
+  border-radius: 100px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid transparent; cursor: pointer;
+  background: white; color: var(--ink-3); border-color: var(--paper-3);
+  transition: all 0.18s; white-space: nowrap; letter-spacing: 0.02em;
+}
+.cat-chip:hover { border-color: var(--blue); color: var(--blue-d); }
+.cat-chip.active { background: var(--ink); color: white; border-color: var(--ink); }
+.cat-chip.active.market  { background: var(--blue);  border-color: var(--blue); }
+.cat-chip.active.alert   { background: var(--red);   border-color: var(--red); }
+.cat-chip.active.policy  { background: #6366f1; border-color: #6366f1; }
+.cat-chip.active.audit   { background: var(--green); border-color: var(--green); }
+.cat-chip.active.guide   { background: var(--amber); border-color: var(--amber); }
+
+/* ── Category badge on cards ── */
+.cat-badge { display: inline-flex; padding: 2px 10px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.cat-badge.market  { background: var(--blue-l);  color: var(--blue-d); }
+.cat-badge.alert   { background: var(--red-l);   color: var(--red); }
+.cat-badge.policy  { background: #eef2ff; color: #4338ca; }
+.cat-badge.audit   { background: var(--green-l); color: var(--green); }
+.cat-badge.guide   { background: var(--amber-l); color: var(--amber); }
+
+/* ── V2.0 今日要闻（Typography-first，无图）── */
+.top-stories {
+  background: white; border: 1px solid var(--paper-3);
+  border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.top-stories:hover { border-color: var(--blue); box-shadow: 0 4px 16px rgba(0,169,224,0.08); }
+.top-stories:hover .top-title { color: var(--blue); }
+.top-stories .top-label { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; color: var(--blue); text-transform: uppercase; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.top-stories .top-title { font-family: 'Noto Serif SC', serif; font-size: clamp(18px, 2.5vw, 22px); font-weight: 900; color: var(--ink); line-height: 1.35; margin-bottom: 8px; transition: color 0.18s; }
+.top-stories .top-excerpt { font-size: 13px; color: var(--ink-3); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.top-stories .top-meta { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 11px; color: var(--ink-4); }
+.top-stories .top-meta span { font-family: 'JetBrains Mono', monospace; }
+
+/* ── V2.0 自适应 List 卡片（有图侧边小缩略图，无图铺满）── */
+.list-card-v2 {
+  display: flex; gap: 16px; padding: 18px 0;
+  border-bottom: 1px solid var(--paper-3); cursor: pointer;
+  transition: background 0.15s; align-items: flex-start;
+}
+.list-card-v2:last-child { border-bottom: none; }
+.list-card-v2:hover { background: var(--paper-2); }
+.list-card-v2:hover .list-title { color: var(--blue); }
+.list-card-v2 .thumb-sm { width: 96px; min-width: 96px; height: 72px; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: var(--paper-2); }
+.list-card-v2 .list-body { flex: 1; min-width: 0; }
+.list-card-v2 .list-title { font-family: 'Noto Serif SC', serif; font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.18s; }
+.list-card-v2 .list-excerpt { font-size: 12px; color: var(--ink-3); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.list-card-v2 .list-meta { font-size: 11px; color: var(--ink-4); margin-top: 8px; font-family: 'JetBrains Mono', monospace; }
+
+/* ── 无图时：分类渐变块（来自方案 B，兼顾美观与无裂图）── */
+.list-card-v2 .auto-cover {
+  width: 96px; min-width: 96px; height: 72px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  color: rgba(255,255,255,0.95); text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+/* ── 有图时：thumb-wrap 包裹，img 加载失败显示 fallback ── */
+.list-card-v2 .thumb-wrap { width: 96px; min-width: 96px; height: 72px; flex-shrink: 0; position: relative; border-radius: 8px; overflow: hidden; }
+.list-card-v2 .thumb-wrap .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.list-card-v2 .thumb-wrap .thumb-fallback { position: absolute; inset: 0; width: 100%; height: 100%; }
+.list-card-v2 .auto-cover.market  { background: linear-gradient(135deg, #00a9e0 0%, #0f1d2e 100%); }
+/* 蓝底占位：品牌字「HiMiao」，替代原图标 */
+.list-card-v2 .auto-cover.market .auto-cover-brand {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em; color: rgba(255,255,255,0.98);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.25); font-family: 'DM Sans', 'JetBrains Mono', sans-serif;
+}
+@media (max-width: 768px) {
+  .list-card-v2 .auto-cover.market .auto-cover-brand { font-size: 10px; letter-spacing: 0.04em; }
+}
+.list-card-v2 .auto-cover.alert  { background: linear-gradient(135deg, #ef4444 0%, #450a0a 100%); }
+.list-card-v2 .auto-cover.policy { background: linear-gradient(135deg, #6366f1 0%, #1e1b4b 100%); }
+.list-card-v2 .auto-cover.audit  { background: linear-gradient(135deg, #10b981 0%, #064e3b 100%); }
+.list-card-v2 .auto-cover.guide  { background: linear-gradient(135deg, #f59e0b 0%, #451a03 100%); }
+
+/* ── 侧栏热读 list-card（保留）── */
+.list-card {
+  display: flex; gap: 14px; padding: 16px 0;
+  border-bottom: 1px solid var(--paper-3); cursor: pointer;
+}
+.list-card:last-child { border-bottom: none; }
+.list-card .thumb-sm { width: 72px; height: 54px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--paper-2); }
+.list-card .thumb-wrap { width: 72px; height: 54px; min-width: 72px; flex-shrink: 0; position: relative; border-radius: 6px; overflow: hidden; background: var(--paper-2); }
+.list-card .thumb-wrap .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.list-card .thumb-wrap .thumb-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--ink-4); background: var(--paper-2); }
+.list-card .thumb-wrap .thumb-fallback.auto-cover {
+  color: rgba(255,255,255,0.95); text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+/* 侧栏热读：与市场情报列表一致，蓝底 HiMiao */
+.list-card .auto-cover {
+  width: 72px; min-width: 72px; height: 54px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.95); text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.list-card .auto-cover.market  { background: linear-gradient(135deg, #00a9e0 0%, #0f1d2e 100%); }
+.list-card .auto-cover.market .auto-cover-brand {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.05em; color: rgba(255,255,255,0.98);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.25); font-family: 'DM Sans', 'JetBrains Mono', sans-serif;
+}
+.list-card .auto-cover.alert  { background: linear-gradient(135deg, #ef4444 0%, #450a0a 100%); font-size: 18px; }
+.list-card .auto-cover.policy { background: linear-gradient(135deg, #6366f1 0%, #1e1b4b 100%); font-size: 16px; }
+.list-card .auto-cover.audit  { background: linear-gradient(135deg, #10b981 0%, #064e3b 100%); font-size: 18px; }
+.list-card .auto-cover.guide  { background: linear-gradient(135deg, #f59e0b 0%, #451a03 100%); font-size: 16px; }
+.list-card:hover h4 { color: var(--blue); }
+
+/* ── Hot indicator ── */
+.hot-dot { display: inline-flex; align-items: center; gap: 4px; }
+.hot-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block; animation: blink 1.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ── 分页按钮（与 product-list 统一） ── */
+.filter-btn { font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--paper-3); background: white; cursor: pointer; color: var(--ink-2); transition: all .15s; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+.filter-btn:hover, .filter-btn.active { border-color: var(--blue); background: var(--blue-l); color: var(--blue-d); }
+
+/* ── Subscribe card ── */
+.sub-card {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a2e44 100%);
+  border-radius: 16px; padding: 28px 24px; position: relative; overflow: hidden;
+}
+.sub-card::before {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,169,224,0.2) 0%, transparent 70%);
+}
+
+
+/* ── Search ── */
+.search-box { position: relative; }
+.search-box input { width: 100%; background: white; border: 1.5px solid var(--paper-3); border-radius: 100px; padding: 10px 18px 10px 42px; font-size: 13px; color: var(--ink); outline: none; transition: border-color 0.18s; font-family: 'DM Sans', sans-serif; }
+.search-box input:focus { border-color: var(--blue); }
+.search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-3); width: 16px; height: 16px; pointer-events: none; }
+
+/* ── Reading progress ── */
+#readingProgress { position: fixed; top: 0; left: 0; height: 2px; background: var(--blue); z-index: 999; transition: width 0.1s linear; width: 0%; }
+
+/* ── Responsive utilities ── */
+@media (max-width: 768px) {
+  .list-card-v2 .thumb-sm { width: 72px; min-width: 72px; height: 54px; }
+  .list-card-v2 .thumb-wrap { width: 72px; min-width: 72px; height: 54px; }
+  .list-card-v2 .auto-cover { width: 72px; min-width: 72px; height: 54px; font-size: 18px; }
+  .top-stories .top-excerpt { -webkit-line-clamp: 1; }
+}
+
+/* ── Article hidden state ── */
+.article-item { transition: opacity 0.2s, transform 0.2s; }
+.article-item.hidden { display: none; }
+
+
+/* ── Staggered load animation ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.4s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.1s; }
+.fade-up-3 { animation-delay: 0.15s; }
+.fade-up-4 { animation-delay: 0.2s; }
+.fade-up-5 { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div id="readingProgress"></div>
+
+<!-- ═══════════════════════════════════ NAV ═══════════════════════════════════ -->
+<div id="himiao-nav"></div>
+<script src="components/lang.js"></script>
+<script src="components/i18n-engine.js"></script>
+<script src="components/nav.js"></script>
+<script src="js/api-client.js"></script>
+
+<style>
+@media (min-width: 1024px) { .lg-flex { display: flex !important; } }
+</style>
+
+
+
+<!-- ════════════════════════════════ MAIN ══════════════════════════════════ -->
+<main style="max-width:1280px;margin:0 auto;padding:0 20px 80px;">
+
+  <!-- Page Header（采纳方案 A：2px 底边增强终端感） -->
+  <div style="padding:32px 0 24px;border-bottom:2px solid var(--ink);margin-bottom:28px" class="fade-up">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.15em;color:var(--blue);text-transform:uppercase;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Market Intelligence</div>
+        <h1 style="font-size:clamp(26px,4vw,38px);font-weight:900;color:var(--ink);letter-spacing:-0.5px;font-family:'Noto Serif SC',serif;line-height:1.1"><span data-i18n="page_h1">情报站</span></h1>
+        <p style="font-size:13px;color:var(--ink-3);margin-top:6px"><span data-i18n="page_sub">由 HiMiao 精算团队独立出品 · 不带货 · 只讲真话</span></p>
+      </div>
+      <div class="search-box" style="width:min(100%,260px)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="搜索文章…" data-i18n-placeholder="search_ph" oninput="handleSearch(this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Filter -->
+  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:28px;-webkit-overflow-scrolling:touch;scrollbar-width:none" class="fade-up fade-up-1">
+    <button class="cat-chip active" data-cat="all" onclick="filterCat('all',this)"><span data-i18n="cat_all">全部</span></button>
+    <button class="cat-chip" data-cat="market" onclick="filterCat('market',this)"><span data-i18n="cat_market">📊 市场情报</span></button>
+    <button class="cat-chip" data-cat="alert" onclick="filterCat('alert',this)"><span data-i18n="cat_alert">🔴 避雷预警</span></button>
+    <button class="cat-chip" data-cat="policy" onclick="filterCat('policy',this)"><span data-i18n="cat_policy">📋 政策解读</span></button>
+    <button class="cat-chip" data-cat="audit" onclick="filterCat('audit',this)"><span data-i18n="cat_audit">⚖ 产品审计</span></button>
+    <button class="cat-chip" data-cat="guide" onclick="filterCat('guide',this)"><span data-i18n="cat_guide">🧭 新手指南</span></button>
+  </div>
+
+  <!-- Layout: Left Main + Right Sidebar -->
+  <div style="display:grid;grid-template-columns:1fr;gap:28px" id="mainGrid">
+
+    <!-- ── LEFT COLUMN ── -->
+    <div id="leftCol">
+
+      <!-- V2.0 今日要闻（Typography-first，无大图） -->
+      <div class="article-item fade-up fade-up-2" id="top-stories-wrap" style="margin-bottom:20px">
+        <!-- JS 渲染：主推 1 篇，纯文字排版 -->
+      </div>
+
+      <!-- V2.0 资讯流 List 列表（自适应：有图侧边缩略图，无图铺满） -->
+      <div id="articleList" style="background:white;border:1px solid var(--paper-3);border-radius:12px;padding:0 20px;">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- 分页（与 product-list 统一设计） -->
+      <div id="pagination"></div>
+
+    </div>
+
+    <!-- ── RIGHT SIDEBAR ── -->
+    <div id="rightCol">
+
+      <!-- Subscribe card -->
+      <div class="sub-card fade-up fade-up-3" style="margin-bottom:20px">
+        <div class="ai-pulse" style="width:6px;height:6px;margin-bottom:12px;position:relative"></div>
+        <h3 style="font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:white;margin-bottom:6px"><span data-i18n="sub_h">订阅审计周报</span></h3>
+        <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:16px;line-height:1.6"><span data-i18n="sub_desc">每周一送达。精算师亲写，不含广告，不带货。</span></p>
+        <div style="display:flex;gap:8px;flex-direction:column">
+          <input type="email" id="subEmail" placeholder="your@email.com" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:white;font-size:12px;outline:none;font-family:'DM Sans'" onfocus="this.style.borderColor='#00a9e0'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+          <button onclick="handleSubscribe()" style="width:100%;padding:10px;border-radius:8px;background:#00a9e0;color:white;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;font-family:'DM Sans';transition:background 0.18s" onmouseover="this.style.background='#0083af'" onmouseout="this.style.background='#00a9e0'">
+            免费订阅
+          </button>
+        </div>
+        <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:10px"><span data-i18n="sub_note">已有 2,847 位读者 · 随时可退订</span></p>
+      </div>
+
+      <!-- V2.0 最新文章（按时间排序前4篇）；标题采纳方案 A 的终端风格 -->
+      <div style="background:white;border:1px solid var(--paper-3);border-radius:12px;padding:18px;margin-bottom:20px" class="fade-up fade-up-4">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.1em;color:var(--ink);text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid var(--paper-3);padding-bottom:10px;font-family:'JetBrains Mono',monospace"><span data-i18n="latest_label">🔥 热门追踪 TOP STORIES</span></div>
+        <div id="hotList"><!-- JS rendered --></div>
+      </div>
+
+      <!-- Product CTA — 纯数据导航，无咨询/导流 -->
+      <div style="background:var(--paper-2);border:1px solid var(--paper-3);border-radius:12px;padding:18px" class="fade-up fade-up-5">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:10px;font-family:'JetBrains Mono',monospace">相关产品数据</div>
+        <p style="font-size:12px;color:var(--ink-3);margin-bottom:14px;line-height:1.6">读完情报，查阅精算审计过的客观产品数据。</p>
+        <a href="product-list.html" style="display:block;width:100%;padding:10px;background:var(--ink);color:white;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-align:center;text-decoration:none;transition:background 0.18s" onmouseover="this.style.background='#000'" onmouseout="this.style.background='var(--ink)'">
+          进入产品审计库 →
+        </a>
+      </div>
+
+    </div>
+
+  </div><!-- /mainGrid -->
+
+  <!-- Empty state -->
+  <div id="emptyState" style="display:none;text-align:center;padding:80px 20px">
+    <div style="font-size:48px;margin-bottom:16px">🔍</div>
+    <p style="color:var(--ink-3);font-size:15px;font-weight:500">没有找到相关文章</p>
+    <button onclick="filterCat('all',document.querySelector('[data-cat=all]'))" style="margin-top:16px;color:var(--blue);font-size:13px;font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline">查看全部文章</button>
+  </div>
+
+</main>
+
+<!-- ════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<footer-placeholder></footer-placeholder>
+
+<!-- ══ AI Chatbox — 全站统一组件，取代旧 alert 弹窗 ══ -->
+<!-- V8.0 合规：提示语为中立精算指令 -->
+
+
+<!-- ════════════════════════════════ SCRIPTS ══════════════════════════════════ -->
+<script>
+/* ── M3-04: 静态 ARTICLES 已删除，改由 /api/v1/articles 动态获取 ── */
+
+/* ── i18n 辅助：优先调用 HM_I18N.t()，回退到内置默认值 ── */
+function t(key, fallback) {
+  return (window.HM_I18N && window.HM_I18N.t) ? window.HM_I18N.t(key) : fallback;
+}
+
+/* ── 分类展示配置（标签文案走 i18n，样式类名固定不变） ── */
+const CAT_ICONS = { market:'📊', alert:'🔴', policy:'📋', audit:'⚖', guide:'🧭' };
+const CAT_I18N  = { market:'cat_market', alert:'cat_alert', policy:'cat_policy', audit:'cat_audit', guide:'cat_guide' };
+const CAT_FB    = { market:'市场情报', alert:'避雷预警', policy:'政策解读', audit:'产品审计', guide:'新手指南' };
+
+function catLabel(cat) {
+  return (CAT_ICONS[cat] || '') + ' ' + t(CAT_I18N[cat], CAT_FB[cat] || cat);
+}
+
+/* ── 分页常量（服务端分页） ── */
+const PAGE_SIZE = 7;
+
+/* ── 全局状态 ── */
+let ARTICLES    = [];   // 当前页数据
+let TOTAL_COUNT = 0;    // 服务端返回的总条数
+let currentCat  = 'all';
+let currentSearch = '';
+let currentPage  = 1;
+let TOP_SLUG    = null;
+let TOP_ARTICLE = null; // 今日要闻完整数据，跨页保持
+
+/* ── Loading / Error 状态 ── */
+function showGridLoading() {
+  document.getElementById('articleList').innerHTML =
+    `<div style="text-align:center;padding:60px 0;color:var(--ink-3)">
+       <div style="display:inline-block;width:28px;height:28px;border:3px solid var(--paper-3);
+                   border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;margin-bottom:12px"></div>
+       <p style="font-size:13px">加载中…</p>
+     </div>`;
+}
+
+function showGridError(msg) {
+  document.getElementById('articleList').innerHTML =
+    `<div style="text-align:center;padding:60px 0;color:var(--ink-3)">
+       <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+       <p style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px">加载失败</p>
+       <p style="font-size:12px">${msg || '请刷新页面重试'}</p>
+       <button onclick="loadArticles(1)" style="margin-top:14px;padding:7px 18px;border-radius:100px;border:1.5px solid var(--blue);color:var(--blue);background:none;font-size:12px;font-weight:700;cursor:pointer">重新加载</button>
+     </div>`;
+}
+
+/* ── CSS: loading spinner（注入一次，避免 tailwind 未覆盖） ── */
+(function() {
+  const s = document.createElement('style');
+  s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(s);
+})();
+
+/* ── 分类图标（无图时 auto-cover 用；market 用品牌字 HiMiao） ── */
+const CAT_ICON = { market: '📊', alert: '🔴', policy: '📋', audit: '⚖', guide: '🧭' };
+
+/**
+ * 接口里的 category 可能是英文 key、中文「市场通讯」等；映射到现有 CSS 类名。
+ */
+function categoryCssClass(a) {
+  const raw = a.category;
+  const s = raw == null ? '' : String(raw).trim();
+  const lower = s.toLowerCase();
+  const map = {
+    market: 'market', newsletter: 'market', market_news: 'market',
+    alert: 'alert', policy: 'policy', audit: 'audit', guide: 'guide'
+  };
+  if (map[lower]) return map[lower];
+  if (s === '市场情报' || s === '市场通讯') return 'market';
+  return map[lower] || 'market';
+}
+
+/** 若封面 URL 像站点默认的「书本」占位图，也改为 HiMiao */
+function looksLikeDefaultBookCover(url) {
+  if (!url || typeof url !== 'string') return false;
+  const u = url.toLowerCase();
+  if (/book|opengraph|\/og\.|placeholder|default[_-]?thumb|favicon|thumb\/default|images\/placeholder/i.test(u)) return true;
+  // 可在页面其它脚本中先赋值：window.HIMIAO_BOOK_COVER_SUBSTR = ['你的CDN域名','/path/片段'];
+  try {
+    const extra = window.HIMIAO_BOOK_COVER_SUBSTR;
+    if (Array.isArray(extra) && extra.some((sub) => sub && u.includes(String(sub).toLowerCase()))) return true;
+  } catch (e) {}
+  return false;
+}
+
+/**
+ * 不显示 cover_url、改用蓝底 HiMiao：① 市场类分类 ② URL 像默认书本图。
+ * （若强刷仍见旧图，多半是线上未部署本文件，或分类/URL 仍不匹配，可改 looksLikeDefaultBookCover。）
+ */
+function useBrandInsteadOfCover(a) {
+  try {
+    if (window.HIMIAO_FORCE_BRAND_THUMB === true) return true;
+  } catch (e) {}
+  const raw = a.category;
+  const s = raw == null ? '' : String(raw).trim();
+  const lower = s.toLowerCase();
+  if (lower === 'market' || lower === 'newsletter' || lower === 'market_news') return true;
+  if (s === '市场情报' || s === '市场通讯') return true;
+  if (/市场/.test(s) && /通讯|情报/.test(s)) return true;
+  const url = (a.cover_url || '').trim();
+  if (url && looksLikeDefaultBookCover(url)) return true;
+  return false;
+}
+
+/** 缩略图区块用的渐变类：品牌占位时固定 market（蓝底 HiMiao） */
+function thumbVisualClass(a) {
+  return useBrandInsteadOfCover(a) ? 'market' : categoryCssClass(a);
+}
+
+/** 无封面缩略图内部 HTML：market 为蓝底 + HiMiao 文案 */
+function autoCoverInner(cssClass) {
+  if (cssClass === 'market') return '<span class="auto-cover-brand">HiMiao</span>';
+  return CAT_ICON[cssClass] || '📰';
+}
+
+/**
+ * 主列表缩略图：市场类 / 默认书本 URL → 蓝底 HiMiao，不显示该封面图。
+ */
+function mainListThumbHTML(a) {
+  const vClass = thumbVisualClass(a);
+  const icon = CAT_ICON[vClass] || '📰';
+  const coverInner = autoCoverInner(vClass);
+  const hasCover = !useBrandInsteadOfCover(a) && !!(a.cover_url && a.cover_url.trim());
+  if (hasCover) {
+    return `<div class="thumb-wrap"><img class="thumb-sm thumb-img" src="${a.cover_url}" alt="" loading="lazy" data-cat="${a.category || ''}" data-icon="${icon}"><div class="thumb-sm auto-cover ${vClass} thumb-fallback" style="display:none">${coverInner}</div></div>`;
+  }
+  return `<div class="thumb-sm auto-cover ${vClass}">${coverInner}</div>`;
+}
+
+/** 侧栏热读缩略图 */
+function hotListThumbHTML(a) {
+  const vClass = thumbVisualClass(a);
+  const coverInner = autoCoverInner(vClass);
+  const hasCover = !useBrandInsteadOfCover(a) && !!(a.cover_url && a.cover_url.trim());
+  if (hasCover) {
+    return `<div class="thumb-wrap"><img class="thumb-sm thumb-img" src="${a.cover_url}" alt="" loading="lazy"><div class="thumb-sm thumb-fallback auto-cover ${vClass}" style="display:none">${coverInner}</div></div>`;
+  }
+  return `<div class="thumb-sm auto-cover ${vClass}">${coverInner}</div>`;
+}
+
+/* ── V2.0 渲染 List 卡片：有图侧边小图，无图用分类渐变块；图片 fallback 用 thumb-wrap 包裹 ── */
+function listCardHTML(a) {
+  const dateStr = (a.published_at || a.created_at || '').split('T')[0];
+  const cat = a.category || 'market';
+  const thumbPart = mainListThumbHTML(a);
+  return `
+  <div class="list-card-v2 article-item" data-cat="${cat}" data-id="${a.id || ''}" onclick="goArticle('${a.slug}')">
+    ${thumbPart}
+    <div class="list-body">
+      <span class="cat-badge ${a.category}" style="margin-bottom:6px;display:inline-block">${catLabel(a.category)}</span>
+      <h3 class="list-title">${a.title || ''}</h3>
+      ${(a.excerpt || '').trim() ? `<p class="list-excerpt">${a.excerpt}</p>` : ''}
+      <div class="list-meta">${a.author || ''} · ${dateStr}${a.read_min ? ' · ' + a.read_min + ' min' : ''}</div>
+    </div>
+  </div>`;
+}
+
+/* ── V2.0 今日要闻（Typography-first，无图） ── */
+function renderTopStories(topData) {
+  const wrap = document.getElementById('top-stories-wrap');
+  if (!topData) {
+    wrap.innerHTML = '';
+    wrap.style.display = 'none';
+    return;
+  }
+  const dateStr = (topData.published_at || topData.created_at || '').split('T')[0];
+  wrap.style.display = 'block';
+  wrap.setAttribute('data-cat', topData.category);
+  wrap.innerHTML = `
+    <div class="top-stories" onclick="goArticle('${topData.slug}')">
+      <div class="top-label">${t('top_stories','今日要闻')}</div>
+      <h2 class="top-title">${topData.title || ''}</h2>
+      ${(topData.excerpt || '').trim() ? `<p class="top-excerpt">${topData.excerpt}</p>` : ''}
+      <div class="top-meta">
+        <span>${topData.author || ''}</span>
+        <span>${dateStr}</span>
+        ${topData.read_min ? `<span>${topData.read_min} min read</span>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ── 服务端分页：页码切换 ── */
+function goPage(n) {
+  const totalPages = Math.max(1, Math.ceil(TOTAL_COUNT / PAGE_SIZE));
+  if (n < 1 || n > totalPages) return;
+  currentPage = n;
+  loadArticles(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  let html = '<div style="display:flex;justify-content:center;gap:8px;margin-top:32px;flex-wrap:wrap;">';
+  if (currentPage > 1) {
+    html += '<button class="filter-btn" onclick="goPage(' + (currentPage - 1) + ')">← 上一页</button>';
+  }
+  for (let i = 1; i <= totalPages; i++) {
+    const active = i === currentPage ? ' active' : '';
+    html += '<button class="filter-btn' + active + '" onclick="goPage(' + i + ')">' + i + '</button>';
+  }
+  if (currentPage < totalPages) {
+    html += '<button class="filter-btn" onclick="goPage(' + (currentPage + 1) + ')">下一页 →</button>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderGrid() {
+  const listEl   = document.getElementById('articleList');
+  const topWrap  = document.getElementById('top-stories-wrap');
+  const empty    = document.getElementById('emptyState');
+  const showTop  = TOP_ARTICLE && currentCat === 'all' && !currentSearch;
+
+  if (showTop && topWrap) {
+    topWrap.classList.remove('hidden');
+    renderTopStories(TOP_ARTICLE);
+  } else if (topWrap) {
+    topWrap.classList.add('hidden');
+  }
+
+  const pageItems = (currentPage === 1 && TOP_SLUG) ? ARTICLES.filter(a => a.slug !== TOP_SLUG) : ARTICLES;
+
+  if (ARTICLES.length === 0 && !showTop) {
+    listEl.innerHTML = '';
+    empty.style.display = 'block';
+    renderPagination(0);
+  } else {
+    empty.style.display = 'none';
+    listEl.innerHTML = pageItems.map(a => listCardHTML(a)).join('');
+    renderPagination(TOTAL_COUNT);
+    attachThumbFallback();
+  }
+}
+
+function attachThumbFallback() {
+  document.getElementById('articleList')?.querySelectorAll('.thumb-img').forEach(img => {
+    img.onerror = null;
+    img.onerror = function() {
+      this.style.display = 'none';
+      const fb = this.nextElementSibling;
+      if (fb && fb.classList.contains('thumb-fallback')) fb.style.display = 'flex';
+    };
+  });
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  currentPage = 1;
+  document.querySelectorAll('.cat-chip').forEach(b => {
+    b.className = 'cat-chip' + (b.dataset.cat === cat ? ' active ' + cat : '');
+  });
+  loadArticles(1);
+}
+
+function handleSearch(val) {
+  currentSearch = val.trim();
+  currentPage = 1;
+  loadArticles(1);
+}
+
+function goArticle(slug) {
+  window.location.href = 'article.html?slug=' + slug;
+}
+
+function handleSubscribe() {
+  const email = document.getElementById('subEmail').value.trim();
+  if (!email || !email.includes('@')) { alert('请输入有效的邮箱地址'); return; }
+  document.getElementById('subEmail').value = '';
+  const btn = document.querySelector('[onclick="handleSubscribe()"]');
+  btn.textContent = '✓ 订阅成功！';
+  btn.style.background = '#1e7e44';
+  setTimeout(() => { btn.textContent = '免费订阅'; btn.style.background = '#00a9e0'; }, 3000);
+}
+
+/* ── 响应式侧栏 ── */
+function initLayout() {
+  const grid = document.getElementById('mainGrid');
+  if (window.innerWidth >= 1024) {
+    grid.style.gridTemplateColumns = '1fr 300px';
+  } else {
+    grid.style.gridTemplateColumns = '1fr';
+  }
+}
+
+/* ── 阅读进度条 ── */
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  document.getElementById('readingProgress').style.width = (window.scrollY / total * 100) + '%';
+});
+
+/* ── 核心：服务端分页，每次 fetch 当前页 ── */
+async function loadArticles(page) {
+  const p = page ?? currentPage;
+  currentPage = p;
+  showGridLoading();
+  try {
+    const params = { page: p, limit: PAGE_SIZE, is_published: true };
+    if (currentCat !== 'all') params.category = currentCat;
+    if (currentSearch) params.q = currentSearch;
+    const data = await window.HiMiaoAPI.getArticles(params);
+    const items = Array.isArray(data) ? data : (data.items || data.data || []);
+    TOTAL_COUNT = data?.total ?? data?.total_count ?? items.length;
+    ARTICLES = items;
+
+    if (p === 1 && currentCat === 'all' && !currentSearch) {
+      const topRes = await window.HiMiaoAPI.getArticles({ limit: 1, is_published: true }).catch(() => null);
+      const topArr = topRes ? (Array.isArray(topRes) ? topRes : (topRes.items || topRes.data || [])) : [];
+      const top = topArr[0] || null;
+      TOP_SLUG = top ? top.slug : null;
+      TOP_ARTICLE = top;
+      const hotRes = await window.HiMiaoAPI.getArticles({ limit: 4, is_published: true }).catch(() => null);
+      const hotArr = hotRes ? (Array.isArray(hotRes) ? hotRes : (hotRes.items || hotRes.data || [])) : [];
+      document.getElementById('hotList').innerHTML = hotArr.map(a => {
+        const dateStr = (a.published_at || a.created_at || '').split('T')[0];
+        const meta = a.read_min ? `${a.read_min} min · ${dateStr}` : dateStr;
+        const thumbPart = hotListThumbHTML(a);
+        return `<div class="list-card" onclick="goArticle('${a.slug}')">${thumbPart}<div style="flex:1;min-width:0"><span class="cat-badge ${a.category}" style="margin-bottom:5px;display:inline-block">${catLabel(a.category)}</span><h4 style="font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:color 0.18s">${a.title || ''}</h4><span style="font-size:10px;color:var(--ink-4);font-family:'JetBrains Mono',monospace">${meta}</span></div></div>`;
+      }).join('');
+      attachThumbFallback();
+    }
+
+    renderGrid();
+  } catch (err) {
+    console.error('[HiMiao] 文章加载失败:', err);
+    showGridError(`${err.message} · 请检查网络或刷新重试`);
+  }
+}
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  initLayout();
+  window.addEventListener('resize', initLayout);
+  loadArticles(1);
+});
+</script>
+
+
+
+<script>
+// ══ V8.0 Geo 软隔离 ══════════════════════════════
+(function() {
+    function showMainlandBanner() {
+        var banner = document.createElement('div');
+        banner.id = 'geo-mainland-banner';
+        banner.style.cssText = [
+            'position:fixed;top:0;left:0;right:0;z-index:9999',
+            'background:#1d4ed8;color:white;font-size:12px',
+            'padding:10px 20px;text-align:center;line-height:1.6',
+            'box-shadow:0 2px 8px rgba(0,0,0,0.2)'
+        ].join(';');
+        banner.innerHTML = '【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地开展任何保险推介、报告下载或业务引导服务。' +
+            ' / This platform provides actuarial data only and does not offer insurance services in Mainland China.';
+        document.body.insertBefore(banner, document.body.firstChild);
+
+        var hideSelectors = [
+            '.dl-btn', '#download-btn', '[data-geo-hide]',
+            'input[type=email]', 'form', '.contact-form'
+        ];
+        hideSelectors.forEach(function(sel) {
+            document.querySelectorAll(sel).forEach(function(el) {
+                el.style.display = 'none';
+            });
+        });
+        document.body.style.paddingTop = '46px';
+    }
+
+    var cfMeta = document.querySelector('meta[name="cf-ipcountry"]');
+    if (cfMeta && cfMeta.content === 'CN') {
+        showMainlandBanner(); return;
+    }
+
+    fetch('https://ip-api.com/json/?fields=countryCode', { cache: 'no-store' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (d.countryCode === 'CN') showMainlandBanner(); })
+        .catch(function() {});
+})();
+</script>
+
+<ai-capsule-placeholder></ai-capsule-placeholder>
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#00a9e0">
+  <link rel="manifest" href="/manifest.json">
+  <title>产品库 | HiMiao Audit</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --blue: #00a9e0;
+      --blue-d: #0083af;
+      --blue-l: #e3f6fd;
+      --navy: #0f1d2e;
+      --paper: #f8fafc;
+      --ink: #0f172a;
+      --ink2: #475569;
+      --ink3: #64748b;
+      --rule: #e2e8f0;
+      --success: #0d9488;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      padding-bottom: 72px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "palt" 1;
+    }
+    .top-bar {
+      background: var(--navy);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .top-bar a { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px; }
+    .top-bar .brand { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
+    .top-bar .brand span { color: var(--blue); }
+    .top-bar .audit { font-size: 9px; font-weight: 800; letter-spacing: 0.12em; opacity: 0.6; text-transform: uppercase; }
+    .top-bar .lang-btn {
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      color: white;
+    }
+    .top-bar .lang-btn:active { background: rgba(255,255,255,0.2); }
+    .tabs-bar {
+      background: white;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      position: sticky;
+      top: 48px;
+      z-index: 90;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 1;
+      min-width: 80px;
+      padding: 14px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink3);
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--ink); }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tab:active { background: var(--blue-l); }
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: white;
+      border-bottom: 1px solid var(--rule);
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      font-size: 14px;
+      background: var(--paper);
+    }
+    .search-clear {
+      width: 36px; height: 36px;
+      border: none;
+      background: var(--rule);
+      border-radius: 50%;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--ink2);
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .sort-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--rule);
+      background: white;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sort-btn:active { background: var(--blue-l); color: var(--blue); }
+    .insurer-wrap { position: relative; }
+    .insurer-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 80;
+      padding: 8px;
+      min-width: 140px;
+    }
+    .insurer-dropdown label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .insurer-dropdown label:hover { background: var(--blue-l); }
+    .insurer-dropdown label.active { font-weight: 800; color: var(--blue); }
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--rule);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .card:active { transform: scale(0.98); }
+    .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-company { font-size: 12px; font-weight: 800; color: var(--blue); }
+    .card-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--blue-l); color: var(--blue-d); }
+    .card-body { padding: 14px 16px; }
+    .card-title { font-size: 15px; font-weight: 800; color: var(--ink); line-height: 1.3; margin-bottom: 2px; }
+    .card-sub { font-size: 11px; color: var(--ink3); margin-bottom: 12px; }
+    .card-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .metric { text-align: center; }
+    .metric-val { font-size: 18px; font-weight: 900; font-family: 'JetBrains Mono', monospace; color: var(--blue); }
+    .metric-lbl { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+    .metric-rating { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .metric-rating .rating-val { font-size: 18px; font-weight: 900; font-family: 'JetBrains Mono', monospace; color: var(--blue); line-height: 1.3; }
+    .metric-rating .rating-lbl { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+    .metric-rating .rating-src { font-size: 10px; color: var(--ink3); margin-top: 4px; }
+    .metric-rating .rating-src a { color: var(--ink3); text-decoration: none; }
+    .metric-rating .rating-src a:hover { text-decoration: underline; }
+    .card-footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-tags { font-size: 11px; color: var(--ink3); }
+    .card-cta { font-size: 12px; font-weight: 700; color: var(--blue); }
+    .bottom-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: white;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      z-index: 200;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .btab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink3);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btab:hover, .btab:active { color: var(--ink); }
+    .btab.active { color: var(--blue); }
+    .btab svg { width: 22px; height: 22px; opacity: 0.8; }
+    .btab.active svg { opacity: 1; }
+    .loading { text-align: center; padding: 40px; color: var(--ink3); font-size: 14px; }
+    .empty { text-align: center; padding: 60px 20px; color: var(--ink3); font-size: 14px; }
+    .add-shortlist {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--blue);
+      background: white;
+      color: var(--blue);
+      font-size: 16px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+    .add-shortlist:active { transform: scale(0.95); }
+    .add-shortlist.in-list { background: var(--blue); color: white; }
+    .compare-banner {
+      background: linear-gradient(90deg, #e0f2fe, #f0f9ff);
+      border-bottom: 1px solid var(--rule);
+      padding: 10px 16px;
+      font-size: 13px; font-weight: 600;
+      color: var(--ink2);
+      text-align: center;
+    }
+    .float-bar {
+      position: fixed;
+      bottom: 56px;
+      left: 0; right: 0;
+      background: white;
+      border-top: 1px solid var(--rule);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 190;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+    }
+    .float-bar .left { font-size: 13px; font-weight: 700; color: var(--ink); }
+    .float-bar .btns { display: flex; gap: 8px; }
+    .float-bar .btns button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px; font-weight: 700;
+      border: none;
+      cursor: pointer;
+    }
+    .float-bar .btns .btn-list { background: var(--blue-l); color: var(--blue-d); }
+    .float-bar .btns .btn-link { background: var(--blue); color: white; }
+    .sheet {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 300;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-panel {
+      background: white;
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+      max-height: 70vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .sheet-head {
+      padding: 16px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sheet-head h3 { font-size: 16px; font-weight: 800; }
+    .sheet-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink3); }
+    .sheet-body { padding: 16px; overflow-y: auto; flex: 1; }
+    .share-url { font-size: 12px; word-break: break-all; background: var(--paper); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    .copy-btn { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .shortlist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .shortlist-item:last-child { border-bottom: none; }
+    .shortlist-item .name { font-size: 14px; font-weight: 700; }
+    .shortlist-item .remove { font-size: 12px; color: var(--ink3); background: none; border: none; cursor: pointer; }
+    @media (min-width: 768px) {
+      .card-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部品牌栏 -->
+  <header class="top-bar">
+    <a href="index-v2.html">
+      <span class="brand">Hi<span>Miao</span></span>
+      <span class="audit">AUDIT</span>
+    </a>
+    <button class="lang-btn" id="langBtn" onclick="toggleLangMenu()">EN</button>
+  </header>
+
+  <!-- 搜索栏（客户模式时隐藏） -->
+  <div id="searchRow" class="search-row">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索产品名或保司…" autocomplete="off">
+    <button type="button" id="searchClear" class="search-clear" aria-label="清空">×</button>
+  </div>
+
+  <!-- 险种 Tab（客户模式时隐藏） -->
+  <div id="tabsBar" class="tabs-bar">
+    <div class="tab active" data-type="savings" data-i18n="tab_savings">储蓄险</div>
+    <div class="tab" data-type="whole_life" data-i18n="tab_whole_life">终身寿</div>
+    <div class="tab" data-type="critical_illness" data-i18n="tab_ci">重疾险</div>
+  </div>
+
+  <!-- 为您精选横幅（仅 ?share= 时显示） -->
+  <div id="shareBanner" class="compare-banner" style="display:none;">📋 为您精选了 <span id="shareCount">0</span> 款产品</div>
+
+  <!-- 内容区 -->
+  <main class="content">
+    <div id="toolbar" class="toolbar">
+      <button class="sort-btn" id="sortBtn">排序 ▾</button>
+      <div class="insurer-wrap">
+        <button class="sort-btn insurer-btn" id="insurerBtn">保司 ▾</button>
+        <div id="insurerDropdown" class="insurer-dropdown" style="display:none;"></div>
+      </div>
+    </div>
+    <div id="cardList" class="card-list"></div>
+    <div id="loading" class="loading" style="display:none;">加载中…</div>
+    <div id="empty" class="empty" style="display:none;" data-i18n="empty_products">暂无产品</div>
+  </main>
+
+  <!-- 底部浮出操作条（已选产品时显示） -->
+  <div id="floatBar" class="float-bar" style="display:none;">
+    <span class="left">已选 <span id="shortlistCount">0</span> 款</span>
+    <div class="btns">
+      <button type="button" class="btn-list" id="btnShowList">清单</button>
+      <button type="button" class="btn-link" id="btnGenLink">生成链接</button>
+    </div>
+  </div>
+
+  <!-- 清单 sheet -->
+  <div id="sheetList" class="sheet" style="display:none;" data-close="sheetList">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h3>我的清单</h3>
+        <button type="button" class="sheet-close" onclick="document.getElementById('sheetList').style.display='none'">✕</button>
+      </div>
+      <div class="sheet-body" id="sheetListBody"></div>
+    </div>
+  </div>
+
+  <!-- 生成链接 sheet -->
+  <div id="sheetLink" class="sheet" style="display:none;" data-close="sheetLink">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h3>分享链接</h3>
+        <button type="button" class="sheet-close" onclick="document.getElementById('sheetLink').style.display='none'">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="share-url" id="shareUrlText"></div>
+        <button type="button" class="copy-btn" id="btnCopyLink">复制链接</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部 4 Tab -->
+  <nav class="bottom-tabs">
+    <a href="index-v2.html" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span data-i18n="nav_home">首页</span>
+    </a>
+    <a href="product-list-v2.html?t=savings" class="btab active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span data-i18n="tab_savings">储蓄险</span>
+    </a>
+    <a href="product-list-v2.html?t=whole_life" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span data-i18n="tab_whole_life">终身寿</span>
+    </a>
+    <a href="product-list-v2.html?t=critical_illness" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <span data-i18n="tab_ci">重疾险</span>
+    </a>
+  </nav>
+
+  <script src="components/lang.js"></script>
+  <script src="components/i18n-engine.js"></script>
+  <script src="js/api-client.js"></script>
+  <script>
+    function getApiBase() {
+      const params = new URLSearchParams(location.search);
+      if (params.get('api')) return params.get('api').replace(/\/$/, '');
+      return window.API_BASE || '/api/v1';
+    }
+    const SHORTLIST_KEY = 'hm_shortlist';
+    const MAX_SHORTLIST = 3;
+    function getShortlist() {
+      try {
+        const raw = localStorage.getItem(SHORTLIST_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.slice(0, MAX_SHORTLIST) : [];
+      } catch (e) { return []; }
+    }
+    function setShortlist(arr) {
+      const out = arr.slice(0, MAX_SHORTLIST);
+      localStorage.setItem(SHORTLIST_KEY, JSON.stringify(out));
+      return out;
+    }
+    function toggleShortlist(slug) {
+      let list = getShortlist();
+      const i = list.indexOf(slug);
+      if (i >= 0) list = list.filter((_, j) => j !== i);
+      else if (list.length >= MAX_SHORTLIST) { alert('最多选3款'); return; }
+      else list = list.concat(slug);
+      setShortlist(list);
+      updateFloatBar();
+      render();
+    }
+    function updateFloatBar() {
+      const list = getShortlist();
+      const bar = document.getElementById('floatBar');
+      const countEl = document.getElementById('shortlistCount');
+      if (countEl) countEl.textContent = list.length;
+      if (bar) bar.style.display = (!isClientMode && list.length > 0) ? 'flex' : 'none';
+    }
+    let currentType = 'savings';
+    let sortBy = 'default';
+    let allProducts = [];
+    let products = [];
+    let shareSlugs = [];
+    let isClientMode = false;
+    let searchQuery = '';
+    let selectedInsurers = [];
+
+    function getLang() { return (window.HM_I18N && window.HM_I18N.lang()) || localStorage.getItem('himiao-lang') || 'cn'; }
+    function T() { return (window.HM_DICT && window.HM_DICT[getLang()]) || {}; }
+
+    function toggleLangMenu() {
+      const next = getLang() === 'cn' ? 'hk' : getLang() === 'hk' ? 'en' : 'cn';
+      if (window.HM_I18N) window.HM_I18N.set(next);
+      else localStorage.setItem('himiao-lang', next);
+      document.dispatchEvent(new CustomEvent('hm:langchange', { detail: { lang: next } }));
+      document.getElementById('langBtn').textContent = next.toUpperCase();
+    }
+
+    function setTab(type) {
+      currentType = type;
+      selectedInsurers = [];
+      document.querySelectorAll('.tabs-bar .tab').forEach(t => t.classList.remove('active'));
+      const t = document.querySelector('.tabs-bar .tab[data-type="' + type + '"]');
+      if (t) t.classList.add('active');
+      document.querySelectorAll('.bottom-tabs .btab').forEach(b => b.classList.remove('active'));
+      const href = 'product-list-v2.html?t=' + type;
+      const b = document.querySelector('.bottom-tabs a[href="' + href + '"]');
+      if (b) b.classList.add('active');
+      load();
+    }
+
+    function parseShareFromUrl() {
+      const params = new URLSearchParams(location.search);
+      const share = params.get('share');
+      if (share && typeof share === 'string') {
+        shareSlugs = share.split(',').map(s => s.trim()).filter(Boolean);
+        isClientMode = shareSlugs.length > 0;
+      } else {
+        shareSlugs = [];
+        isClientMode = false;
+      }
+    }
+    function applyFilters() {
+      let list = allProducts.slice();
+      if (isClientMode && shareSlugs.length > 0) {
+        const set = new Set(shareSlugs);
+        list = list.filter(p => set.has((p.meta && p.meta.slug) ? p.meta.slug : (p.slug || p.id || '')));
+      } else {
+        if (searchQuery) {
+          const q = searchQuery.trim().toLowerCase();
+          list = list.filter(p => {
+            const m = p.meta || {};
+            const name = (m.name || p.product_name_cn || '').toLowerCase();
+            const nameEn = (m.name_en || p.product_name_en || '').toLowerCase();
+            const company = (m.company || '').toLowerCase();
+            return name.includes(q) || nameEn.includes(q) || company.includes(q);
+          });
+        }
+        if (selectedInsurers.length > 0) {
+          const set = new Set(selectedInsurers);
+          list = list.filter(p => set.has((p.meta && p.meta.company) || ''));
+        }
+      }
+      if (sortBy === 'irr') list.sort((a, b) => (b.actuarial?.irr_20y || 0) - (a.actuarial?.irr_20y || 0));
+      else if (sortBy === 'breakeven') list.sort((a, b) => (a.actuarial?.breakeven_year || 99) - (b.actuarial?.breakeven_year || 99));
+      products = list;
+    }
+    async function load() {
+      parseShareFromUrl();
+      const list = document.getElementById('cardList');
+      const loading = document.getElementById('loading');
+      const empty = document.getElementById('empty');
+      list.innerHTML = '';
+      loading.style.display = 'block';
+      empty.style.display = 'none';
+      const showHideClientMode = () => {
+        document.getElementById('searchRow').style.display = isClientMode ? 'none' : 'flex';
+        document.getElementById('tabsBar').style.display = isClientMode ? 'none' : 'flex';
+        document.getElementById('toolbar').style.display = isClientMode ? 'none' : 'flex';
+      };
+      try {
+        const lang = getLang();
+        const url = getApiBase() + '/products?type=' + currentType + '&limit=200' + (lang ? '&lang=' + lang : '');
+        const res = await fetch(url);
+        const raw = await res.json().catch(() => null);
+        if (!res.ok) {
+          const msg = (raw && raw.detail) ? (typeof raw.detail === 'string' ? raw.detail : JSON.stringify(raw.detail)) : ('HTTP ' + res.status);
+          list.innerHTML = '<div class="empty" style="color:#dc2626;">接口错误：' + msg + '</div>';
+          allProducts = [];
+          products = [];
+        } else if (Array.isArray(raw)) {
+          allProducts = raw;
+        } else if (raw && Array.isArray(raw.items)) {
+          allProducts = raw.items;
+        } else {
+          allProducts = [];
+        }
+        applyFilters();
+        render();
+        if (isClientMode) {
+          document.getElementById('shareBanner').style.display = 'block';
+          document.getElementById('shareCount').textContent = products.length;
+        }
+        showHideClientMode();
+        updateFloatBar();
+        buildInsurerDropdown();
+      } catch (e) {
+        console.error(e);
+        list.innerHTML = '<div class="empty" style="color:#dc2626;">加载失败：' + (e.message || '请确认后端 API 已启动且同源可访问') + '</div>';
+        allProducts = [];
+        products = [];
+      }
+      loading.style.display = 'none';
+      if (products.length === 0 && list.innerHTML === '') empty.style.display = 'block';
+    }
+    function buildInsurerDropdown() {
+      const companies = [];
+      const seen = new Set();
+      allProducts.forEach(p => {
+        const c = (p.meta && p.meta.company) ? p.meta.company : '';
+        if (c && !seen.has(c)) { seen.add(c); companies.push(c); }
+      });
+      companies.sort();
+      const dd = document.getElementById('insurerDropdown');
+      if (!dd) return;
+      dd.innerHTML = '<label data-insurer=""><input type="checkbox"> 全部</label>' +
+        companies.map(c => '<label data-insurer="' + c + '"><input type="checkbox"> ' + companyDisplay(c) + '</label>').join('');
+      dd.querySelector('label[data-insurer=""] input').checked = selectedInsurers.length === 0;
+      companies.forEach(c => {
+        const lab = dd.querySelector('label[data-insurer="' + c + '"]');
+        if (lab) lab.querySelector('input').checked = selectedInsurers.indexOf(c) >= 0;
+      });
+      dd.querySelectorAll('label').forEach(lab => {
+        lab.addEventListener('click', (e) => {
+          e.preventDefault();
+          const insurer = lab.dataset.insurer;
+          const checkbox = lab.querySelector('input');
+          if (insurer === '') {
+            selectedInsurers = [];
+            dd.querySelectorAll('input').forEach(cb => { cb.checked = false; });
+            checkbox.checked = true;
+          } else {
+            dd.querySelector('label[data-insurer=""] input').checked = false;
+            if (selectedInsurers.indexOf(insurer) >= 0) selectedInsurers = selectedInsurers.filter(x => x !== insurer);
+            else selectedInsurers = selectedInsurers.concat(insurer);
+            checkbox.checked = selectedInsurers.indexOf(insurer) >= 0;
+            lab.classList.toggle('active', checkbox.checked);
+          }
+          applyFilters();
+          render();
+        });
+      });
+    }
+
+    const COMPANY_ZH = { 'AIA':'友邦','Manulife':'宏利','Prudential':'保诚','FWD':'富卫','Sun Life':'永明','SunLife':'永明','YF Life':'万通','YFLife':'万通','HSBC':'汇丰','Zurich':'苏黎世','China Life':'中国人寿','ChinaLife':'中国人寿','BOC Life':'中银','BOCLife':'中银','AXA':'安盛','CTFLife':'中信保诚','GENERALI':'忠利' };
+    function companyDisplay(company) {
+      if (!company) return '';
+      const zh = COMPANY_ZH[company] || '';
+      return zh ? zh + ' ' + company : company;
+    }
+    function getMetricsForProduct(p) {
+      const m = p.meta || {};
+      const a = p.actuarial || {};
+      const pType = p.product_type || m.type || currentType || 'savings';
+      const t = T();
+      if (pType === 'critical_illness') {
+        var r = m.rating || '—';
+        var rAgency = m.rating_agency || '';
+        var rSrc = m.rating_source_url;
+        var v3Html = rSrc && r !== '—'
+          ? '<div class="metric-rating"><div class="rating-val">' + r + '</div><div class="rating-lbl">保司评级</div><div class="rating-src">来源 <a href="' + rSrc + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + (rAgency || '链接') + '</a></div></div>'
+          : '<div class="metric-rating"><div class="rating-val">' + r + '</div><div class="rating-lbl">保司评级</div>' + (rAgency ? '<div class="rating-src">' + rAgency + '</div>' : '') + '</div>';
+        return {
+          v1: a.covered_conditions_count != null ? a.covered_conditions_count + '种' : '—',
+          l1: '病种数',
+          v2: a.multi_pay ? '支持' : (a.multi_pay === false ? '单次' : '—'),
+          l2: '多重赔付',
+          v3Html: v3Html,
+          v3: r,
+          l3: '保司评级'
+        };
+      }
+      if (pType === 'whole_life') {
+        return {
+          v1: a.irr_20y != null ? a.irr_20y + '%' : '—',
+          l1: t.lbl_irr || '20年IRR',
+          v2: a.breakeven_year != null ? a.breakeven_year + (t.lbl_year || '年') : '—',
+          l2: t.lbl_breakeven || '回本年',
+          v3: a.loan_ltv != null ? a.loan_ltv + '%' : '—',
+          l3: '贷款成数'
+        };
+      }
+      return {
+        v1: a.irr_20y != null ? a.irr_20y + '%' : '—',
+        l1: t.lbl_irr || '20年IRR',
+        v2: a.breakeven_year != null ? a.breakeven_year + (t.lbl_year || '年') : '—',
+        l2: t.lbl_breakeven || '回本年',
+        v3: a.dividend_fulfillment_5y != null ? a.dividend_fulfillment_5y + '%' : '—',
+        l3: t.lbl_fulfill || '分红率'
+      };
+    }
+    function render() {
+      const list = document.getElementById('cardList');
+      const t = T();
+      const shortlist = getShortlist();
+      const slugOf = p => (p.meta && p.meta.slug) ? p.meta.slug : (p.slug || p.id || '');
+      list.innerHTML = products.map(p => {
+        const m = p.meta || {};
+        const a = p.actuarial || {};
+        const slug = slugOf(p);
+        const mt = getMetricsForProduct(p);
+        const tags = (p.tags || []).slice(0, 2).map(x => typeof x === 'object' ? (x.zh || x.en || x.hk) : x).join(' · ') || m.currency || '';
+        const inList = shortlist.indexOf(slug) >= 0;
+        const addBtn = isClientMode ? '' : `<button type="button" class="add-shortlist ${inList ? 'in-list' : ''}" data-slug="${slug}" aria-label="${inList ? '已加入' : '加入清单'}">${inList ? '✓' : '＋'}</button>`;
+        const m3html = mt.v3Html ? mt.v3Html : '<div class="metric-val">' + mt.v3 + '</div><div class="metric-lbl">' + mt.l3 + '</div>';
+        return `
+          <div class="card" data-slug="${slug}" data-href="product-detail-v2.html?id=${slug}">
+            <div class="card-header">
+              <span class="card-company">${companyDisplay(m.company)}</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                ${p.highlight ? '<span class="card-badge">精选</span>' : ''}
+                ${addBtn}
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-title">${m.name || ''}</div>
+              <div class="card-sub">${m.name_en || ''}</div>
+              <div class="card-metrics">
+                <div class="metric">
+                  <div class="metric-val">${mt.v1}</div>
+                  <div class="metric-lbl">${mt.l1}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-val">${mt.v2}</div>
+                  <div class="metric-lbl">${mt.l2}</div>
+                </div>
+                <div class="metric">${m3html}</div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="card-tags">${m.currency || ''} · 缴${a.premium_years || '—'}年 · ${tags}</span>
+              <span class="card-cta">${t.btn_get || '查看报告'} →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('cardList').addEventListener('click', (e) => {
+      const btn = e.target.closest('.add-shortlist');
+      if (btn && btn.dataset.slug) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleShortlist(btn.dataset.slug);
+        return;
+      }
+      const card = e.target.closest('.card[data-href]');
+      if (card && card.dataset.href) {
+        e.preventDefault();
+        location.href = card.dataset.href;
+      }
+    });
+
+    document.querySelectorAll('.tabs-bar .tab').forEach(tab => {
+      tab.addEventListener('click', () => setTab(tab.dataset.type));
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', () => {
+      sortBy = sortBy === 'default' ? 'irr' : sortBy === 'irr' ? 'breakeven' : 'default';
+      document.getElementById('sortBtn').textContent =
+        sortBy === 'default' ? '排序 ▾' : sortBy === 'irr' ? 'IRR 高→低 ▾' : '回本年 短→长 ▾';
+      applyFilters();
+      render();
+    });
+    document.getElementById('insurerBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dd = document.getElementById('insurerDropdown');
+      dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    });
+    document.getElementById('insurerDropdown').addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => { document.getElementById('insurerDropdown').style.display = 'none'; });
+    document.getElementById('searchInput').addEventListener('input', function() {
+      searchQuery = this.value;
+      document.getElementById('searchClear').style.visibility = searchQuery ? 'visible' : 'hidden';
+      applyFilters();
+      render();
+    });
+    document.getElementById('searchClear').addEventListener('click', () => {
+      document.getElementById('searchInput').value = '';
+      searchQuery = '';
+      document.getElementById('searchClear').style.visibility = 'hidden';
+      applyFilters();
+      render();
+    });
+    document.getElementById('searchClear').style.visibility = 'hidden';
+
+    document.getElementById('btnShowList').addEventListener('click', () => {
+      const list = getShortlist();
+      const slugToName = {};
+      products.forEach(p => {
+        const s = (p.meta && p.meta.slug) ? p.meta.slug : (p.slug || p.id || '');
+        slugToName[s] = (p.meta && p.meta.name) ? p.meta.name : (p.name || s);
+      });
+      const body = document.getElementById('sheetListBody');
+      body.innerHTML = list.map(slug => `
+        <div class="shortlist-item" data-slug="${slug}">
+          <span class="name">${slugToName[slug] || slug}</span>
+          <button type="button" class="remove" data-slug="${slug}">移除</button>
+        </div>
+      `).join('');
+      body.querySelectorAll('.remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          let arr = getShortlist().filter(s => s !== btn.dataset.slug);
+          setShortlist(arr);
+          updateFloatBar();
+          render();
+          if (arr.length === 0) document.getElementById('sheetList').style.display = 'none';
+          else body.querySelector('.shortlist-item[data-slug="' + btn.dataset.slug + '"]')?.remove();
+        });
+      });
+      document.getElementById('sheetList').style.display = 'flex';
+    });
+
+    document.getElementById('btnGenLink').addEventListener('click', () => {
+      const slugs = getShortlist();
+      const url = location.origin + location.pathname + '?share=' + slugs.join(',');
+      document.getElementById('shareUrlText').textContent = url;
+      document.getElementById('sheetLink').style.display = 'flex';
+    });
+
+    document.getElementById('btnCopyLink').addEventListener('click', () => {
+      const el = document.getElementById('shareUrlText');
+      const text = el && el.textContent ? el.textContent : '';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          document.getElementById('btnCopyLink').textContent = '已复制';
+          setTimeout(() => { document.getElementById('btnCopyLink').textContent = '复制链接'; }, 2000);
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        document.getElementById('btnCopyLink').textContent = '已复制';
+        setTimeout(() => { document.getElementById('btnCopyLink').textContent = '复制链接'; }, 2000);
+      }
+    });
+
+    document.querySelectorAll('.sheet[data-close]').forEach(sheet => {
+      sheet.addEventListener('click', (e) => {
+        if (e.target === sheet) sheet.style.display = 'none';
+      });
+    });
+
+    document.getElementById('langBtn').textContent = getLang().toUpperCase();
+
+    const params = new URLSearchParams(location.search);
+    const tParam = params.get('t');
+    if (tParam && ['savings', 'whole_life', 'critical_illness'].includes(tParam)) {
+      setTab(tParam);
+    } else {
+      setTab('savings');
+    }
+
+    document.addEventListener('hm:langchange', function(e) {
+      const lang = (e.detail && e.detail.lang) || 'cn';
+      document.getElementById('langBtn').textContent = lang.toUpperCase();
+      if (window.HM_I18N && window.HM_I18N.render) window.HM_I18N.render();
+      render();
+    });
+  </script>
+</body>
+</html>

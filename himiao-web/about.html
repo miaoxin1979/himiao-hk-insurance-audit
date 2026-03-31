@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n-title="page_title">关于 HiMiao | 独立精算审计平台</title>
+<meta name="description" content="HiMiao Audit 是独立第三方香港保险精算审计平台。不销售，不带货，只讲真话。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://himiao.com/about.html">
+<meta property="og:title" content="关于 HiMiao Audit | 独立精算审计平台">
+<meta property="og:description" content="HiMiao 不销售、不导流、不提供个人建议。独立第三方香港保险精算数据终端。">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root {
+  --blue: #00a9e0;
+  --blue-d: #0083af;
+  --blue-l: #e8f6fd;
+  --navy: #0f1d2e;
+  --paper: #fdfbf7;
+  --paper-2: #f5f1e8;
+  --ink: #1c1c1e;
+  --ink-2: #48484a;
+  --ink-3: #8e8e93;
+  --rule: #ede8de;
+  --green: #1a7a3c;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  font-feature-settings: "palt" 1; /* CJK标点位置修正 */
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+.section { padding: 72px 28px; }
+.label {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 12px;
+}
+h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 900;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+p { color: var(--ink-2); }
+.rule { border: none; border-top: 1px solid var(--rule); margin: 0; }
+
+/* Cards */
+.card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px;
+}
+.card-sm {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Principle grid */
+.principle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* Process timeline */
+.process-list { display: flex; flex-direction: column; gap: 0; }
+.process-item {
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.process-item:last-child { border-bottom: none; }
+.step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+/* Contact */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.contact-card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  transition: border-color .2s, box-shadow .2s;
+}
+.contact-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 20px rgba(0,169,224,.1);
+}
+
+/* Disclaimer */
+.disc-block {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 18px 22px;
+}
+.disc-block + .disc-block { margin-top: 10px; }
+.disc-block h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+.disc-block p { font-size: 13.5px; color: var(--ink-2); line-height: 1.75; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .section { padding: 48px 20px; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .5s ease both; }
+.d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+
+    /* ── 字号修复 ── */
+    .label { font-size: 15px !important; font-weight: 700; letter-spacing: 0.08em; }
+    #privacy .disc-block h3 { font-size: 16px !important; font-weight: 700; color: var(--ink-2); }
+    #privacy .disc-block p  { font-size: 15px !important; line-height: 1.8; }
+    .why-section h2 { font-size: clamp(2.2rem, 5vw, 3.5rem) !important; }
+    .principles h2, .principles .section-label { font-size: 15px !important; }
+
+  </style>
+</head>
+<body>
+
+<div id="himiao-nav"></div>
+
+<!-- ═══════════════════════════════════
+     HERO
+═══════════════════════════════════ -->
+<section style="background: var(--navy); padding: 80px 28px 72px; position: relative; overflow: hidden;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 18% 60%,rgba(0,169,224,.15) 0%,transparent 55%),radial-gradient(ellipse at 80% 20%,rgba(0,169,224,.07) 0%,transparent 45%);pointer-events:none;"></div>
+
+  <div class="wrap" style="position:relative;z-index:1;">
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+
+      <!-- Copy -->
+      <div class="fade-up">
+        <span class="label" style="color:rgba(0,169,224,.75);" data-i18n="about_hero_label">关于 HiMiao</span>
+        <h1 style="font-family:'Noto Serif SC',serif;font-size:clamp(32px,4.5vw,50px);font-weight:900;color:white;line-height:1.15;letter-spacing:-.5px;margin-bottom:20px;">
+          <span data-i18n="hero_h1">我们不卖保险，<br>我们只讲真话。</span>
+        </h1>
+        <p style="font-size:16px;color:rgba(255,255,255,.5);line-height:1.8;max-width:440px;">
+          <span data-i18n="hero_sub">HiMiao Audit 是独立第三方香港保险精算审计平台。在充满销售话术的行业里，我们站在消费者一侧，用精算数据说话。</span>
+        </p>
+      </div>
+
+      <!-- Stats -->
+      <div class="fade-up d2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:24px 20px;text-align:center;">
+          <div style="font-size:38px;font-weight:900;color:white;line-height:1;letter-spacing:-1px;">147</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:6px;font-weight:500;"><span data-i18n="stat1">已审计产品</span></div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:24px 20px;text-align:center;">
+          <div style="font-size:38px;font-weight:900;color:white;line-height:1;letter-spacing:-1px;">12</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:6px;font-weight:500;"><span data-i18n="stat2">精算师平均年限</span></div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:24px 20px;text-align:center;">
+          <div style="font-size:38px;font-weight:900;color:var(--blue);line-height:1;letter-spacing:-1px;">0</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:6px;font-weight:500;"><span data-i18n="stat3">与保司销售合作</span></div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:24px 20px;text-align:center;">
+          <div style="font-size:38px;font-weight:900;color:white;line-height:1;letter-spacing:-1px;">4</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);margin-top:6px;font-weight:500;"><span data-i18n="stat4">险种覆盖</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     WHY WE EXIST
+═══════════════════════════════════ -->
+<section class="section" style="background: white;">
+  <div class="wrap">
+    <div class="two-col" style="display:grid;grid-template-columns:1.1fr 1fr;gap:64px;align-items:start;">
+
+      <div>
+        <span class="label" data-i18n="why_label">为什么存在</span>
+        <h2 data-i18n="why_h2">香港保险市场，<br>信息严重不对称</h2>
+        <p style="font-size:15px;line-height:1.8;margin-bottom:16px;"><span data-i18n="about_why_p1">一张储蓄分红险计划书，少则几十页，多则上百页。保证收益和非保证收益混排，IRR 被刻意模糊，回本期的定义各家保司不统一。</span></p>
+        <p style="font-size:15px;line-height:1.8;margin-bottom:16px;"><span data-i18n="about_why_p2">普通消费者没有时间、没有工具、也没有精算知识，去穿透这些信息。于是他们只能依赖经纪人——而经纪人的收入来自佣金。</span></p>
+        <p style="font-size:15px;line-height:1.8;font-weight:700;color:var(--ink);"><span data-i18n="about_why_p3">HiMiao 的存在，是为了打破这个循环。我们是消费者在这个市场里的精算师。</span></p>
+      </div>
+
+      <div>
+        <span class="label" data-i18n="about_principles_label">核心原则</span>
+        <div class="principle-grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+          <div class="card-sm">
+            <div style="font-size:22px;margin-bottom:10px;">🔬</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;" data-i18n="about_p1_title">数据先于观点</div>
+            <p style="font-size:13px;color:var(--ink-3);line-height:1.6;"><span data-i18n="about_p1_desc">所有结论来自计算，不来自主观判断。每个数字都有原始出处。</span></p>
+          </div>
+          <div class="card-sm">
+            <div style="font-size:22px;margin-bottom:10px;">⚖️</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;" data-i18n="about_p2_title">无销售立场</div>
+            <p style="font-size:13px;color:var(--ink-3);line-height:1.6;"><span data-i18n="about_p2_desc">不存在佣金分成。好的说好，有风险的点明。</span></p>
+          </div>
+          <div class="card-sm">
+            <div style="font-size:22px;margin-bottom:10px;">📖</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;" data-i18n="about_p3_title">让普通人看懂</div>
+            <p style="font-size:13px;color:var(--ink-3);line-height:1.6;"><span data-i18n="about_p3_desc">把精算结论翻译成任何人都能理解的语言。</span></p>
+          </div>
+          <div class="card-sm">
+            <div style="font-size:22px;margin-bottom:10px;">🔄</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;" data-i18n="about_p4_title">持续更新</div>
+            <p style="font-size:13px;color:var(--ink-3);line-height:1.6;"><span data-i18n="about_p4_desc">随保司条款更新同步，不发布过时审计报告。</span></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════
+     AUDIT PROCESS
+═══════════════════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="two-col" style="display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:start;">
+
+      <div>
+        <span class="label" data-i18n="about_process_label">精算审计流程</span>
+        <h2 data-i18n="about_process_h2">每一份审计报告，<br>都经过四道关卡</h2>
+        <p style="font-size:15px;line-height:1.8;color:var(--ink-2);"><span data-i18n="about_process_intro">从原始计划书到产品库展示，我们的审计流程经过精算师、数据工程师与 AI 引擎的三重把关，确保每一个数字的准确性。</span></p>
+        <div class="process-visual" style="margin-top:40px;max-width:320px;">
+          <svg viewBox="0 0 280 140" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;" aria-hidden="true">
+            <defs>
+              <linearGradient id="ag-line" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--blue)"/><stop offset="100%" stop-color="var(--navy)"/></linearGradient>
+            </defs>
+            <!-- 流程线 -->
+            <path d="M 20 70 H 260" stroke="url(#ag-line)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            <!-- 四个节点 -->
+            <circle cx="50" cy="70" r="14" fill="var(--paper)" stroke="var(--navy)" stroke-width="2"/>
+            <circle cx="110" cy="70" r="14" fill="var(--paper)" stroke="var(--navy)" stroke-width="2"/>
+            <circle cx="170" cy="70" r="14" fill="var(--blue)" stroke="var(--blue-d)" stroke-width="2"/>
+            <circle cx="230" cy="70" r="14" fill="var(--paper)" stroke="var(--navy)" stroke-width="2"/>
+            <!-- 节点内图标：文档→笔→✓→发布 -->
+            <path d="M44 62h12v16H44z M46 66h8" stroke="var(--ink-3)" stroke-width="1.2" fill="none"/>
+            <path d="M106 64l4 4-4 4 M110 68h-8" stroke="var(--ink-3)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <path d="M163 65l6 6-10 10" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M222 64v12h4l4-6-4-6h-4z" stroke="var(--ink-3)" stroke-width="1.2" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 8px 24px;">
+        <div class="process-list">
+          <div class="process-item">
+            <div class="step-num">01</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px;" data-i18n="about_step1_title">采集与数字化</div>
+              <p style="font-size:14px;color:var(--ink-3);line-height:1.65;"><span data-i18n="about_step1_desc">从保司官方《利益说明文件》精准提取原始数据，严格分离「保证金额」与「非保证金额」两列。</span></p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="step-num">02</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px;" data-i18n="about_step2_title">人工清洗校验</div>
+              <p style="font-size:14px;color:var(--ink-3);line-height:1.65;"><span data-i18n="about_step2_desc">数据专员逐行比对原始计划书，纠正 OCR 误读，确保年份与数值严格对应，防止错位。</span></p>
+            </div>
+          </div>
+          <div class="process-item" style="background:linear-gradient(90deg,rgba(0,169,224,.04),transparent);border-radius:8px;padding:20px 16px;margin:0 -16px;border-bottom:none;">
+            <div class="step-num" style="background:var(--blue);">03</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px;">
+                <span data-i18n="about_step3_title">AI 精算核验</span>
+                <span style="font-size:10px;font-weight:800;background:var(--blue);color:white;padding:2px 8px;border-radius:4px;margin-left:6px;letter-spacing:.05em;" data-i18n="about_step3_badge">核心护城河</span>
+              </div>
+              <p style="font-size:14px;color:var(--ink-3);line-height:1.65;"><span data-i18n="about_step3_desc">算法引擎自动反推 IRR，检测曲线平滑性，验证回本期合理性。不通过则驳回重审。</span></p>
+            </div>
+          </div>
+          <div class="process-item" style="border-bottom:none;">
+            <div class="step-num">04</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px;" data-i18n="about_step4_title">自动发布上架</div>
+              <p style="font-size:14px;color:var(--ink-3);line-height:1.65;"><span data-i18n="about_step4_desc">通过核验后生成标准化 JSON，推送至产品库。整个流程最快 24 小时完成。</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════
+     CONTACT
+═══════════════════════════════════ -->
+<section class="section" style="background:white;" id="contact">
+  <div class="wrap">
+    <div style="max-width:820px;">
+      <span class="label" data-i18n="contact_label">联系我们</span>
+      <h2 data-i18n="about_contact_h2">有问题，来找我们</h2>
+      <p style="font-size:15px;color:var(--ink-3);margin-bottom:36px;"><span data-i18n="about_contact_intro">无论是产品数据勘误、精算合作申请，还是想了解 HiMiao，欢迎联系。</span></p>
+
+      <div class="contact-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:28px;">
+
+        <div class="contact-card">
+          <div style="width:52px;height:52px;background:var(--blue-l);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px;">📮</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px;" data-i18n="about_contact_email">电子邮件</div>
+          <a href="mailto:your_email@example.com" style="font-size:13px;color:var(--blue);text-decoration:none;font-family:'JetBrains Mono',monospace;">your_email@example.com</a>
+          <p style="font-size:12px;color:var(--ink-3);margin-top:8px;"><span data-i18n="about_contact_email_reply">通常 24–48 小时内回复</span></p>
+        </div>
+
+        <div class="contact-card">
+          <div style="font-size:15px;font-weight:700;margin-bottom:12px;" data-i18n="about_contact_wechat">微信</div>
+          <div style="width:160px;height:160px;background:#fff;border:1px solid var(--rule);border-radius:8px;margin:0 auto 8px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            <img src="assets/images/wechat-qr.png" alt="微信二维码" style="width:100%;height:100%;object-fit:contain;"
+              onerror="this.parentElement.innerHTML='<svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=&quot;#ccc&quot; stroke-width=1.5><rect x=3 y=3 width=7 height=7 rx=1/><rect x=14 y=3 width=7 height=7 rx=1/><rect x=3 y=14 width=7 height=7 rx=1/><rect x=14 y=14 width=3 height=3/><rect x=18 y=14 width=3 height=3/><rect x=14 y=18 width=3 height=3/><rect x=18 y=18 width=3 height=3/></svg>'">
+          </div>
+          <p style="font-size:12px;color:var(--ink-3);"><span data-i18n="about_contact_wechat_qr">扫码添加，备注「HiMiao」</span></p>
+        </div>
+
+        <div class="contact-card" style="text-align:left;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:14px;" data-i18n="about_contact_we_response">我们会回应什么</div>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--ink-2);">
+            <span>✅ <span data-i18n="about_contact_ok1">产品数据勘误反馈</span></span>
+            <span>✅ <span data-i18n="about_contact_ok2">精算审计合作申请</span></span>
+            <span>✅ <span data-i18n="about_contact_ok3">媒体引用与授权</span></span>
+            <span>✅ <span data-i18n="about_contact_ok4">经纪人平台合作</span></span>
+            <span style="color:var(--ink-3);">❌ <span data-i18n="about_contact_no">产品推销（无此业务）</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════
+     DISCLAIMER
+═══════════════════════════════════ -->
+<section class="section" id="privacy">
+  <div class="wrap">
+    <div style="max-width:820px;">
+      <span class="label" data-i18n="about_disc_label">法律声明与免责条款</span>
+      <h2 data-i18n="about_disc_h2">完整免责声明</h2>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_1_h3">1 · 平台性质</h3>
+        <p><span data-i18n="about_disc_1_p">HiMiao Audit（「本平台」）为独立第三方保险信息审计平台，由 HiMiao 团队独立运营。本平台与任何持牌保险公司、持牌保险经纪人或持牌保险代理人不存在任何形式的销售合作、佣金分成或利益关联关系。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_2_h3">2 · 信息性质与使用限制</h3>
+        <p><span data-i18n="about_disc_2_p">本平台所有内容（包括但不限于产品审计报告、精算数据、IRR 计算结果、评分系统、编辑评论及情报站文章）仅供一般信息参考用途。上述内容不构成任何形式的投资建议、财务建议、保险购买建议或任何专业意见，亦不构成对任何保险产品的招揽或推介。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_3_h3">3 · 数据来源与准确性</h3>
+        <p><span data-i18n="about_disc_3_p">本平台数据主要来源于相关保险公司官方《利益说明文件》、香港保险业监管局（HKIA）公开披露资料。本平台已采取合理措施确保数据准确性，但不对任何数据的完整性、时效性或准确性作出保证。保险产品条款、收益假设及分红政策可能随时变更，请以相关保险公司最新官方文件为准。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_4_h3">4 · IRR 及收益演示说明</h3>
+        <p><span data-i18n="about_disc_4_p">本平台展示的 IRR（内部收益率）数据及现金价值演示均基于特定假设条件计算，包含非保证收益部分。非保证收益不代表实际将获得的收益，实际结果可能与演示存在重大差异。过往分红实现率不构成对未来分红表现的保证或预测。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_5_h3">5 · 专业建议声明</h3>
+        <p><span data-i18n="about_disc_5_p">在作出任何保险购买决定前，请寻求持牌保险顾问、财务规划师或其他相关专业人士的独立专业意见，并仔细阅读相关保险产品的完整条款及细则。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_6_h3">6 · 知识产权</h3>
+        <p><span data-i18n="about_disc_6_p">本平台所有原创内容的知识产权归 HiMiao 团队所有。未经书面授权，不得以任何形式复制、转载或商业使用。媒体引用请联系</span> <a href="mailto:your_email@example.com" style="color:var(--blue);">your_email@example.com</a>。</p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_7_h3">7 · 隐私政策</h3>
+        <p><span data-i18n="about_disc_7_p">本平台收集的用户信息（包括订阅邮箱）仅用于发送本平台内容推送，不会出售、转让或以任何商业目的向第三方披露。用户可随时通过邮件要求删除个人信息。本平台不使用追踪性广告 Cookie。</span></p>
+      </div>
+
+      <div class="disc-block">
+        <h3 data-i18n="about_disc_8_h3">8 · 适用法律</h3>
+        <p><span data-i18n="about_disc_8_p">本平台服务条款及免责声明受香港特别行政区法律管辖。如有任何争议，以香港特别行政区法院为解决争议的司法管辖地。</span></p>
+      </div>
+
+      <div style="margin-top:16px;padding:14px 18px;background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;font-size:13px;color:var(--ink-3);">
+        <strong style="color:var(--ink-2);" data-i18n="disclaimer_updated">最后更新：2026 年 2 月</strong>
+        <span data-i18n="disclaimer_contact"> · 如对本声明有任何疑问，请联系</span>
+        <a href="mailto:your_email@example.com" style="color:var(--blue);margin-left:4px;">your_email@example.com</a>
+      </div>
+
+    </div><!-- /max-width:820px -->
+  </div><!-- /wrap -->
+</section><!-- /privacy -->
+
+<!-- i18n dict removed: now in components/lang.js -->
+
+<footer-placeholder></footer-placeholder>
+<ai-capsule-placeholder></ai-capsule-placeholder>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="components/lang.js"></script>
+  <script src="components/i18n-engine.js"></script>
+  <script src="components/nav.js"></script>
+<!-- about.html applyLang removed -->
+
+<script>
+// ══ V8.0 Geo 软隔离 ══════════════════════════════
+// 检测内地 IP：优先读 Cloudflare CF-IPCountry meta（上云后由 Worker 注入）
+// NAS MVP 阶段：通过 ip-api.com 检测（免费，无需 key）
+(function() {
+    function showMainlandBanner() {
+        var banner = document.createElement('div');
+        banner.id = 'geo-mainland-banner';
+        banner.style.cssText = [
+            'position:fixed;top:0;left:0;right:0;z-index:9999',
+            'background:#1d4ed8;color:white;font-size:12px',
+            'padding:10px 20px;text-align:center;line-height:1.6',
+            'box-shadow:0 2px 8px rgba(0,0,0,0.2)'
+        ].join(';');
+        banner.innerHTML = '【区域提示】本平台仅提供公开精算数据模型展示，不面向中国内地开展任何保险推介、报告下载或业务引导服务。' +
+            ' / This platform provides actuarial data only and does not offer insurance services in Mainland China.';
+        document.body.insertBefore(banner, document.body.firstChild);
+
+        // 隐藏下载和留资组件
+        var hideSelectors = [
+            '.dl-btn', '#download-btn', '[data-geo-hide]',
+            'input[type=email]', 'form', '.contact-form'
+        ];
+        hideSelectors.forEach(function(sel) {
+            document.querySelectorAll(sel).forEach(function(el) {
+                el.style.display = 'none';
+            });
+        });
+        document.body.style.paddingTop = '46px';
+    }
+
+    // 先检查 CF-IPCountry meta（上云后由 Cloudflare Worker 注入）
+    var cfMeta = document.querySelector('meta[name="cf-ipcountry"]');
+    if (cfMeta && cfMeta.content === 'CN') {
+        showMainlandBanner(); return;
+    }
+
+    // MVP 降级：ip-api.com（异步，不影响页面加载）
+    fetch('https://ip-api.com/json/?fields=countryCode', { cache: 'no-cache' }).then(r=>r.json()).catch(()=>null).then(function(data){
+      if (data && data.countryCode === 'CN') showMainlandBanner();
+    });
+})();
+</script>
+
+</body>
+</html>

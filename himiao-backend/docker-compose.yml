@@ -1,0 +1,115 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────
+# HiMiao 全栈 NAS 部署
+# 服务拓扑：
+#   Internet → NPM(反向代理+SSL) → himiao-web(静态前端)
+#                                → himiao-api(FastAPI后端)
+#   DDNS-GO 维持动态公网 IP 解析
+# ─────────────────────────────────────────────────────────
+
+services:
+
+  # ── 1. Nginx 静态前端 ─────────────────────────────────
+  himiao-web:
+    image: nginx:alpine
+    container_name: himiao-web
+    restart: unless-stopped
+    volumes:
+      # NAS 路径 → 容器路径（存放 HTML/JS/CSS 文件）
+      - ../himiao-web:/usr/share/nginx/html:ro
+      - ./nginx-web.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80" # 内网端口，NPM 代理到此
+    networks:
+      - himiao-net
+
+  # ── 2. FastAPI 后端 API ───────────────────────────────
+  himiao-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: himiao-api
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      # SQLite 数据库文件持久化到 NAS
+      - ../himiao-data/db:/app/data
+      # 上传文件持久化
+      - ../himiao-data/uploads:/data/uploads
+      # 代码目录挂载（改这里的文件直接生效）
+      - ../himiao-backend/app:/app/app
+    ports:
+      - "8888:8888" # 内网端口，NPM 代理到此
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8888/health')" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - himiao-net
+    dns:
+      - 223.5.5.5
+      - 119.29.29.29
+      - 8.8.8.8
+    depends_on:
+      - himiao-web
+
+  # ── 3. Nginx Proxy Manager（反向代理 + SSL）───────────
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: himiao-npm
+    restart: unless-stopped
+    ports:
+      - "8181:81" # NPM 管理界面（内网访问）
+      - "8443:443" # HTTPS 对外端口（NPM 对外暴露）
+      - "8090:80" # HTTP → HTTPS 跳转
+    volumes:
+      - ../npm-data:/data
+      - ../npm-letsencrypt:/etc/letsencrypt
+    networks:
+      - himiao-net
+
+  # ── 4. DDNS-GO（动态域名解析）────────────────────────
+  ddns-go:
+    image: jeessy/ddns-go:latest
+    container_name: himiao-ddns
+    restart: unless-stopped
+    network_mode: host # 需要获取真实 IP
+    volumes:
+      - ../ddns-go:/root
+    # 访问管理页：http://NAS_IP:9876
+    # 配置域名服务商 API（阿里云/腾讯云 DNSPod）
+
+    # ── 5. 爬虫 + OCR 调度器 ──────────────────────────
+  himiao-scraper:
+    build:
+      context: .
+      dockerfile: scraper/Dockerfile
+    container_name: himiao-scraper
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - OLLAMA_HOST=http://${MAC_IP}:11434/v1
+      - OLLAMA_MODEL_NAME=${OLLAMA_MODEL_NAME}
+      # VPN/代理：在 .env 里加 SCRAPER_PROXY=socks5://host:port 即可启用
+      - SCRAPER_PROXY=${SCRAPER_PROXY:-}
+    volumes:
+      # 共享数据库文件（爬虫写入，API 读取）
+      - ../himiao-data/db:/app/data
+      # 爬虫输出（JSONL 备份 + 下载的 PDF）
+      - ../himiao-data/scraper_output:/data/scraper_output
+      - ../himiao-data/scraper_pdfs:/data/scraper_pdfs
+      - ../himiao-data/logs:/data/logs
+    networks:
+      - himiao-net
+    dns:
+      - 223.5.5.5
+      - 119.29.29.29
+      - 8.8.8.8
+    depends_on:
+      - himiao-api
+
+networks:
+  himiao-net:
+    driver: bridge

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f1d2e">
+  <link rel="manifest" href="/manifest.json">
+  <title>HiMiao Audit · 香港保险独立精算</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --blue: #00a9e0;
+      --blue-d: #0083af;
+      --navy: #0f1d2e;
+      --navy-bg: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy-bg);
+      color: #fff;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(12px + env(safe-area-inset-top, 0)) 24px calc(24px + env(safe-area-inset-bottom, 0));
+      -webkit-font-smoothing: antialiased;
+      text-align: center;
+    }
+    .lang-wrap {
+      position: absolute;
+      top: calc(12px + env(safe-area-inset-top, 0));
+      right: 24px;
+    }
+    .lang-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      color: rgba(255,255,255,0.9);
+    }
+    .lang-btn:active { background: rgba(255,255,255,0.2); }
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 320px;
+    }
+    .logo {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .logo span { color: var(--blue); }
+    .logo-sub {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 32px;
+    }
+    .tagline {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .tagline-2 {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 40px;
+    }
+    .cta-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cta {
+      display: block;
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.15s, opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta:active { transform: scale(0.98); }
+    .cta-primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0,169,224,0.35);
+    }
+    .cta-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.25);
+    }
+    .foot-note {
+      margin-top: 40px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-wrap">
+    <button class="lang-btn" id="langBtn">CN ▾</button>
+  </div>
+
+  <main class="hero">
+    <div class="logo">Hi<span>Miao</span></div>
+    <div class="logo-sub">Audit</div>
+    <p class="tagline">香港保险 独立精算</p>
+    <p class="tagline-2">不销售 · 不带货</p>
+
+    <div class="cta-wrap">
+      <a href="product-list-v2.html?t=savings" class="cta cta-primary">查看储蓄险榜单 →</a>
+      <a href="product-list-v2.html?t=whole_life" class="cta cta-secondary">查看终身寿险 →</a>
+      <a href="product-list-v2.html?t=critical_illness" class="cta cta-secondary">查看重疾险 →</a>
+    </div>
+
+    <p class="foot-note">
+      <span id="stat-products-v2">—</span><br>
+      数据来自官方演示文件
+    </p>
+  </main>
+
+  <script>
+    (function(){
+      fetch('/api/v1/products?limit=200').then(function(r){ return r.json(); }).then(function(d){
+        var el = document.getElementById('stat-products-v2');
+        if (el && Array.isArray(d)) {
+          var companies = new Set(d.map(function(p){ return p.meta && p.meta.company || p.company; }).filter(Boolean));
+          el.textContent = d.length + '款 · ' + companies.size + '家保司';
+        } else if (el) el.textContent = '—';
+      }).catch(function(){ var e=document.getElementById('stat-products-v2'); if(e)e.textContent='—'; });
+    })();
+  </script>
+  <script src="components/lang.js"></script>
+  <script src="components/i18n-engine.js"></script>
+  <script>
+    function getLang() { return (window.HM_I18N && window.HM_I18N.lang()) || localStorage.getItem('himiao-lang') || 'cn'; }
+    document.getElementById('langBtn').addEventListener('click', function() {
+      const next = getLang() === 'cn' ? 'hk' : getLang() === 'hk' ? 'en' : 'cn';
+      if (window.HM_I18N) window.HM_I18N.set(next);
+      else localStorage.setItem('himiao-lang', next);
+      document.getElementById('langBtn').textContent = (next === 'cn' ? 'CN' : next === 'hk' ? 'HK' : 'EN') + ' ▾';
+      document.dispatchEvent(new CustomEvent('hm:langchange', { detail: { lang: next } }));
+    });
+    if (window.HM_I18N) document.getElementById('langBtn').textContent = (getLang() === 'hk' ? 'HK' : getLang() === 'en' ? 'EN' : 'CN') + ' ▾';
+  </script>
+</body>
+</html>

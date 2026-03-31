@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大讲堂 · 香港保险知识库 | HiMiao Audit</title>
+<meta name="description" content="HiMiao 大讲堂：精算团队出品的香港保险知识库，储蓄险 IRR 解读、重疾险对比、理赔实战指南，帮你在买保险前读懂每一个关键数字。">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { himiao: '#00a9e0', charcoal: '#2d2d2d' },
+      fontFamily: {
+        serif: ['"Noto Serif SC"','serif'],
+        sans:  ['"DM Sans"','sans-serif'],
+        mono:  ['"JetBrains Mono"','monospace']
+      }
+    }}
+  }
+</script>
+<style>
+/* ── Design Tokens ── */
+:root {
+  --paper:   #fdfbf7;
+  --paper-2: #f5f1e8;
+  --paper-3: #ede8de;
+  --ink:     #1c1c1e;
+  --ink-2:   #48484a;
+  --ink-3:   #8e8e93;
+  --ink-4:   #c7c7cc;
+  --blue:    #00a9e0;
+  --blue-d:  #0083af;
+  --blue-l:  #e3f6fd;
+  --navy:    #0f1d2e;
+
+  /* Academy category palette */
+  --cat-savings-fg:   #00a9e0;
+  --cat-savings-bg:   #e3f6fd;
+  --cat-savings-grad: linear-gradient(135deg, #00a9e0 0%, #0f1d2e 100%);
+  --cat-ci-fg:        #10b981;
+  --cat-ci-bg:        #f0faf4;
+  --cat-ci-grad:      linear-gradient(135deg, #10b981 0%, #064e3b 100%);
+  --cat-compare-fg:   #6366f1;
+  --cat-compare-bg:   #eef2ff;
+  --cat-compare-grad: linear-gradient(135deg, #6366f1 0%, #1e1b4b 100%);
+  --cat-claims-fg:    #f59e0b;
+  --cat-claims-bg:    #fef9ec;
+  --cat-claims-grad:  linear-gradient(135deg, #f59e0b 0%, #451a03 100%);
+  --cat-reg-fg:       #8e8e93;
+  --cat-reg-bg:       #f5f5f5;
+  --cat-reg-grad:     linear-gradient(135deg, #8e8e93 0%, #3a3a3c 100%);
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ── Reading progress bar ── */
+#readingProgress {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--blue); z-index: 9999;
+  transition: width 0.1s linear; width: 0%;
+}
+
+/* ── Hero ── */
+.academy-hero {
+  background: var(--navy);
+  padding: 64px 20px 52px;
+  position: relative;
+  overflow: hidden;
+}
+/* 网格线底纹 */
+.academy-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,169,224,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,169,224,0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+/* 蓝色光晕 */
+.academy-hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 75% 30%, rgba(0,169,224,0.13) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 80%, rgba(0,131,175,0.08) 0%, transparent 45%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* ── 浮动科技方块 ── */
+.hero-blocks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hb {
+  position: absolute;
+  border: 1px solid rgba(0,169,224,0.18);
+  border-radius: 4px;
+  background: rgba(0,169,224,0.03);
+  animation: hb-float linear infinite;
+}
+.hb::before {
+  content: '';
+  position: absolute; top: -1px; left: 8px;
+  width: 24px; height: 1px;
+  background: rgba(0,169,224,0.5);
+}
+.hb-1  { width:80px;  height:56px;  top:12%;  left:68%;  animation-duration:18s; animation-delay:-3s; }
+.hb-2  { width:48px;  height:48px;  top:55%;  left:82%;  animation-duration:23s; animation-delay:-8s; }
+.hb-3  { width:120px; height:40px;  top:72%;  left:55%;  animation-duration:20s; animation-delay:-1s; }
+.hb-4  { width:56px;  height:72px;  top:20%;  left:90%;  animation-duration:26s; animation-delay:-12s; }
+.hb-5  { width:96px;  height:32px;  top:40%;  left:74%;  animation-duration:17s; animation-delay:-5s; }
+.hb-6  { width:40px;  height:56px;  top:80%;  left:92%;  animation-duration:22s; animation-delay:-9s; }
+.hb-7  { width:64px;  height:44px;  top:8%;   left:78%;  animation-duration:19s; animation-delay:-15s; opacity:0.6; }
+/* 角落高亮方块（亮一点） */
+.hb-bright {
+  border-color: rgba(0,169,224,0.35);
+  background: rgba(0,169,224,0.06);
+}
+.hb-bright::before { background: rgba(0,169,224,0.9); width: 32px; }
+
+@keyframes hb-float {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  33%  { transform: translateY(-8px) rotate(0.5deg); }
+  66%  { transform: translateY(4px) rotate(-0.3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* 扫描线 */
+.hero-scan {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,169,224,0.25) 40%, rgba(0,169,224,0.5) 50%, rgba(0,169,224,0.25) 60%, transparent 100%);
+  animation: scan 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%   { top: 10%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
+/* ── Category chips ── */
+.cat-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 16px; border-radius: 100px;
+  font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--paper-3);
+  background: white; color: var(--ink-3);
+  cursor: pointer; transition: all 0.18s;
+  white-space: nowrap; letter-spacing: 0.02em;
+}
+.cat-chip:hover { border-color: var(--blue); color: var(--blue-d); }
+.cat-chip.active           { background: var(--ink);            color: white; border-color: var(--ink); }
+.cat-chip.active.savings   { background: var(--cat-savings-fg); border-color: var(--cat-savings-fg); }
+.cat-chip.active.ci        { background: var(--cat-ci-fg);      border-color: var(--cat-ci-fg); }
+.cat-chip.active.compare   { background: var(--cat-compare-fg); border-color: var(--cat-compare-fg); }
+.cat-chip.active.claims    { background: var(--cat-claims-fg);  border-color: var(--cat-claims-fg); }
+.cat-chip.active.reg       { background: var(--cat-reg-fg);     border-color: var(--cat-reg-fg); }
+
+/* ── Category badges ── */
+.cat-badge {
+  display: inline-flex; padding: 2px 10px; border-radius: 100px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+.cat-badge.savings { background: var(--cat-savings-bg); color: var(--cat-savings-fg); }
+.cat-badge.ci      { background: var(--cat-ci-bg);      color: var(--cat-ci-fg); }
+.cat-badge.compare { background: var(--cat-compare-bg); color: var(--cat-compare-fg); }
+.cat-badge.claims  { background: var(--cat-claims-bg);  color: var(--cat-claims-fg); }
+.cat-badge.reg     { background: var(--cat-reg-bg);     color: var(--cat-reg-fg); }
+
+/* ── Featured card ── */
+.featured-card {
+  display: block;
+  background: linear-gradient(135deg, var(--navy) 0%, #0a3650 55%, #003c58 100%);
+  border-radius: 16px; padding: 36px 40px;
+  position: relative; overflow: hidden;
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 28px;
+}
+.featured-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 88% 12%, rgba(0,169,224,0.18) 0%, transparent 48%),
+    radial-gradient(ellipse at 12% 88%, rgba(0,131,175,0.1) 0%, transparent 40%);
+  pointer-events: none;
+}
+.featured-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 44px rgba(0,169,224,0.16);
+}
+.featured-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.15em; color: var(--blue);
+  text-transform: uppercase; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+  position: relative; z-index: 1;
+}
+.featured-label::before {
+  content: ''; display: inline-block;
+  width: 22px; height: 1.5px; background: var(--blue);
+}
+.featured-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(20px, 3vw, 28px); font-weight: 900;
+  color: white; line-height: 1.35; margin-bottom: 14px;
+  transition: color 0.18s; position: relative; z-index: 1;
+}
+.featured-card:hover .featured-title { color: #a8e8f8; }
+.featured-excerpt {
+  font-size: 14px; color: rgba(255,255,255,0.75);
+  line-height: 1.65; margin-bottom: 22px;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+  position: relative; z-index: 1;
+}
+.featured-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.65);
+  position: relative; z-index: 1;
+}
+
+/* ── Article grid ── */
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+@media (max-width: 640px) {
+  .article-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Article card ── */
+.article-card {
+  display: flex; flex-direction: column; gap: 10px;
+  background: white;
+  border: 1.5px solid var(--paper-3);
+  border-radius: 12px; padding: 22px 22px 18px;
+  cursor: pointer; text-decoration: none;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  height: 100%;
+}
+.article-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 20px rgba(0,169,224,0.1);
+  transform: translateY(-2px);
+}
+.card-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 15.5px; font-weight: 700;
+  color: var(--ink); line-height: 1.45;
+  transition: color 0.18s;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.article-card:hover .card-title { color: var(--blue-d); }
+.card-excerpt {
+  font-size: 12.5px; color: var(--ink-3);
+  line-height: 1.6; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-meta {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; color: var(--ink-2);
+  margin-top: 2px; padding-top: 10px;
+  border-top: 1px solid var(--paper-3);
+}
+
+/* ── Filter animation ── */
+.article-item { transition: opacity 0.22s, transform 0.22s; }
+.article-item.hidden { display: none; }
+
+/* ── Section label ── */
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.12em; color: var(--ink-3);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--paper-3);
+}
+
+/* ── Subscribe card (mirrors news.html) ── */
+.sub-card {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a2e44 100%);
+  border-radius: 16px; padding: 28px 24px;
+  position: relative; overflow: hidden;
+}
+.sub-card::before {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,169,224,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Sidebar trust / info block ── */
+.info-block {
+  background: white; border: 1px solid var(--paper-3);
+  border-radius: 12px; padding: 20px;
+}
+.info-block-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  color: var(--ink); text-transform: uppercase;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--paper-3);
+}
+
+/* ── Coming-soon list ── */
+.coming-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid var(--paper-3);
+}
+.coming-item:last-child { border-bottom: none; padding-bottom: 0; }
+.coming-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  margin-top: 6px; flex-shrink: 0;
+}
+
+/* ── Two-column layout ── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .sidebar-col { display: none; }
+}
+
+/* ── Staggered animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up   { animation: fadeUp 0.4s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.10s; }
+.fade-up-3 { animation-delay: 0.15s; }
+.fade-up-4 { animation-delay: 0.20s; }
+.fade-up-5 { animation-delay: 0.25s; }
+.fade-up-6 { animation-delay: 0.30s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div id="readingProgress"></div>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<div id="himiao-nav"></div>
+<script src="components/lang.js"></script>
+<script src="components/nav.js"></script>
+
+<!-- ═══════════════════════════════ HERO ══════════════════════════════ -->
+<section class="academy-hero">
+  <!-- 科技感装饰层 -->
+  <div class="hero-blocks">
+    <div class="hb hb-1 hb-bright"></div>
+    <div class="hb hb-2"></div>
+    <div class="hb hb-3"></div>
+    <div class="hb hb-4 hb-bright"></div>
+    <div class="hb hb-5"></div>
+    <div class="hb hb-6"></div>
+    <div class="hb hb-7"></div>
+  </div>
+  <div class="hero-scan"></div>
+  <div class="hero-inner">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:0.18em;color:rgba(0,169,224,0.65);text-transform:uppercase;margin-bottom:14px;">
+      HIMIAO ACADEMY
+    </div>
+    <h1 style="font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,44px);font-weight:900;color:white;line-height:1.2;letter-spacing:-0.5px;margin-bottom:12px;">
+      HiMiao 大讲堂
+    </h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.78);max-width:420px;line-height:1.65;margin-bottom:28px;">
+      买保险前，先读懂它
+    </p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#00a9e0;flex-shrink:0;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">精算团队出品</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0;"></div>
+        <span id="heroArticleCount" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">深度解析</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">持续更新中</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ MAIN ══════════════════════════════ -->
+<main style="max-width:1280px;margin:0 auto;padding:36px 20px 80px;">
+
+  <!-- Category filter tabs -->
+  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:32px;-webkit-overflow-scrolling:touch;scrollbar-width:none;" class="fade-up">
+    <button class="cat-chip active" data-cat="all"     onclick="filterCat('all',this)">全部</button>
+    <button class="cat-chip"        data-cat="savings"  onclick="filterCat('savings',this)">🏦 储蓄险入门</button>
+    <button class="cat-chip"        data-cat="ci"       onclick="filterCat('ci',this)">🏥 重疾险解析</button>
+    <button class="cat-chip"        data-cat="compare"  onclick="filterCat('compare',this)">⚖️ 内地 VS 港险</button>
+    <button class="cat-chip"        data-cat="claims"   onclick="filterCat('claims',this)">📋 理赔实战</button>
+    <button class="cat-chip"        data-cat="reg"      onclick="filterCat('reg',this)">📊 监管与合规</button>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="main-layout">
+
+    <!-- ════ LEFT: article content ════ -->
+    <div>
+
+      <!-- Featured article (动态渲染) -->
+      <div id="featured-wrap" style="display:none;" class="fade-up fade-up-1"></div>
+
+      <!-- Grid section label -->
+      <div class="section-label fade-up fade-up-2" id="gridLabel" style="display:none;">知识文章</div>
+
+      <!-- Article grid (动态渲染) -->
+      <div class="article-grid" id="articleGrid"></div>
+
+      <!-- Loading state -->
+      <div id="loadingState" style="text-align:center;padding:64px 20px;">
+        <div style="width:32px;height:32px;border:3px solid var(--paper-3);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+        <p style="color:var(--ink-3);font-size:14px;">加载中…</p>
+      </div>
+
+      <!-- Empty state -->
+      <div id="emptyState" style="display:none;text-align:center;padding:64px 20px;">
+        <div style="font-size:42px;margin-bottom:14px;">📚</div>
+        <p style="color:var(--ink-3);font-size:15px;font-weight:500;">该分类暂无文章</p>
+        <button onclick="filterCat('all',document.querySelector('[data-cat=all]'))"
+          style="margin-top:14px;color:var(--blue);font-size:13px;font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline;">
+          查看全部文章
+        </button>
+      </div>
+
+      <!-- Disclaimer -->
+      <div style="margin-top:36px;padding:14px 18px;background:var(--paper-2);border:1px solid var(--paper-3);border-radius:10px;">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-2);line-height:1.7;">
+          免责声明 · 本页所有内容由 HiMiao 精算团队基于公开资料整理，仅供参考，不构成任何投保建议。数据来源：各保司官方计划书及 HKIA 公开披露文件。
+        </p>
+      </div>
+
+    </div><!-- /left col -->
+
+    <!-- ════ RIGHT: sidebar ════ -->
+    <aside class="sidebar-col" style="display:flex;flex-direction:column;gap:20px;position:sticky;top:24px;">
+
+      <!-- Trust block -->
+      <div class="info-block fade-up fade-up-2">
+        <div class="info-block-title">精算团队出品</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="font-size:15px;flex-shrink:0;line-height:1.4;">⚖️</span>
+            <p style="font-size:12px;color:var(--ink-2);line-height:1.6;">独立立场，不受任何保司或经纪公司资助</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="font-size:15px;flex-shrink:0;line-height:1.4;">🔢</span>
+            <p style="font-size:12px;color:var(--ink-2);line-height:1.6;">所有数字均来自官方计划书或监管披露文件</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="font-size:15px;flex-shrink:0;line-height:1.4;">🚫</span>
+            <p style="font-size:12px;color:var(--ink-2);line-height:1.6;">不含"最佳""推荐"等主观评价，符合 Cap.41 合规要求</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coming soon -->
+      <div class="info-block fade-up fade-up-3">
+        <div class="info-block-title">即将上线</div>
+        <div>
+          <div class="coming-item">
+            <div class="coming-dot" style="background:var(--cat-ci-fg);"></div>
+            <div>
+              <p style="font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.4;">重疾险多次赔付完整指南</p>
+              <p style="font-size:11px;color:var(--ink-2);margin-top:2px;">重疾险解析</p>
+            </div>
+          </div>
+          <div class="coming-item">
+            <div class="coming-dot" style="background:var(--cat-compare-fg);"></div>
+            <div>
+              <p style="font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.4;">港险赴港投保全流程指引</p>
+              <p style="font-size:11px;color:var(--ink-2);margin-top:2px;">内地 VS 港险</p>
+            </div>
+          </div>
+          <div class="coming-item">
+            <div class="coming-dot" style="background:var(--cat-savings-fg);"></div>
+            <div>
+              <p style="font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.4;">外币储蓄险汇率风险量化</p>
+              <p style="font-size:11px;color:var(--ink-2);margin-top:2px;">储蓄险入门</p>
+            </div>
+          </div>
+          <div class="coming-item">
+            <div class="coming-dot" style="background:var(--cat-claims-fg);"></div>
+            <div>
+              <p style="font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.4;">内地就医如何申请港险理赔</p>
+              <p style="font-size:11px;color:var(--ink-2);margin-top:2px;">理赔实战</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscribe CTA -->
+      <div class="sub-card fade-up fade-up-4">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--blue);margin-bottom:14px;"></div>
+        <h3 style="font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:white;margin-bottom:6px;position:relative;z-index:1;">订阅大讲堂更新</h3>
+        <p style="font-size:12px;color:rgba(255,255,255,0.40);margin-bottom:18px;line-height:1.6;position:relative;z-index:1;">新文章发布时第一时间通知。精算师亲写，不含广告，不带货。</p>
+        <div style="display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;">
+          <input type="email" id="subEmail" placeholder="your@email.com"
+            style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:white;font-size:12px;outline:none;font-family:'DM Sans';"
+            onfocus="this.style.borderColor='#00a9e0'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+          <button onclick="handleSubscribe()"
+            style="width:100%;padding:10px;border-radius:8px;background:#00a9e0;color:white;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;font-family:'DM Sans';transition:background 0.18s;"
+            onmouseover="this.style.background='#0083af'" onmouseout="this.style.background='#00a9e0'">
+            免费订阅
+          </button>
+        </div>
+        <p style="font-size:10px;color:rgba(255,255,255,0.18);margin-top:10px;position:relative;z-index:1;">已有读者订阅 · 随时可退订</p>
+      </div>
+
+      <!-- Product audit CTA -->
+      <div style="background:var(--paper-2);border:1px solid var(--paper-3);border-radius:12px;padding:18px;" class="fade-up fade-up-5">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:0.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:10px;">相关产品数据</div>
+        <p style="font-size:12px;color:var(--ink-3);margin-bottom:14px;line-height:1.6;">读完知识文章，查阅精算审计过的客观产品数据库。</p>
+        <a href="index.html"
+          style="display:block;width:100%;padding:10px;background:var(--ink);color:white;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-align:center;text-decoration:none;transition:background 0.18s;"
+          onmouseover="this.style.background='#000'" onmouseout="this.style.background='var(--ink)'">
+          进入产品审计库 →
+        </a>
+      </div>
+
+    </aside><!-- /sidebar -->
+
+  </div><!-- /main-layout -->
+
+</main>
+
+<!-- ═══════════════════════════════ FOOTER ════════════════════════════ -->
+<footer-placeholder></footer-placeholder>
+
+<!-- ═══════════════════════════════ SCRIPTS ══════════════════════════ -->
+<script>
+/* ── Reading progress bar ── */
+window.addEventListener('scroll', function () {
+  var el = document.getElementById('readingProgress');
+  if (!el) return;
+  var scrolled = window.scrollY || document.documentElement.scrollTop;
+  var total = document.documentElement.scrollHeight - window.innerHeight;
+  el.style.width = total > 0 ? (scrolled / total * 100) + '%' : '0%';
+});
+
+/* ── 分类配置 ── */
+var CAT_CONFIG = {
+  savings: { label: '🏦 储蓄险入门', cls: 'savings' },
+  ci:      { label: '🏥 重疾险解析', cls: 'ci' },
+  compare: { label: '⚖️ 内地 VS 港险', cls: 'compare' },
+  claims:  { label: '📋 理赔实战',    cls: 'claims' },
+  reg:     { label: '📊 监管与合规',  cls: 'reg' },
+};
+
+function readingTime(text) {
+  var n = Math.ceil((text || '').length / 400);
+  return '阅读约 ' + (n < 1 ? 1 : n) + ' 分钟';
+}
+
+function catBadgeHtml(cat) {
+  var c = CAT_CONFIG[cat] || { label: cat, cls: '' };
+  return '<span class="cat-badge ' + c.cls + '">' + c.label + '</span>';
+}
+
+/* ── 渲染函数 ── */
+function renderFeatured(a) {
+  var wrap = document.getElementById('featured-wrap');
+  var rt = readingTime(a.content_zh || a.excerpt || '');
+  wrap.setAttribute('data-cat', a.category || 'all');
+  wrap.innerHTML = '<a href="academy-article.html?slug=' + encodeURIComponent(a.slug) + '" class="featured-card">' +
+    '<div class="featured-label">精选推荐</div>' +
+    '<h2 class="featured-title">' + (a.title_zh || a.title_en || '') + '</h2>' +
+    '<p class="featured-excerpt">' + (a.excerpt || '') + '</p>' +
+    '<div class="featured-meta">' +
+      '<span class="cat-badge" style="background:rgba(0,169,224,0.18);color:#7dd8f4;">' + (CAT_CONFIG[a.category] ? CAT_CONFIG[a.category].label : a.category) + '</span>' +
+      '<span>' + rt + '</span>' +
+      '<span>' + (a.author || 'HiMiao 精算团队') + '</span>' +
+    '</div></a>';
+  wrap.style.display = '';
+}
+
+function renderGrid(articles) {
+  var grid = document.getElementById('articleGrid');
+  if (!articles.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = articles.map(function(a, i) {
+    var delay = 'fade-up-' + Math.min(i + 2, 6);
+    var rt = readingTime(a.content_zh || a.excerpt || '');
+    return '<div class="article-item fade-up ' + delay + '" data-cat="' + (a.category || '') + '">' +
+      '<a href="academy-article.html?slug=' + encodeURIComponent(a.slug) + '" class="article-card">' +
+        '<div>' + catBadgeHtml(a.category) + '</div>' +
+        '<h3 class="card-title">' + (a.title_zh || a.title_en || '') + '</h3>' +
+        '<p class="card-excerpt">' + (a.excerpt || '') + '</p>' +
+        '<div class="card-meta"><span>' + (a.author || 'HiMiao 精算团队') + '</span><span>' + rt + '</span></div>' +
+      '</a></div>';
+  }).join('');
+  document.getElementById('gridLabel').style.display = '';
+}
+
+/* ── 全量文章缓存，供前端过滤 ── */
+var ALL_ARTICLES = [];
+var FEATURED_SLUG = '';
+
+function applyFilter(cat) {
+  var featured = ALL_ARTICLES[0];
+  var rest = ALL_ARTICLES.slice(1);
+
+  // Featured 可见性
+  var wrap = document.getElementById('featured-wrap');
+  if (featured) {
+    var showF = (cat === 'all' || featured.category === cat);
+    wrap.style.display = showF ? '' : 'none';
+  }
+
+  // Grid 过滤
+  var filtered = (cat === 'all') ? rest : rest.filter(function(a){ return a.category === cat; });
+  renderGrid(filtered);
+
+  // Empty state
+  var visibleCount = filtered.length + (wrap.style.display !== 'none' ? 1 : 0);
+  document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+/* ── Category filtering ── */
+function filterCat(cat, btnEl) {
+  document.querySelectorAll('.cat-chip').forEach(function(b) {
+    b.classList.remove('active', 'savings', 'ci', 'compare', 'claims', 'reg');
+  });
+  btnEl.classList.add('active');
+  if (cat !== 'all') btnEl.classList.add(cat);
+  applyFilter(cat);
+}
+
+/* ── 从 API 加载讲堂文章 ── */
+function loadAcademyArticles() {
+  fetch('/api/v1/articles?channel=academy&limit=50')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      document.getElementById('loadingState').style.display = 'none';
+      var articles = Array.isArray(data) ? data : (data.items || data.articles || []);
+      ALL_ARTICLES = articles;
+
+      // 更新 hero 文章数量
+      var countEl = document.getElementById('heroArticleCount');
+      if (countEl) countEl.textContent = articles.length + ' 篇深度解析';
+
+      if (!articles.length) {
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+      renderFeatured(articles[0]);
+      renderGrid(articles.slice(1));
+    })
+    .catch(function() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+    });
+}
+
+/* 页面加载 */
+loadAcademyArticles();
+
+/* ── Subscribe handler ── */
+function handleSubscribe() {
+  var input = document.getElementById('subEmail');
+  var email = input ? input.value.trim() : '';
+  if (!email || !email.includes('@')) {
+    alert('请输入有效的电子邮件地址');
+    return;
+  }
+  fetch('/api/v1/subscribers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, source: 'academy' })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function () {
+    if (input) input.value = '';
+    alert('订阅成功！新文章发布时将第一时间通知您。');
+  })
+  .catch(function () {
+    alert('订阅失败，请稍后再试。');
+  });
+}
+</script>
+
+</body>
+</html>

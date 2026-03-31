@@ -1,0 +1,27 @@
+# scraper/requirements-scraper.txt
+# 爬虫容器专用依赖（不装进 API 容器）
+
+# ── 爬虫框架 ──
+scrapy==2.11.2
+requests==2.32.3
+
+# ── PDF 处理 ──
+pdfplumber==0.11.4
+PyMuPDF==1.24.9          # fitz，PDF 转图片（OCR 前处理）
+
+# ── OCR（按需安装，NAS 性能够用）──
+# paddlepaddle==2.6.1    # CPU 版，取消注释启用
+# paddleocr==2.7.3       # 取消注释启用
+
+# ── 调度 ──
+APScheduler==3.10.4
+
+# ── 数据处理 ──
+python-dotenv==1.0.1
+sqlalchemy==2.0.36
+pydantic==2.9.2
+pydantic-settings==2.6.0
+
+# ── 共用 app/ 的 ORM（不重复安装，只在同一容器里）──
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0

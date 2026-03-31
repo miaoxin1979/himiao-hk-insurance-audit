@@ -1,0 +1,98 @@
+{
+  "version": "2026-Q1",
+  "updated": "2026-02-18",
+  "categories": [
+    { "id": "all",     "label_cn": "全部",     "label_hk": "全部",     "label_en": "All" },
+    { "id": "market",  "label_cn": "市场情报", "label_hk": "市場情報", "label_en": "Market Intel" },
+    { "id": "alert",   "label_cn": "避雷预警", "label_hk": "避雷預警", "label_en": "Alert" },
+    { "id": "policy",  "label_cn": "政策解读", "label_hk": "政策解讀", "label_en": "Policy" },
+    { "id": "audit",   "label_cn": "产品审计", "label_hk": "產品審計", "label_en": "Audit" },
+    { "id": "guide",   "label_cn": "新手指南", "label_hk": "新手指南", "label_en": "Guide" }
+  ],
+  "articles": [
+    {
+      "id": "trump-usd-policy-2026",
+      "category": "market",
+      "featured": true,
+      "title_cn": "特朗普回归 100 天：你的美金保单正在经历什么？",
+      "title_en": "100 Days of Trump: What's Happening to Your USD Policy?",
+      "excerpt_cn": "美联储降息预期反复横跳，美元指数承压，港险储蓄的「锁汇」优势正在重新被定价。我们用数据告诉你，现在该持有、加仓还是等待。",
+      "author": "HiMiao 精算研究组",
+      "date": "2026-02-17",
+      "read_min": 8,
+      "tags": ["美元保单", "利率", "宏观"],
+      "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1200",
+      "hot": true
+    },
+    {
+      "id": "dividend-irr-hidden-trap",
+      "category": "alert",
+      "featured": false,
+      "title_cn": "警惕：这款「网红」分红险的真实回本期被延长了 3 年",
+      "title_en": "Red Flag: This Viral Policy's Real Breakeven Is 3 Years Later Than Advertised",
+      "excerpt_cn": "某头部保司的爆款产品，计划书上写着「第 6 年回本」。我们对 2,000 份真实保单数据做了复盘，实际情况让人沉默。",
+      "author": "M. Chen · FHKIA",
+      "date": "2026-02-15",
+      "read_min": 6,
+      "tags": ["分红险", "IRR", "避雷"],
+      "image": "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=800",
+      "hot": true
+    },
+    {
+      "id": "hkia-2026-new-rules",
+      "category": "policy",
+      "featured": false,
+      "title_cn": "香港保监局 2026 新规：分红实现率披露要求全面升级",
+      "title_en": "HKIA 2026 Update: Dividend Fulfillment Disclosure Requirements Upgraded",
+      "excerpt_cn": "从今年起，所有储蓄分红险必须披露过去 10 年的分红实现率区间，而非仅公布均值。这对消费者意味着什么？",
+      "author": "HiMiao 合规研究组",
+      "date": "2026-02-12",
+      "read_min": 5,
+      "tags": ["监管", "HKIA", "合规"],
+      "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800",
+      "hot": false
+    },
+    {
+      "id": "aia-vs-pru-ci-audit",
+      "category": "audit",
+      "featured": false,
+      "title_cn": "重疾险深度审计：AIA 危疾保障 vs 保诚危疾 · 哪家「多重赔付」更实在？",
+      "title_en": "CI Audit: AIA vs Prudential — Whose Multi-Pay Critical Illness Is Actually Better?",
+      "excerpt_cn": "两款市占率合计超过 60% 的旗舰重疾险，我们从定义严苛度、等待期、续保条款三个维度做了逐行拆解。",
+      "author": "HiMiao 精算研究组",
+      "date": "2026-02-08",
+      "read_min": 12,
+      "tags": ["重疾险", "AIA", "保诚", "对比"],
+      "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800",
+      "hot": false
+    },
+    {
+      "id": "first-time-buyer-8-questions",
+      "category": "guide",
+      "featured": false,
+      "title_cn": "新手必看：买香港保险前，你必须问经纪人的 8 个问题",
+      "title_en": "First-Timer's Guide: 8 Questions You Must Ask Before Buying HK Insurance",
+      "excerpt_cn": "不是所有的「高分红」都是真的高。不是所有的「保证回本」都指同一件事。这 8 个问题，能帮你在签单前看穿 90% 的信息不对称。",
+      "author": "HiMiao 编辑部",
+      "date": "2026-02-05",
+      "read_min": 7,
+      "tags": ["新手", "购险指南", "经纪人"],
+      "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800",
+      "hot": false
+    },
+    {
+      "id": "usd-lockdown-rate-analysis",
+      "category": "market",
+      "featured": false,
+      "title_cn": "降息周期下，港险美元储蓄的「锁息」价值究竟有多少？",
+      "title_en": "Rate-Cut Cycle: How Valuable Is the USD Rate-Lock in HK Savings Insurance?",
+      "excerpt_cn": "当联储局从 5.5% 降至预期的 3.5%，一张 20 年期的美元储蓄险，内含的「锁息溢价」大约值多少钱？我们做了定量测算。",
+      "author": "M. Chen · FHKIA",
+      "date": "2026-01-28",
+      "read_min": 9,
+      "tags": ["利率", "美元", "储蓄险", "测算"],
+      "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=800",
+      "hot": false
+    }
+  ]
+}

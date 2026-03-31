@@ -1,0 +1,30 @@
+# env / secrets
+.env
+.env.*
+*.env
+
+# databases / runtime data
+*.db
+*.sqlite
+himiao-data/
+
+# build / archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# uploads / logs / generated
+uploads/
+logs/
+.scraper_output/
+
+# OS
+.DS_Store
+
+# editor
+.idea/
+.vscode/
+
+# smb delete markers
+.smbdelete*

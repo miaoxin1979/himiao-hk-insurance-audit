@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大讲堂 | HiMiao</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { himiao: '#00a9e0', charcoal: '#2d2d2d' },
+      fontFamily: {
+        serif: ['"Noto Serif SC"','serif'],
+        sans:  ['"DM Sans"','sans-serif'],
+        mono:  ['"JetBrains Mono"','monospace']
+      }
+    }}
+  }
+</script>
+<style>
+/* ── Design Tokens ── */
+:root {
+  --paper:   #fdfbf7;
+  --paper-2: #f5f1e8;
+  --paper-3: #ede8de;
+  --ink:     #1c1c1e;
+  --ink-2:   #48484a;
+  --ink-3:   #8e8e93;
+  --ink-4:   #c7c7cc;
+  --blue:    #00a9e0;
+  --blue-d:  #0083af;
+  --blue-l:  #e3f6fd;
+  --navy:    #0f1d2e;
+
+  --cat-savings-fg:   #00a9e0;
+  --cat-savings-bg:   #e3f6fd;
+  --cat-ci-fg:        #10b981;
+  --cat-ci-bg:        #f0faf4;
+  --cat-compare-fg:   #6366f1;
+  --cat-compare-bg:   #eef2ff;
+  --cat-claims-fg:    #f59e0b;
+  --cat-claims-bg:    #fef9ec;
+  --cat-reg-fg:       #8e8e93;
+  --cat-reg-bg:       #f5f5f5;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ── Reading progress bar ── */
+#readingProgress {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--blue); z-index: 9999;
+  transition: width 0.1s linear; width: 0%;
+}
+
+/* ── Hero banner (same as academy.html) ── */
+.article-hero {
+  background: var(--navy);
+  padding: 64px 20px 52px;
+  position: relative;
+  overflow: hidden;
+}
+.article-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,169,224,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,169,224,0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+.article-hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 75% 30%, rgba(0,169,224,0.13) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 80%, rgba(0,131,175,0.08) 0%, transparent 45%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* floating blocks */
+.hero-blocks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hb {
+  position: absolute;
+  border: 1px solid rgba(0,169,224,0.18);
+  border-radius: 4px;
+  background: rgba(0,169,224,0.03);
+  animation: hb-float linear infinite;
+}
+.hb::before {
+  content: '';
+  position: absolute; top: -1px; left: 8px;
+  width: 24px; height: 1px;
+  background: rgba(0,169,224,0.5);
+}
+.hb-1  { width:80px;  height:56px;  top:12%;  left:68%;  animation-duration:18s; animation-delay:-3s; }
+.hb-2  { width:48px;  height:48px;  top:55%;  left:82%;  animation-duration:23s; animation-delay:-8s; }
+.hb-3  { width:120px; height:40px;  top:72%;  left:55%;  animation-duration:20s; animation-delay:-1s; }
+.hb-4  { width:56px;  height:72px;  top:20%;  left:90%;  animation-duration:26s; animation-delay:-12s; }
+.hb-5  { width:96px;  height:32px;  top:40%;  left:74%;  animation-duration:17s; animation-delay:-5s; }
+.hb-6  { width:40px;  height:56px;  top:80%;  left:92%;  animation-duration:22s; animation-delay:-9s; }
+.hb-7  { width:64px;  height:44px;  top:8%;   left:78%;  animation-duration:19s; animation-delay:-15s; opacity:0.6; }
+.hb-bright { border-color: rgba(0,169,224,0.35); background: rgba(0,169,224,0.06); }
+.hb-bright::before { background: rgba(0,169,224,0.9); width: 32px; }
+@keyframes hb-float {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  33%  { transform: translateY(-8px) rotate(0.5deg); }
+  66%  { transform: translateY(4px) rotate(-0.3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+.hero-scan {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,169,224,0.25) 40%, rgba(0,169,224,0.5) 50%, rgba(0,169,224,0.25) 60%, transparent 100%);
+  animation: scan 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%   { top: 10%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
+/* breadcrumb (in content area, dark text) */
+.breadcrumb-inner {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--ink-3);
+}
+.breadcrumb-inner a { color: var(--blue); text-decoration: none; transition: color 0.15s; }
+.breadcrumb-inner a:hover { color: var(--blue-d); }
+.breadcrumb-inner .sep { color: var(--ink-4); }
+
+/* ── Article content (single column) ── */
+.article-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 52px 32px 88px;
+}
+@media (max-width: 640px) {
+  .article-content { padding: 36px 18px 64px; }
+}
+
+/* ── Article header ── */
+.article-header {
+  margin-bottom: 20px;
+}
+
+/* ── Category badge ── */
+.cat-badge {
+  display: inline-flex; padding: 3px 12px; border-radius: 100px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+.cat-badge.savings { background: var(--cat-savings-bg); color: var(--cat-savings-fg); }
+.cat-badge.ci      { background: var(--cat-ci-bg);      color: var(--cat-ci-fg); }
+.cat-badge.compare { background: var(--cat-compare-bg); color: var(--cat-compare-fg); }
+.cat-badge.claims  { background: var(--cat-claims-bg);  color: var(--cat-claims-fg); }
+.cat-badge.reg     { background: var(--cat-reg-bg);     color: var(--cat-reg-fg); }
+
+/* ── Article title ── */
+.article-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.3;
+  margin: 0 0 16px;
+  letter-spacing: -0.3px;
+}
+
+/* ── Meta row ── */
+.article-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--ink-3);
+}
+.article-meta .dot { color: var(--ink-4); }
+
+.article-divider {
+  border: none;
+  border-top: 1.5px solid var(--paper-3);
+  margin: 0;
+}
+
+/* ── Article body (no card frame) ── */
+.article-body {}
+
+/* ── Markdown typography ── */
+.prose h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+  margin-top: 32px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--paper-3);
+  line-height: 1.3;
+}
+.prose h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 24px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.prose p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16.5px;
+  line-height: 1.85;
+  color: var(--ink-2);
+  margin-bottom: 18px;
+}
+.prose ul, .prose ol {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--ink-2);
+  padding-left: 20px;
+  margin-bottom: 16px;
+  line-height: 1.8;
+}
+.prose li { margin-bottom: 4px; }
+.prose blockquote {
+  border-left: 3px solid var(--blue);
+  background: var(--blue-l);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-style: italic;
+  color: var(--ink-2);
+  margin: 20px 0;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.prose code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--paper-2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+.prose pre {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-3);
+  border-radius: 8px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.prose strong { color: var(--ink); font-weight: 700; }
+.prose em { font-style: italic; }
+.prose a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
+.prose a:hover { color: var(--blue-d); }
+.prose hr {
+  border: none;
+  border-top: 1.5px solid var(--paper-3);
+  margin: 28px 0;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+.prose th, .prose td {
+  border: 1px solid var(--paper-3);
+  padding: 8px 12px;
+  text-align: left;
+}
+.prose th {
+  background: var(--paper-2);
+  font-weight: 700;
+  color: var(--ink);
+}
+.prose td { color: var(--ink-2); }
+
+/* ── Fallback empty state ── */
+.content-empty {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 15px;
+  font-style: italic;
+}
+
+/* ── Sidebar ── */
+.article-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 80px;
+}
+
+.sidebar-block {
+  background: white;
+  border: 1.5px solid var(--paper-3);
+  border-radius: 12px;
+  padding: 20px;
+}
+.sidebar-block-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.12em; color: var(--ink);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--paper-3);
+}
+
+/* ── TOC ── */
+#toc-list { list-style: none; padding: 0; margin: 0; }
+#toc-list li {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--paper-3);
+}
+#toc-list li:last-child { border-bottom: none; }
+#toc-list a {
+  font-size: 12px; color: var(--ink-2); text-decoration: none;
+  line-height: 1.5; display: block;
+  transition: color 0.15s;
+}
+#toc-list a:hover { color: var(--blue); }
+#toc-list a.h3-link {
+  font-size: 11.5px; color: var(--ink-3);
+  padding-left: 12px;
+}
+#toc-list a.h3-link:hover { color: var(--blue); }
+#toc-empty {
+  font-size: 12px; color: var(--ink-3); font-style: italic;
+}
+
+/* ── Related articles ── */
+.related-item {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--paper-3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.related-item:last-child { border-bottom: none; }
+.related-item-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--ink); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  transition: color 0.15s;
+}
+.related-item:hover .related-item-title { color: var(--blue-d); }
+.related-item-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--ink-3);
+}
+
+/* ── Contact CTA ── */
+.contact-cta {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a2e44 100%);
+  border-radius: 12px; padding: 22px 20px;
+  position: relative; overflow: hidden;
+}
+.contact-cta::before {
+  content: ''; position: absolute; top: -20px; right: -20px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,169,224,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Prev/Next nav ── */
+.article-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 28px;
+}
+@media (max-width: 560px) {
+  .article-nav { grid-template-columns: 1fr; }
+}
+.article-nav-card {
+  background: white;
+  border: 1.5px solid var(--paper-3);
+  border-radius: 12px; padding: 16px 18px;
+  text-decoration: none;
+  display: flex; flex-direction: column; gap: 4px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.article-nav-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 16px rgba(0,169,224,0.1);
+}
+.article-nav-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; color: var(--ink-3);
+  text-transform: uppercase;
+}
+.article-nav-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13.5px; font-weight: 700;
+  color: var(--ink); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  transition: color 0.15s;
+}
+.article-nav-card:hover .article-nav-title { color: var(--blue-d); }
+.article-nav-card.next { text-align: right; }
+
+/* ── Error state ── */
+#error-state {
+  display: none;
+  max-width: 480px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+/* ── Disclaimer ── */
+.disclaimer {
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--paper-2);
+  border: 1px solid var(--paper-3);
+  border-radius: 10px;
+}
+.disclaimer p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--ink-2); line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Loading skeleton ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--paper-2) 25%, var(--paper-3) 50%, var(--paper-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div id="readingProgress"></div>
+
+<!-- NAV -->
+<div id="himiao-nav"></div>
+<script src="components/lang.js"></script>
+<script src="components/nav.js"></script>
+
+<!-- 固定品牌横幅（与大讲堂首页完全一致） -->
+<section class="article-hero">
+  <div class="hero-blocks">
+    <div class="hb hb-1 hb-bright"></div>
+    <div class="hb hb-2"></div>
+    <div class="hb hb-3"></div>
+    <div class="hb hb-4 hb-bright"></div>
+    <div class="hb hb-5"></div>
+    <div class="hb hb-6"></div>
+    <div class="hb hb-7"></div>
+  </div>
+  <div class="hero-scan"></div>
+  <div class="hero-inner">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:0.18em;color:rgba(0,169,224,0.65);text-transform:uppercase;margin-bottom:14px;">HIMIAO ACADEMY</div>
+    <h1 style="font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,44px);font-weight:900;color:white;line-height:1.2;letter-spacing:-0.5px;margin-bottom:12px;">HiMiao 大讲堂</h1>
+    <p style="font-size:15px;color:rgba(255,255,255,0.78);max-width:420px;line-height:1.65;margin-bottom:28px;">买保险前，先读懂它</p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#00a9e0;flex-shrink:0;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">精算团队出品</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">深度解析</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.65);">持续更新中</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Error state (hidden by default) -->
+<div id="error-state">
+  <div style="font-size:48px;margin-bottom:16px;">📭</div>
+  <h2 style="font-family:'Noto Serif SC',serif;font-size:22px;font-weight:900;color:var(--ink);margin-bottom:10px;">文章不存在</h2>
+  <p style="font-size:14px;color:var(--ink-3);margin-bottom:24px;line-height:1.7;">抱歉，找不到您请求的文章。可能已被移除，或链接有误。</p>
+  <a href="academy.html"
+    style="display:inline-block;padding:10px 24px;background:var(--blue);color:white;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:background 0.18s;"
+    onmouseover="this.style.background='var(--blue-d)'" onmouseout="this.style.background='var(--blue)'">
+    返回大讲堂
+  </a>
+</div>
+
+<!-- Main content -->
+<div id="main-content" style="display:none;">
+
+  <!-- Article content -->
+  <div class="article-content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-inner" id="breadcrumb-bar" style="margin-bottom:28px;">
+      <a href="academy.html">大讲堂</a>
+      <span class="sep">›</span>
+      <span id="breadcrumb-cat">加载中…</span>
+    </div>
+
+    <!-- Article header: badge + title + meta -->
+    <div id="article-cat-badge" style="margin-bottom:12px;"></div>
+    <h1 class="article-title" id="article-title">
+      <span class="skeleton" style="display:block;height:38px;width:85%;margin-bottom:8px;border-radius:6px;"></span>
+      <span class="skeleton" style="display:block;height:38px;width:60%;border-radius:6px;"></span>
+    </h1>
+    <div class="article-meta" id="article-meta" style="margin-bottom:28px;">
+      <span class="skeleton" style="display:inline-block;height:13px;width:200px;border-radius:4px;"></span>
+    </div>
+    <hr style="border:none;border-top:1.5px solid var(--paper-3);margin-bottom:32px;">
+
+    <!-- Prose body -->
+    <div class="prose" id="article-prose">
+      <div>
+        <div class="skeleton" style="height:15px;width:100%;margin-bottom:11px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:15px;width:93%;margin-bottom:11px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:15px;width:97%;margin-bottom:11px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:15px;width:75%;margin-bottom:24px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:15px;width:100%;margin-bottom:11px;border-radius:4px;"></div>
+        <div class="skeleton" style="height:15px;width:88%;margin-bottom:11px;border-radius:4px;"></div>
+      </div>
+    </div>
+
+    <!-- Prev/Next navigation -->
+    <div class="article-nav" id="article-nav" style="display:none;"></div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <p>免责声明 · 本页所有内容由 HiMiao 精算团队基于公开资料整理，仅供参考，不构成任何投保建议。数据来源：各保司官方计划书及 HKIA 公开披露文件。</p>
+    </div>
+
+  </div><!-- /article-content -->
+
+</div><!-- /main-content -->
+
+<!-- FOOTER -->
+<footer-placeholder></footer-placeholder>
+
+<script>
+/* ── Reading progress bar ── */
+window.addEventListener('scroll', function() {
+  var el = document.getElementById('readingProgress');
+  if (!el) return;
+  var scrolled = window.scrollY || document.documentElement.scrollTop;
+  var total = document.documentElement.scrollHeight - window.innerHeight;
+  el.style.width = total > 0 ? (scrolled / total * 100) + '%' : '0%';
+});
+
+/* ── Category config ── */
+var CAT_CONFIG = {
+  savings: { label: '🏦 储蓄险入门', cls: 'savings' },
+  ci:      { label: '🏥 重疾险解析', cls: 'ci' },
+  compare: { label: '⚖️ 内地 VS 港险', cls: 'compare' },
+  claims:  { label: '📋 理赔实战',    cls: 'claims' },
+  reg:     { label: '📊 监管与合规',  cls: 'reg' },
+};
+
+/* ── Helpers ── */
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getSlugFromURL() {
+  var params = new URLSearchParams(window.location.search);
+  return params.get('slug') || '';
+}
+
+function estimateReadingTime(text) {
+  if (!text) return 1;
+  var chars = text.replace(/\s/g,'').length;
+  return Math.max(1, Math.ceil(chars / 400));
+}
+
+function formatDate(str) {
+  if (!str) return '';
+  var d = new Date(str);
+  if (isNaN(d.getTime())) return str.split('T')[0] || str;
+  return d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+}
+
+/* ── Render article ── */
+function renderArticle(a) {
+  // Title tag
+  document.title = (a.title_zh || a.title_en || '文章') + ' | HiMiao 大讲堂';
+
+  // Breadcrumb category
+  var cat = a.category || '';
+  var catConf = CAT_CONFIG[cat] || { label: cat, cls: 'reg' };
+  document.getElementById('breadcrumb-cat').textContent = catConf.label;
+
+  // Category badge
+  var badgeEl = document.getElementById('article-cat-badge');
+  badgeEl.innerHTML = '<span class="cat-badge ' + catConf.cls + '">' + escHtml(catConf.label) + '</span>';
+  badgeEl.style.marginBottom = '12px';
+
+  // Title
+  var titleEl = document.getElementById('article-title');
+  titleEl.textContent = a.title_zh || a.title_en || '无标题';
+
+  // Meta
+  var readingTime = estimateReadingTime(a.content_zh || a.content_en || '');
+  var author = a.author || 'HiMiao 精算团队';
+  var dateStr = formatDate(a.published_at || a.created_at || '');
+  var metaEl = document.getElementById('article-meta');
+  metaEl.innerHTML =
+    escHtml(author) +
+    '<span class="dot">·</span>' +
+    (dateStr ? escHtml(dateStr) + '<span class="dot">·</span>' : '') +
+    '阅读约 ' + readingTime + ' 分钟';
+
+  // Content
+  var content = a.content_zh || a.content_en || '';
+  var proseEl = document.getElementById('article-prose');
+  if (!content.trim()) {
+    proseEl.innerHTML = '<div class="content-empty">文章正文整理中，敬请期待</div>';
+  } else {
+    // Configure marked for safe rendering
+    marked.setOptions({ breaks: true, gfm: true });
+    proseEl.innerHTML = marked.parse(content);
+  }
+
+}
+
+/* ── Build Table of Contents ── */
+function buildTOC(proseEl) {
+  var headings = proseEl.querySelectorAll('h2, h3');
+  var tocList  = document.getElementById('toc-list');
+  var tocEmpty = document.getElementById('toc-empty');
+  var tocBlock = document.getElementById('toc-block');
+
+  if (headings.length === 0) {
+    tocEmpty.style.display = 'block';
+    tocList.style.display  = 'none';
+    tocBlock.style.display = 'block';
+    return;
+  }
+
+  var html = '';
+  headings.forEach(function(h, i) {
+    var id = 'heading-' + i;
+    h.id = id;
+    var isH3 = h.tagName === 'H3';
+    html += '<li><a href="#' + id + '" class="' + (isH3 ? 'h3-link' : '') + '">' + escHtml(h.textContent) + '</a></li>';
+  });
+
+  tocList.innerHTML = html;
+  tocList.style.display = 'block';
+  tocEmpty.style.display = 'none';
+  tocBlock.style.display = 'block';
+
+  // Smooth scroll on click
+  tocList.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.getElementById(link.getAttribute('href').slice(1));
+      if (target) {
+        var offset = 80;
+        var top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+}
+
+/* ── Load related articles ── */
+async function loadRelated(currentSlug) {
+  try {
+    var res = await fetch('/api/v1/articles?channel=academy&limit=5');
+    if (!res.ok) throw new Error('failed');
+    var data = await res.json();
+    var items = (data.items || data || []).filter(function(a) {
+      return a.slug !== currentSlug;
+    }).slice(0, 4);
+
+    var relatedEl = document.getElementById('related-list');
+    if (!items.length) {
+      relatedEl.innerHTML = '<div style="font-size:12px;color:var(--ink-3);font-style:italic;">暂无相关文章</div>';
+      return;
+    }
+    relatedEl.innerHTML = items.map(function(a) {
+      var cat = a.category || '';
+      var catConf = CAT_CONFIG[cat] || { label: cat, cls: 'reg' };
+      return '<a href="academy-article.html?slug=' + encodeURIComponent(a.slug) + '" class="related-item">' +
+        '<span class="related-item-title">' + escHtml(a.title_zh || a.title_en || '') + '</span>' +
+        '<span class="related-item-meta">' + escHtml(catConf.label) + '</span>' +
+        '</a>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('related-list').innerHTML =
+      '<div style="font-size:12px;color:var(--ink-3);font-style:italic;">暂无相关文章</div>';
+  }
+}
+
+/* ── Load prev/next navigation ── */
+async function loadPrevNext(currentSlug) {
+  try {
+    var res = await fetch('/api/v1/articles?channel=academy&limit=100');
+    if (!res.ok) return;
+    var data = await res.json();
+    var items = data.items || data || [];
+    // Sort by published_at descending (newest first)
+    items.sort(function(a, b) {
+      return new Date(b.published_at || 0) - new Date(a.published_at || 0);
+    });
+
+    var idx = items.findIndex(function(a) { return a.slug === currentSlug; });
+    if (idx < 0) return;
+
+    var prev = idx < items.length - 1 ? items[idx + 1] : null;
+    var next = idx > 0 ? items[idx - 1] : null;
+
+    if (!prev && !next) return;
+
+    var navEl = document.getElementById('article-nav');
+    var html  = '';
+
+    if (prev) {
+      html += '<a href="academy-article.html?slug=' + encodeURIComponent(prev.slug) + '" class="article-nav-card">' +
+        '<span class="article-nav-label">← 上一篇</span>' +
+        '<span class="article-nav-title">' + escHtml(prev.title_zh || prev.title_en || '') + '</span>' +
+        '</a>';
+    } else {
+      html += '<div></div>';
+    }
+
+    if (next) {
+      html += '<a href="academy-article.html?slug=' + encodeURIComponent(next.slug) + '" class="article-nav-card next">' +
+        '<span class="article-nav-label">下一篇 →</span>' +
+        '<span class="article-nav-title">' + escHtml(next.title_zh || next.title_en || '') + '</span>' +
+        '</a>';
+    } else {
+      html += '<div></div>';
+    }
+
+    navEl.innerHTML = html;
+    navEl.style.display = 'grid';
+  } catch(e) {
+    // Nav is optional; silently ignore errors
+  }
+}
+
+/* ── Main init ── */
+async function init() {
+  var slug = getSlugFromURL();
+
+  if (!slug) {
+    showError();
+    return;
+  }
+
+  try {
+    var res = await fetch('/api/v1/articles/' + encodeURIComponent(slug));
+    if (res.status === 404 || !res.ok) {
+      showError();
+      return;
+    }
+    var article = await res.json();
+
+    renderArticle(article);
+    document.getElementById('main-content').style.display = 'block';
+
+    // Load prev/next nav (non-blocking)
+    loadPrevNext(slug);
+
+  } catch(e) {
+    showError();
+  }
+}
+
+function showError() {
+  document.getElementById('error-state').style.display = 'block';
+  document.getElementById('breadcrumb-cat').textContent = '文章不存在';
+  document.title = '文章不存在 | HiMiao 大讲堂';
+}
+
+init();
+</script>
+</body>
+</html>

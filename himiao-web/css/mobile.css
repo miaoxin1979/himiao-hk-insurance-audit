@@ -1,0 +1,237 @@
+/**
+ * frontend-patch/mobile.css
+ * 移动端响应式补丁 — 所有页面引入
+ * 在各页面 </head> 前加：
+ * <link rel="stylesheet" href="css/mobile.css">
+ *
+ * 断点：
+ *   ≤768px  → 手机
+ *   ≤1024px → 平板
+ */
+
+/* ── 全局基础 ──────────────────────────── */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+
+  /* 防止内容超宽 */
+  img, video, iframe { max-width: 100%; }
+
+  /* 水平滚动表格包裹 */
+  .table-wrapper, table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* ── 通用栅格：手机堆叠 ────────────────── */
+@media (max-width: 768px) {
+  .two-col,
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .three-col,
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns:repeat(3"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ── index.html Hero ──────────────────── */
+@media (max-width: 768px) {
+  /* Hero 标题字体缩小 */
+  section h1 { font-size: clamp(26px, 7vw, 36px) !important; }
+
+  /* Calculator 卡片：全宽 */
+  .calculator-card, [style*="width:min(100%,360px)"] {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* 旋转布局（纵向写字）→ 隐藏 */
+  .writing-vertical { display: none !important; }
+}
+
+/* ── product-list.html ────────────────── */
+@media (max-width: 768px) {
+  /* 侧边筛选栏 → 顶部横向滚动 */
+  .sidebar-filter,
+  aside[style*="width:220px"],
+  aside[style*="width: 220px"] {
+    position: static !important;
+    width: 100% !important;
+    max-height: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid #ede8de;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* 主内容：去掉左边距 */
+  main[style*="margin-left"] {
+    margin-left: 0 !important;
+  }
+
+  /* 产品卡片内部：两列 KPI → 一列 */
+  .product-kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* 按钮行：堆叠 */
+  .card-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .card-actions a, .card-actions button {
+    width: 100% !important;
+    text-align: center;
+  }
+}
+
+/* ── product-detail.html ──────────────── */
+@media (max-width: 768px) {
+  /* 模式切换栏：全宽按钮 */
+  #btn-simple, #btn-pro {
+    flex: 1 !important;
+    text-align: center;
+  }
+
+  /* Simple 模式三问卡片：竖排 */
+  #panel-simple [style*="display:grid"],
+  #panel-simple [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* KPI 数字条：2列 */
+  .simple-kpi-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* 专业模式图表容器 */
+  #panel-pro canvas {
+    max-height: 240px !important;
+  }
+
+  /* Action 按钮组 */
+  .action-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .action-bar button, .action-bar a {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+/* ── compare.html ─────────────────────── */
+@media (max-width: 768px) {
+  /* 对比表：固定第一列，横向滚动 */
+  .compare-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .compare-table-wrap table {
+    min-width: 560px;
+  }
+  .compare-table-wrap td:first-child,
+  .compare-table-wrap th:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 2;
+    border-right: 1px solid #ede8de;
+  }
+}
+
+/* ── news.html ────────────────────────── */
+@media (max-width: 768px) {
+  /* 左内容 + 右侧边栏 → 全宽堆叠 */
+  #mainGrid {
+    grid-template-columns: 1fr !important;
+  }
+  #rightCol {
+    order: -1;  /* 订阅框在顶部 */
+  }
+
+  /* Hero 文章图片高度 */
+  .hero-card { height: 200px !important; }
+
+  /* 分类筛选 chips：横向滚动不换行 */
+  .cat-chips-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+}
+
+/* ── about.html ───────────────────────── */
+@media (max-width: 768px) {
+  .principle-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .team-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ── admin.html ───────────────────────── */
+@media (max-width: 768px) {
+  /* 侧边栏 → 底部导航栏 */
+  .sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 56px !important;
+    display: flex;
+    flex-direction: row;
+    padding: 0 !important;
+    border-top: 1px solid rgba(255,255,255,.1);
+    z-index: 100;
+  }
+  .sidebar .logo { display: none; }
+  .sidebar .nav-item {
+    flex: 1;
+    flex-direction: column;
+    padding: 6px 4px !important;
+    font-size: 10px !important;
+    text-align: center;
+    border-left: none !important;
+    border-top: 3px solid transparent;
+  }
+  .sidebar .nav-item.active { border-top-color: #00a9e0; }
+  .sidebar .nav-item .icon { font-size: 18px; }
+
+  /* 主内容：底部 padding 避免被导航栏遮盖 */
+  .main {
+    margin-left: 0 !important;
+    padding-bottom: 72px !important;
+  }
+
+  /* 统计格子：2列 */
+  .stat-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* 表格：横向滚动 */
+  .table-card { overflow-x: auto; }
+  table { min-width: 600px; }
+}
+
+/* ── 通用：导航栏手机版 ────────────────── */
+@media (max-width: 768px) {
+  /* HiMiao nav 组件的手机菜单 */
+  .nav-mobile-hidden { display: none !important; }
+  .nav-mobile-show   { display: flex !important; }
+
+  /* 汉堡按钮 */
+  .hamburger { display: block !important; }
+}
+
+/* ── 打印样式（PDF 导出用）────────────── */
+@media print {
+  .sidebar, nav, .action-bar, #btn-simple, #btn-pro,
+  .ai-float, footer { display: none !important; }
+  body { background: white !important; font-size: 12px; }
+  #panel-pro { display: block !important; }
+  #panel-simple { display: none !important; }
+}

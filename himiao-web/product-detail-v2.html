@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0d1b2a">
+  <link rel="manifest" href="/manifest.json">
+  <title>产品详情 | HiMiao Audit</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --blue: #0096c7;
+      --blue-d: #0077b6;
+      --blue-l: #caf0f8;
+      --blue-glow: rgba(0,150,199,0.15);
+      --navy: #0d1b2a;
+      --navy-soft: #1b263b;
+      --paper: #f0f4f8;
+      --paper-warm: #f8f7f5;
+      --ink: #1b263b;
+      --ink2: #415a77;
+      --ink3: #778da9;
+      --rule: #e2e8f0;
+      --card-bg: #ffffff;
+      --card-shadow: 0 2px 12px rgba(13,27,42,0.06);
+      --card-shadow-hover: 0 8px 24px rgba(13,27,42,0.08);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      padding-bottom: 130px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .top-bar {
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-soft) 100%);
+      color: white;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: calc(14px + env(safe-area-inset-top, 0));
+    }
+    .top-bar a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 22px;
+      line-height: 1;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .top-bar a:active { background: rgba(255,255,255,0.15); }
+    .top-bar .title {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .top-bar .title span { color: #48cae4; }
+    .top-bar .add-btn {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 20px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .top-bar .add-btn.in-list {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .top-bar .add-btn:active { transform: scale(0.96); }
+    .content-wrap { padding: 0 20px; max-width: 480px; margin: 0 auto; }
+    .hero {
+      padding: 28px 0 24px;
+      background: linear-gradient(180deg, var(--card-bg) 0%, var(--paper-warm) 100%);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      color: #0d1b2a;
+      letter-spacing: -0.02em;
+    }
+    .hero .name-en {
+      font-size: 14px;
+      color: var(--ink2);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .hero .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .tag-pill {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(13,27,42,0.04);
+      color: var(--ink);
+      border: 1px solid rgba(13,27,42,0.12);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .metric-box {
+      text-align: center;
+      padding: 20px 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(0,150,199,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue), #48cae4);
+    }
+    .metric-box .val {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--blue-d);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .metric-box.metric-rating-box { flex-direction: column; align-items: center; gap: 2px; }
+    .metric-box.metric-rating-box .metric-val { font-size: 20px; margin-bottom: 2px; }
+    .metric-box.metric-rating-box .metric-src { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+    .metric-box.metric-rating-box .metric-src a { color: var(--ink3); text-decoration: none; }
+    .metric-box .lbl {
+      font-size: 11px;
+      color: var(--ink3);
+      margin-top: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .section {
+      background: var(--card-bg);
+      margin-bottom: 16px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+    .section-head {
+      padding: 16px 20px;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      color: var(--ink);
+      border-left: 4px solid transparent;
+      transition: background 0.2s;
+    }
+    .section:not(.always-open) .section-head:active { background: var(--paper); }
+    .section.always-open .section-head { border-left-color: var(--blue); }
+    .section-head .arrow {
+      font-size: 11px;
+      color: var(--ink3);
+      transition: transform 0.25s ease;
+    }
+    .section-head.open .arrow { transform: rotate(90deg); }
+    .section-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out; }
+    .section-body-inner { padding: 0 20px 20px; }
+    .section.always-open .section-body { max-height: none; }
+    .section.always-open .section-head .arrow { display: none; }
+    .section.always-open .section-head { cursor: default; }
+    .bottom-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 56px;
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid var(--rule);
+      display: flex;
+      z-index: 200;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      backdrop-filter: blur(10px);
+    }
+    .btab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink3);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btab.active { color: var(--blue-d); }
+    .btab svg { width: 22px; height: 22px; opacity: 0.85; }
+    .btab.active svg { opacity: 1; }
+    .disclaimer {
+      padding: 20px;
+      font-size: 11px;
+      color: var(--ink3);
+      line-height: 1.7;
+      background: var(--paper-warm);
+      border-radius: var(--radius-sm);
+      margin-top: 8px;
+      border: 1px solid var(--rule);
+    }
+    .bottom-bar {
+      position: fixed;
+      bottom: 56px;
+      left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+      border-top: 1px solid var(--rule);
+      padding: 14px 20px;
+      z-index: 90;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0));
+      backdrop-filter: blur(10px);
+    }
+    .bottom-bar .btn-desktop {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-d) 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--blue-glow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .bottom-bar .btn-desktop:active { transform: scale(0.98); }
+    .loading, .error { text-align: center; padding: 60px 20px; color: var(--ink3); font-size: 15px; }
+    .error { color: #b91c1c; }
+    table.data-table {
+      width: 100%;
+      font-size: 13px;
+      border-collapse: collapse;
+    }
+    table.data-table th, table.data-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+    }
+    table.data-table thead th {
+      background: var(--paper);
+      color: var(--ink2);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    table.data-table tbody tr:nth-child(even) { background: #fafbfc; }
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 14px;
+    }
+    .score-row:last-child { border-bottom: none; }
+    .score-row strong { color: var(--blue-d); font-weight: 800; }
+    .chart-wrap { position: relative; height: 240px; padding: 16px 0; }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <a href="product-list-v2.html" aria-label="返回">←</a>
+    <span class="title" id="topTitle"><span>AIA</span> · 储蓄险</span>
+    <button type="button" class="add-btn" id="headerShortlistBtn" aria-label="加入清单" style="display:none;">＋</button>
+  </header>
+
+  <div id="loading" class="loading">加载中…</div>
+  <div id="error" class="error" style="display:none;"></div>
+
+  <div id="main" style="display:none;" class="content-wrap">
+    <div class="hero">
+      <h1 id="productName">—</h1>
+      <div class="name-en" id="productNameEn">—</div>
+      <div class="tags" id="productTags">—</div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-box">
+        <div class="metric-val" id="mVal1">—</div>
+        <div class="metric-lbl" id="mLbl1">20年IRR</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="mVal2">—</div>
+        <div class="metric-lbl" id="mLbl2">回本年</div>
+      </div>
+      <div class="metric-box" id="metricBox3">
+        <div class="metric-val" id="mVal3">—</div>
+        <div class="metric-lbl" id="mLbl3">分红率</div>
+      </div>
+    </div>
+
+    <div class="section always-open" id="secConclusion">
+      <div class="section-head">精算结论</div>
+      <div class="section-body">
+        <div class="section-body-inner">
+          <div id="contentZh" style="font-size:15px;line-height:1.75;color:var(--ink2);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="secLiquidity">
+      <div class="section-head">▶ 流动性分析 <span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="section-body-inner" id="contentLiquidity"></div>
+      </div>
+    </div>
+
+    <div class="section" id="secChart">
+      <div class="section-head">▶ 收益曲线 <span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="section-body-inner">
+          <div class="chart-wrap"><canvas id="chartCanvas"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="secScores">
+      <div class="section-head">▶ 精算评分 <span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="section-body-inner" id="contentScores"></div>
+      </div>
+    </div>
+
+    <div class="section" id="secTable">
+      <div class="section-head">▶ 完整数据表 <span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="section-body-inner">
+          <div style="overflow-x:auto;"><table class="data-table" id="dataTable"></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="secRisk">
+      <div class="section-head">▶ 风险提示 <span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="section-body-inner" style="font-size:13px;line-height:1.6;color:var(--ink2);">
+          <p>分红及非保证收益受保司投资表现影响，过往数据不代表未来。早期退保可能产生损失，请根据自身流动性需求与持有期限评估。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      本页数据来源：保司官方演示文件及 HKIA 公开披露。<br>
+      IRR 基于统一假设（30岁女，5年缴），仅供参考，不构成个人投资建议。<br>
+      实际收益因人而异，请咨询持牌保险顾问。
+    </div>
+  </div>
+
+  <div class="bottom-bar" id="bottomBar" style="display:none;">
+    <a href="#" class="btn-desktop" id="linkDesktop">查看桌面完整版 →</a>
+  </div>
+  <nav class="bottom-tabs" id="bottomTabs" style="display:none;">
+    <a href="index-v2.html" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span>首页</span>
+    </a>
+    <a href="product-list-v2.html?t=savings" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>储蓄险</span>
+    </a>
+    <a href="product-list-v2.html?t=whole_life" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span>终身寿</span>
+    </a>
+    <a href="product-list-v2.html?t=critical_illness" class="btab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <span>重疾险</span>
+    </a>
+  </nav>
+
+  <script>
+    function getApiBase() {
+      const params = new URLSearchParams(location.search);
+      if (params.get('api')) return params.get('api').replace(/\/$/, '');
+      return window.API_BASE || '/api/v1';
+    }
+    const SHORTLIST_KEY = 'hm_shortlist';
+    const MAX_SHORTLIST = 3;
+    function getShortlist() {
+      try {
+        const raw = localStorage.getItem(SHORTLIST_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.slice(0, MAX_SHORTLIST) : [];
+      } catch (e) { return []; }
+    }
+    function setShortlist(arr) {
+      const out = arr.slice(0, MAX_SHORTLIST);
+      localStorage.setItem(SHORTLIST_KEY, JSON.stringify(out));
+      return out;
+    }
+    function isInShortlist(slug) { return getShortlist().indexOf(slug) >= 0; }
+    function addToShortlist(slug) {
+      const list = getShortlist();
+      if (list.indexOf(slug) >= 0 || list.length >= MAX_SHORTLIST) return;
+      setShortlist(list.concat(slug));
+      updateShortlistButton();
+    }
+    function removeFromShortlist(slug) {
+      setShortlist(getShortlist().filter(s => s !== slug));
+      updateShortlistButton();
+    }
+    function toggleShortlist(slug) {
+      if (isInShortlist(slug)) removeFromShortlist(slug);
+      else addToShortlist(slug);
+    }
+    function updateShortlistButton() {
+      const link = document.getElementById('linkDesktop');
+      const slug = link && link.getAttribute('data-slug');
+      const btn = document.getElementById('headerShortlistBtn');
+      if (!btn) return;
+      if (!slug) { btn.style.display = 'none'; return; }
+      btn.style.display = 'flex';
+      if (isInShortlist(slug)) {
+        btn.textContent = '✓';
+        btn.classList.add('in-list');
+      } else {
+        btn.textContent = '＋';
+        btn.classList.remove('in-list');
+      }
+    }
+
+    let product = null;
+    let chartInstance = null;
+
+    function getSlug() {
+      const params = new URLSearchParams(location.search);
+      return params.get('id') || '';
+    }
+
+    function accordion() {
+      document.querySelectorAll('.section:not(.always-open) .section-head').forEach(head => {
+        head.addEventListener('click', () => {
+          const section = head.closest('.section');
+          const body = section && section.querySelector('.section-body');
+          const isOpen = section.classList.contains('open');
+          document.querySelectorAll('.section:not(.always-open)').forEach(s => {
+            s.classList.remove('open');
+            const b = s.querySelector('.section-body');
+            if (b) b.style.maxHeight = null;
+          });
+          if (!isOpen) {
+            section.classList.add('open');
+            if (body) {
+              body.style.maxHeight = (section.id === 'secChart' || section.id === 'secTable' ? 600 : 400) + 'px';
+              if (section.id === 'secChart' && chartInstance) setTimeout(() => chartInstance.resize(), 80);
+            }
+          }
+        });
+      });
+    }
+
+    function buildTimeline(p) {
+      const act = p.actuarial || {};
+      const ad = p.audit_data || {};
+      let timeline = ad.timeline && typeof ad.timeline === 'object' ? ad.timeline : null;
+      if (!timeline || Object.keys(timeline).length === 0) {
+        const premYrs = act.premium_years || 5;
+        const prem = act.premium_annual || 50000;
+        const totalPaid = prem * premYrs;
+        const irr = (act.irr_20y != null ? act.irr_20y : 5) / 100;
+        timeline = {};
+        [1,2,3,5,7,10,15,20].forEach(yr => {
+          let factor = yr <= premYrs ? (yr / premYrs) * 0.7 : 0.7 + (yr - premYrs) * 0.03;
+          if (yr > 10) factor = (timeline[10] ? (timeline[10].gcv + (timeline[10].div_mid || 0)) / totalPaid : 0.9) * Math.pow(1 + irr * 0.5, yr - 10);
+          const base = Math.round(totalPaid * Math.min(factor, 2));
+          timeline[yr] = { gcv: Math.round(base * 0.6), div_mid: Math.round(base * 0.35), div_opt: Math.round(base * 0.4) };
+        });
+      }
+      return timeline;
+    }
+
+    function renderChart(p) {
+      const timeline = buildTimeline(p);
+      const years = Object.keys(timeline).map(Number).sort((a,b)=>a-b);
+      const totals = years.map(yr => {
+        const t = timeline[yr];
+        const g = t && (t.gcv != null) ? t.gcv : 0;
+        const d = t && (t.div_mid != null) ? t.div_mid : (t && t.div_opt != null ? t.div_opt : 0);
+        return g + d;
+      });
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+      if (chartInstance) chartInstance.destroy();
+      const ctx = canvas.getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: years.map(y => y + '年'),
+          datasets: [{ label: '总现金价值', data: totals, borderColor: '#0096c7', backgroundColor: 'rgba(0,150,199,0.12)', fill: true, tension: 0.25 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function renderTable(p) {
+      const timeline = buildTimeline(p);
+      const years = Object.keys(timeline).map(Number).sort((a,b)=>a-b);
+      const thead = '<tr><th>年度</th><th>保证</th><th>非保证(中)</th><th>合计</th></tr>';
+      const rows = years.map(yr => {
+        const t = timeline[yr];
+        const g = t && (t.gcv != null) ? t.gcv : '—';
+        const d = t && (t.div_mid != null) ? t.div_mid : (t && t.div_opt != null ? t.div_opt : '—');
+        const sum = (typeof g === 'number' && typeof d === 'number') ? g + d : '—';
+        return `<tr><td>${yr}年</td><td>${g}</td><td>${d}</td><td>${sum}</td></tr>`;
+      }).join('');
+      const table = document.getElementById('dataTable');
+      if (table) table.innerHTML = '<thead>' + thead + '</thead><tbody>' + rows + '</tbody>';
+    }
+
+    function calcScoresSimple(p) {
+      const act = p.actuarial || {};
+      const meta = p.meta || {};
+      const irr = act.irr_20y != null ? act.irr_20y : 0;
+      const be = act.breakeven_year != null ? act.breakeven_year : 99;
+      const liq = act.max_early_exit_loss_pct != null ? (act.max_early_exit_loss_pct > 30 ? 4 : act.max_early_exit_loss_pct > 15 ? 6 : 8) : null;
+      const ltv = act.loan_ltv != null ? (act.loan_ltv >= 80 ? 9 : act.loan_ltv >= 60 ? 7 : 5) : null;
+      return [
+        { label: '收益潜力', score: irr >= 4 ? 8 : irr >= 3 ? 6 : 5 },
+        { label: '回本速度', score: be <= 8 ? 8 : be <= 12 ? 6 : 5 },
+        { label: '流动性', score: liq != null ? liq : '—' },
+        { label: '贷款价值', score: ltv != null ? ltv : '—' }
+      ];
+    }
+
+    async function load() {
+      const slug = getSlug();
+      if (!slug) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = '缺少产品 ID';
+        return;
+      }
+      try {
+        const res = await fetch(getApiBase() + '/products/' + encodeURIComponent(slug));
+        if (!res.ok) throw new Error(res.status === 404 ? '产品不存在' : 'HTTP ' + res.status);
+        const data = await res.json();
+        product = data;
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = e.message || '加载失败';
+        return;
+      }
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main').style.display = 'block';
+      document.getElementById('bottomBar').style.display = 'block';
+      document.getElementById('bottomTabs').style.display = 'flex';
+
+      const m = product.meta || {};
+      const a = product.actuarial || {};
+      var typeLabel = product.product_type === 'whole_life' ? '终身寿' : product.product_type === 'critical_illness' ? '重疾险' : '储蓄险';
+      const tagList = (product.tags || []).slice(0, 4).map(x => typeof x === 'object' ? (x.zh || x.en || x.hk) : x).filter(Boolean);
+      if (m.currency && !tagList.includes(m.currency)) tagList.unshift(m.currency);
+      var displayTags = [typeLabel].concat(tagList);
+
+      const COMPANY_ZH = { 'AIA':'友邦','Manulife':'宏利','Prudential':'保诚','FWD':'富卫','Sun Life':'永明','SunLife':'永明','YF Life':'万通','YFLife':'万通','HSBC':'汇丰','Zurich':'苏黎世','China Life':'中国人寿','ChinaLife':'中国人寿','BOC Life':'中银','BOCLife':'中银','AXA':'安盛','CTFLife':'中信保诚','GENERALI':'忠利' };
+      const companyStr = m.company || '';
+      const companyDisp = (COMPANY_ZH[companyStr] || '') ? (COMPANY_ZH[companyStr] + ' ' + companyStr) : companyStr;
+      document.getElementById('topTitle').innerHTML = '<span>' + companyDisp + '</span> · ' + typeLabel;
+      document.getElementById('productName').textContent = m.name || product.product_name_cn || slug;
+      document.getElementById('productNameEn').textContent = m.name_en || product.product_name_en || '';
+      document.getElementById('productTags').innerHTML = displayTags.length ? displayTags.map(t => '<span class="tag-pill">' + t + '</span>').join('') : '—';
+
+      var pType = product.product_type || (m.type) || 'savings';
+      if (pType === 'critical_illness') {
+        document.getElementById('mLbl1').textContent = '病种数';
+        document.getElementById('mLbl2').textContent = '多重赔付';
+        document.getElementById('mVal1').textContent = (a.covered_conditions_count != null ? a.covered_conditions_count + '种' : '—');
+        document.getElementById('mVal2').textContent = (a.multi_pay ? '支持' : (a.multi_pay === false ? '单次' : '—'));
+        var r = m.rating || '—';
+        var rSrc = product.meta && product.meta.rating_source_url;
+        var rAgency = product.meta && product.meta.rating_agency;
+        var box3 = document.getElementById('metricBox3');
+        box3.classList.add('metric-rating-box');
+        box3.innerHTML = '<div class="metric-val">' + r + '</div><div class="metric-lbl">保司评级</div>' +
+          (rSrc ? '<div class="metric-src">来源 <a href="' + rSrc + '" target="_blank" rel="noopener">' + (rAgency || '链接') + '</a></div>' : (rAgency ? '<div class="metric-src">' + rAgency + '</div>' : ''));
+      } else if (pType === 'whole_life') {
+        var box3 = document.getElementById('metricBox3');
+        box3.classList.remove('metric-rating-box');
+        box3.innerHTML = '<div class="metric-val" id="mVal3">' + (a.loan_ltv != null ? a.loan_ltv + '%' : '—') + '</div><div class="metric-lbl" id="mLbl3">贷款成数</div>';
+        document.getElementById('mLbl1').textContent = '20年IRR';
+        document.getElementById('mLbl2').textContent = '回本年';
+        document.getElementById('mVal1').textContent = a.irr_20y != null ? a.irr_20y + '%' : '—';
+        document.getElementById('mVal2').textContent = a.breakeven_year != null ? a.breakeven_year + '年' : '—';
+      } else {
+        var box3 = document.getElementById('metricBox3');
+        box3.classList.remove('metric-rating-box');
+        box3.innerHTML = '<div class="metric-val" id="mVal3">' + (a.dividend_fulfillment_5y != null ? a.dividend_fulfillment_5y + '%' : '—') + '</div><div class="metric-lbl" id="mLbl3">分红率</div>';
+        document.getElementById('mLbl1').textContent = '20年IRR';
+        document.getElementById('mLbl2').textContent = '回本年';
+        document.getElementById('mVal1').textContent = a.irr_20y != null ? a.irr_20y + '%' : '—';
+        document.getElementById('mVal2').textContent = a.breakeven_year != null ? a.breakeven_year + '年' : '—';
+      }
+
+      const contentZh = product.content_zh || '';
+      document.getElementById('contentZh').innerHTML = contentZh ? contentZh.replace(/\n/g, '<br>') : '<span style="color:var(--ink3);">暂无精算结论</span>';
+
+      const earlyExit = a.max_early_exit_loss_pct != null ? a.max_early_exit_loss_pct + '%' : '—';
+      const ltv = a.loan_ltv != null ? a.loan_ltv + '%' : '—';
+      document.getElementById('contentLiquidity').innerHTML = '<p style="font-size:13px;line-height:1.6;color:var(--ink2);">早期退保损失（相对已缴保费）：<strong>' + earlyExit + '</strong></p><p style="font-size:13px;line-height:1.6;color:var(--ink2);margin-top:8px;">保单贷款成数（LTV）：<strong>' + ltv + '</strong></p><p style="font-size:12px;color:var(--ink3);margin-top:12px;">短期持有下 IRR 可能为负，请根据资金使用期限与流动性需求评估。</p>';
+
+      const rawScores = product.scores;
+      const scoreList = Array.isArray(rawScores) ? rawScores : (rawScores && Array.isArray(rawScores.dimensions) ? rawScores.dimensions : null) || calcScoresSimple(product);
+      const scoreRows = (Array.isArray(scoreList) ? scoreList : []).map(d => {
+        const s = typeof d.score === 'number' ? d.score : (d.score != null ? d.score : '—');
+        return '<div class="score-row"><span>' + (d.label || d.name) + '</span><strong>' + s + '</strong></div>';
+      }).join('');
+      document.getElementById('contentScores').innerHTML = scoreRows || '<p style="color:var(--ink3);font-size:13px;">待录入</p>';
+
+      renderChart(product);
+      renderTable(product);
+      accordion();
+
+      const linkDesktop = document.getElementById('linkDesktop');
+      linkDesktop.href = 'product-detail.html?id=' + encodeURIComponent(slug);
+      linkDesktop.setAttribute('data-slug', slug);
+      document.getElementById('headerShortlistBtn').addEventListener('click', () => toggleShortlist(slug));
+      updateShortlistButton();
+    }
+
+    document.addEventListener('DOMContentLoaded', load);
+  </script>
+</body>
+</html>
