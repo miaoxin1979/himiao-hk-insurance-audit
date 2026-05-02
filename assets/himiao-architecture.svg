@@ -1,0 +1,58 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F"/>
+      <stop offset="0.52" stop-color="#0F1F2E"/>
+      <stop offset="1" stop-color="#0E3A38"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#172033"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="560" rx="30" fill="url(#bg)"/>
+  <text x="60" y="74" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">HiMiao Hong Kong Insurance Audit Platform</text>
+  <text x="60" y="110" fill="#A7F3D0" font-family="Inter, Arial, sans-serif" font-size="18">Public product intelligence · Admin review workflow · FastAPI backend</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="168" width="250" height="190" rx="20" fill="url(#panel)" stroke="#334155"/>
+    <text x="94" y="218" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Public Site</text>
+    <text x="94" y="258" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">Product list/detail</text>
+    <text x="94" y="286" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">Editorial content</text>
+    <text x="94" y="314" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">EN / 中文 / 繁體</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="370" y="168" width="250" height="190" rx="20" fill="#082F49" stroke="#38BDF8"/>
+    <text x="404" y="218" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Admin Console</text>
+    <text x="404" y="258" fill="#BAE6FD" font-family="Inter, Arial, sans-serif" font-size="16">Data entry</text>
+    <text x="404" y="286" fill="#BAE6FD" font-family="Inter, Arial, sans-serif" font-size="16">Draft / publish review</text>
+    <text x="404" y="314" fill="#BAE6FD" font-family="Inter, Arial, sans-serif" font-size="16">Insurance audit fields</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="680" y="168" width="250" height="190" rx="20" fill="#052E2B" stroke="#2DD4BF"/>
+    <text x="714" y="218" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">FastAPI Backend</text>
+    <text x="714" y="258" fill="#CCFBF1" font-family="Inter, Arial, sans-serif" font-size="16">Auth / JWT</text>
+    <text x="714" y="286" fill="#CCFBF1" font-family="Inter, Arial, sans-serif" font-size="16">Products / articles</text>
+    <text x="714" y="314" fill="#CCFBF1" font-family="Inter, Arial, sans-serif" font-size="16">SQLite by default</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="990" y="168" width="150" height="190" rx="20" fill="#422006" stroke="#F59E0B"/>
+    <text x="1022" y="218" fill="#FFFBEB" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">AI Assist</text>
+    <text x="1022" y="258" fill="#FDE68A" font-family="Inter, Arial, sans-serif" font-size="15">Local LLM</text>
+    <text x="1022" y="286" fill="#FDE68A" font-family="Inter, Arial, sans-serif" font-size="15">Parsing</text>
+    <text x="1022" y="314" fill="#FDE68A" font-family="Inter, Arial, sans-serif" font-size="15">Optional</text>
+  </g>
+
+  <path d="M310 264H370" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M620 264H680" stroke="#2DD4BF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M930 264H990" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+
+  <rect x="200" y="420" width="800" height="72" rx="18" fill="#0F172A" stroke="#334155"/>
+  <text x="260" y="464" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">Sanitized public export · No production database · No secrets · MIT licensed</text>
+</svg>
